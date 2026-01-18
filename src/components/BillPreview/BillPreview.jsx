@@ -33,12 +33,13 @@ function BillPreview({
 
                 {/* Header */}
                 <div className="print-header">
-                    {/* Left - Logo & Greeting */}
+                    <span className="ph-left-greeting">{greeting}</span>
+
+                    {/* Left - Logo */}
                     <div className="ph-left">
                         <div className="bill-logo">
                             <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
                         </div>
-                        <span className="ph-left-greeting">{greeting}</span>
                     </div>
 
                     {/* Center - Business Info */}
@@ -126,7 +127,7 @@ function BillPreview({
                                 {labels.total}
                             </td>
                             <td className="text-center">{formatWeight(totalKg)}</td>
-                            <td className="text-center">{totalRs}</td>
+                            <td className="text-center"><span style={{ fontSize: '14px', marginRight: '2px' }}>ரூ</span> {totalRs}</td>
                         </tr>
                     </tfoot>
                 </table>

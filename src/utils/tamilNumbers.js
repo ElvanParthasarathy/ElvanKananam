@@ -1,11 +1,11 @@
 /**
  * Tamil Number to Words Converter
  * 
- * Converts numeric values to Tamil words (up to 1 crore / 10 million)
- * Properly handles Tamil number naming conventions
+ * Converts numeric values to Tamil words with proper Sandhi rules (grammar joining).
+ * Example: 57 -> ஐம்பத்தேழு (not ஐம்பத்து ஏழு)
+ * Example: 500 oblique -> ஐந்நூற்று
  */
 
-// Units 1-19
 const ones = [
     '', 'ஒன்று', 'இரண்டு', 'மூன்று', 'நான்கு',
     'ஐந்து', 'ஆறு', 'ஏழு', 'எட்டு', 'ஒன்பது',
@@ -13,32 +13,19 @@ const ones = [
     'பதினைந்து', 'பதினாறு', 'பதினேழு', 'பதினெட்டு', 'பத்தொன்பது'
 ];
 
-// Tens 20, 30, 40, etc.
-const tens = [
+// Base tens (20, 30...90)
+const tensBase = [
     '', '', 'இருபது', 'முப்பது', 'நாற்பது',
     'ஐம்பது', 'அறுபது', 'எழுபது', 'எண்பது', 'தொண்ணூறு'
 ];
 
-// Compound tens (when followed by units) - e.g., 21 = இருபத்தி ஒன்று
-const tensCompound = [
-    '', '', 'இருபத்தி', 'முப்பத்தி', 'நாற்பத்தி',
-    'ஐம்பத்தி', 'அறுபத்தி', 'எழுபத்தி', 'எண்பத்தி', 'தொண்ணூற்றி'
+// Oblique tens (20, 30...90 used when combining)
+const tensOblique = [
+    '', '', 'இருபத்து', 'முப்பத்து', 'நாற்பத்து',
+    'ஐம்பத்து', 'அறுபத்து', 'எழுபத்து', 'எண்பத்து', 'தொண்ணூற்று'
 ];
 
-// Hundreds standalone vs compound
-const hundredsCompound = {
-    1: 'நூற்றி',
-    2: 'இருநூற்றி',
-    3: 'முந்நூற்றி',
-    4: 'நானூற்றி',
-    5: 'ஐந்நூற்றி',
-    6: 'அறுநூற்றி',
-    7: 'எழுநூற்றி',
-    8: 'எண்ணூற்றி',
-    9: 'தொள்ளாயிரத்தி'
-};
-
-const hundredsStandalone = {
+const hundredsBase = {
     1: 'நூறு',
     2: 'இருநூறு',
     3: 'முந்நூறு',
@@ -50,69 +37,96 @@ const hundredsStandalone = {
     9: 'தொள்ளாயிரம்'
 };
 
-// Thousands
-const thousandsCompound = {
-    1: 'ஆயிரத்தி',
-    2: 'இரண்டாயிரத்தி',
-    3: 'மூவாயிரத்தி',
-    4: 'நாலாயிரத்தி',
-    5: 'ஐயாயிரத்தி',
-    6: 'ஆறாயிரத்தி',
-    7: 'ஏழாயிரத்தி',
-    8: 'எட்டாயிரத்தி',
-    9: 'ஒன்பதாயிரத்தி',
-    10: 'பத்தாயிரத்தி',
-    11: 'பதினோராயிரத்தி',
-    12: 'பன்னிரெண்டாயிரத்தி',
-    13: 'பதிமூன்றாயிரத்தி',
-    14: 'பதினாலாயிரத்தி',
-    15: 'பதினைந்தாயிரத்தி',
-    16: 'பதினாறாயிரத்தி',
-    17: 'பதினேழாயிரத்தி',
-    18: 'பதினெட்டாயிரத்தி',
-    19: 'பத்தொன்பதாயிரத்தி',
-    20: 'இருபதாயிரத்தி'
+const hundredsOblique = {
+    1: 'நூற்று',
+    2: 'இருநூற்று',
+    3: 'முந்நூற்று',
+    4: 'நானூற்று',
+    5: 'ஐந்நூற்று',
+    6: 'அறுநூற்று',
+    7: 'எழுநூற்று',
+    8: 'எண்ணூற்று',
+    9: 'தொள்ளாயிரத்து'
 };
 
-const thousandsStandalone = {
-    1: 'ஆயிரம்',
-    2: 'இரண்டாயிரம்',
-    3: 'மூவாயிரம்',
-    4: 'நாலாயிரம்',
-    5: 'ஐயாயிரம்',
-    6: 'ஆறாயிரம்',
-    7: 'ஏழாயிரம்',
-    8: 'எட்டாயிரம்',
-    9: 'ஒன்பதாயிரம்',
-    10: 'பத்தாயிரம்',
-    11: 'பதினோராயிரம்',
-    12: 'பன்னிரெண்டாயிரம்',
-    13: 'பதிமூன்றாயிரம்',
-    14: 'பதினாலாயிரம்',
-    15: 'பதினைந்தாயிரம்',
-    16: 'பதினாறாயிரம்',
-    17: 'பதினேழாயிரம்',
-    18: 'பதினெட்டாயிரம்',
-    19: 'பத்தொன்பதாயிரம்',
-    20: 'இருபதாயிரம்'
+// Vowel signs mapping
+const vowelSigns = {
+    'அ': '',
+    'ஆ': 'ா',
+    'இ': 'ி',
+    'ஈ': 'ீ',
+    'உ': 'ு',
+    'ஊ': 'ூ',
+    'எ': 'ெ',
+    'ஏ': 'ே',
+    'ஐ': 'ை',
+    'ஒ': 'ொ',
+    'ஓ': 'ோ',
+    'ஔ': 'ௌ'
 };
 
 /**
- * Convert numbers under 100
+ * Helper to join two Tamil words using Sandhi rules.
+ * Specifically handles words ending in 'u' (து, று, டு) joining with words starting with vowels.
  */
-function convertUnder100(n) {
-    if (n < 20) return ones[n];
-    const tensDigit = Math.floor(n / 10);
-    const onesDigit = n % 10;
-    if (onesDigit === 0) {
-        return tens[tensDigit];
+function joinTamil(word1, word2) {
+    if (!word1) return word2;
+    if (!word2) return word1;
+
+    const vowels = ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ'];
+    const firstChar = Array.from(word2)[0];
+
+    // Check if word2 starts with a vowel
+    if (vowels.includes(firstChar)) {
+        let root = word1;
+        let base = '';
+
+        // Handle specific endings common in numbers (து, று, டு)
+        if (root.endsWith('து')) {
+            // Remove 'து', add 'த்'
+            base = root.substring(0, root.length - 'து'.length) + 'த்';
+        } else if (root.endsWith('று')) {
+            // Remove 'று', add 'ற்'
+            base = root.substring(0, root.length - 'று'.length) + 'ற்';
+        } else if (root.endsWith('டு')) {
+            // Remove 'டு', add 'ட்'
+            base = root.substring(0, root.length - 'டு'.length) + 'ட்';
+        } else {
+            // If no match, just space join (fallback)
+            return word1 + ' ' + word2;
+        }
+
+        // Now add the vowel sign to the base consonant
+        // The base ends with the consonant + virama.
+        // We assume valid Tamil unicode sequence (Consonant + Virama).
+        // e.g. 'த்' is 'த' + '்'.
+        // We remove the virama ('்') and add the vowel sign.
+
+        // Remove last char (virama)
+        let consonantBase = base.substring(0, base.length - 1);
+        let sign = vowelSigns[firstChar];
+
+        // Return Joined String: ConsonantBase + VowelSign + RestOfWord2
+        return consonantBase + sign + word2.substring(firstChar.length);
     }
-    return tensCompound[tensDigit] + ' ' + ones[onesDigit];
+
+    // Default: Join with space
+    return word1 + ' ' + word2;
 }
 
-/**
- * Convert numbers under 1000
- */
+function convertUnder100(n) {
+    if (n < 20) return ones[n];
+
+    const tensDigit = Math.floor(n / 10);
+    const onesDigit = n % 10;
+
+    if (onesDigit === 0) {
+        return tensBase[tensDigit];
+    }
+
+    return joinTamil(tensOblique[tensDigit], ones[onesDigit]);
+}
+
 function convertUnder1000(n) {
     if (n < 100) return convertUnder100(n);
 
@@ -120,81 +134,50 @@ function convertUnder1000(n) {
     const remainder = n % 100;
 
     if (remainder === 0) {
-        return hundredsStandalone[hundredsDigit];
+        return hundredsBase[hundredsDigit];
     }
-    return hundredsCompound[hundredsDigit] + ' ' + convertUnder100(remainder);
+
+    return joinTamil(hundredsOblique[hundredsDigit], convertUnder100(remainder));
 }
 
-/**
- * Convert numbers under 100000 (1 lakh)
- */
 function convertUnder100000(n) {
     if (n < 1000) return convertUnder1000(n);
 
     const thousands = Math.floor(n / 1000);
     const remainder = n % 1000;
 
-    let result = '';
+    let thousandsStr = convertUnder100(thousands);
+    let suffix = (remainder === 0) ? 'ஆயிரம்' : 'ஆயிரத்து';
 
-    // Handle thousands part
-    if (thousands <= 20 && thousandsCompound[thousands] && remainder > 0) {
-        result = thousandsCompound[thousands];
-    } else if (thousands <= 20 && thousandsStandalone[thousands] && remainder === 0) {
-        return thousandsStandalone[thousands];
-    } else if (thousands <= 20 && remainder > 0) {
-        result = thousandsCompound[thousands] || (convertUnder100(thousands) + ' ஆயிரத்தி');
-    } else if (thousands <= 20 && remainder === 0) {
-        return thousandsStandalone[thousands] || (convertUnder100(thousands) + ' ஆயிரம்');
-    } else {
-        // For thousands > 20
-        if (remainder > 0) {
-            result = convertUnder100(thousands) + ' ஆயிரத்தி';
-        } else {
-            return convertUnder100(thousands) + ' ஆயிரம்';
-        }
-    }
+    let thousandPart = joinTamil(thousandsStr, suffix);
 
-    if (remainder > 0) {
-        result += ' ' + convertUnder1000(remainder);
-    }
+    if (remainder === 0) return thousandPart;
 
-    return result;
+    return thousandPart + ' ' + convertUnder1000(remainder);
 }
 
-/**
- * Convert numbers under 1 crore (10 million)
- */
 function convert(n) {
     if (n === 0) return 'பூஜ்ஜியம்';
     if (n < 100000) return convertUnder100000(n);
 
-    // Handle lakhs
     const lakhs = Math.floor(n / 100000);
     const remainder = n % 100000;
 
-    let result = '';
+    let lakhPart = '';
 
     if (lakhs === 1) {
-        result = remainder > 0 ? 'ஒரு இலட்சத்தி' : 'ஒரு இலட்சம்';
-    } else if (lakhs < 10) {
-        result = ones[lakhs] + (remainder > 0 ? ' இலட்சத்தி' : ' இலட்சம்');
+        lakhPart = (remainder === 0) ? 'ஒரு லட்சம்' : 'ஒரு லட்சத்து';
     } else {
-        result = convertUnder100(lakhs) + (remainder > 0 ? ' இலட்சத்தி' : ' இலட்சம்');
+        let lakhsStr = convertUnder100(lakhs);
+        let suffix = (remainder === 0) ? 'லட்சம்' : 'லட்சத்து';
+        lakhPart = joinTamil(lakhsStr, suffix);
     }
 
-    if (remainder > 0) {
-        result += ' ' + convertUnder100000(remainder);
-    }
+    if (remainder === 0) return lakhPart;
 
-    return result;
+    return lakhPart + ' ' + convertUnder100000(remainder);
 }
 
-/**
- * Convert a number to Tamil words with currency suffix
- * @param {number} num - The number to convert
- * @param {string} suffix - Currency suffix (default: 'ரூபாய் மட்டும்')
- * @returns {string} Tamil representation
- */
 export function numberToWordsTamil(num, suffix = 'ரூபாய் மட்டும்') {
     if (num === 0) return 'பூஜ்ஜியம்';
     if (typeof num !== 'number' || isNaN(num)) return '';
