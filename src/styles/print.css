@@ -7,13 +7,13 @@
 
 /* ========== COLOR VARIABLES FOR BILL ========== */
 :root {
-    --bill-primary: #1b5e20;
+    --bill-primary: #388e3c;
     --bill-primary-light: #e8f5e9;
-    --bill-primary-dark: #2d5a30;
-    --bill-accent: #2e7d32;
-    --bill-border: #1b5e20;
-    --bill-text: #1b5e20;
-    --bill-text-dark: #0d3d12;
+    --bill-primary-dark: #388e3c;
+    --bill-accent: #4caf50;
+    --bill-border: #388e3c;
+    --bill-text: #388e3c;
+    --bill-text-dark: #2e7d32;
     --bill-row-alt: #f8faf8;
 }
 
@@ -55,23 +55,29 @@
     padding: 15px 0;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .header-logo {
     flex-shrink: 0;
 }
 
 .header-logo img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
-    filter: sepia(100%) saturate(300%) hue-rotate(85deg);
+    filter: invert(42%) sepia(61%) saturate(545%) hue-rotate(85deg) brightness(89%) contrast(88%);
 }
 
-.header-company {
-    text-align: right;
+.header-company-info {
+    text-align: left;
 }
 
 .company-name {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--bill-primary);
     line-height: 1.2;
@@ -84,13 +90,33 @@
     margin-top: 4px;
 }
 
+.header-right {
+    text-align: right;
+    display: flex;
+    align-items: center;
+}
+
+/* Address Row - Below Logo */
+.address-row {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #333;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 19px;
+    margin-top: -45px;
+}
+
 .bill-type-badge {
     display: inline-block;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--bill-primary);
-    margin-top: 8px;
-    font-style: italic;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-style: normal;
+    font-family: var(--font-primary);
 }
 
 /* ========== DIVIDER LINE ========== */
@@ -102,31 +128,23 @@
 
 /* ========== BILL INFO SECTION ========== */
 .bill-info-section {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-.bill-info-row {
+.bill-meta-row {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 30px;
     margin-bottom: 15px;
-}
-
-.bill-to-badge {
-    background: var(--bill-primary-dark);
-    color: white;
-    padding: 8px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    padding: 8px 12px;
+    background: var(--bill-primary-light);
+    border-radius: 8px;
 }
 
 .bill-meta {
     font-size: 13px;
-    font-weight: 500;
-    color: #444;
+    font-weight: 600;
+    color: var(--bill-text-dark);
 }
 
 .bill-meta strong {
@@ -135,15 +153,26 @@
 }
 
 .customer-info {
-    margin-top: 10px;
     padding-left: 5px;
 }
 
-.customer-name {
+.customer-name-simple {
     font-size: 18px;
     font-weight: 700;
     color: #000;
     margin-bottom: 5px;
+}
+
+.customer-city-simple {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+}
+
+.customer-label {
+    font-weight: 700;
+    color: var(--bill-primary);
+    margin-right: 5px;
 }
 
 .customer-address {
@@ -263,33 +292,67 @@
     font-size: 28px;
     font-weight: 700;
     color: var(--bill-primary);
-    font-style: italic;
+    font-style: normal;
+    font-family: var(--font-primary);
 }
 
 .footer-right {
-    text-align: center;
-    min-width: 200px;
+    text-align: right;
 }
 
-.sign-line {
-    border-bottom: 1px solid var(--bill-primary);
-    min-width: 180px;
-    height: 40px;
+.sign-company {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bill-primary);
+    margin-bottom: 5px;
+}
+
+.sign-space {
+    height: 50px;
+    margin-bottom: 5px;
 }
 
 .sign-label {
     font-size: 12px;
-    margin-top: 8px;
+    font-weight: 600;
     color: #555;
 }
 
-/* ========== CONTACT ROW ========== */
+/* ========== CONTACT SECTION ========== */
+.contact-section {
+    margin-top: 20px;
+    margin-left: -12mm;
+    margin-right: -12mm;
+    margin-bottom: -8mm;
+    padding: 15px 12mm;
+    background: var(--bill-primary-light);
+    border-radius: 0;
+    border: none;
+}
+
+.contact-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bill-primary);
+    margin-bottom: 10px;
+}
+
 .contact-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    align-items: flex-start;
+}
+
+.contact-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-address {
+    font-size: 11px;
+    color: #333;
+    font-weight: 500;
 }
 
 .contact-email {
@@ -628,7 +691,8 @@
     /* Hide UI */
     .editor-wrapper,
     .preview-actions,
-    .login-container {
+    .login-container,
+    .logout-btn {
         display: none !important;
     }
 

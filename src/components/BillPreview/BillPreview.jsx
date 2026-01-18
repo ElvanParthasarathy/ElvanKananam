@@ -39,41 +39,42 @@ function BillPreview({
 
                 {/* Header */}
                 <div className="print-header-new">
-                    {/* Left - Logo */}
-                    <div className="header-logo">
-                        <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
+                    {/* Left - Logo + Company Name */}
+                    <div className="header-left">
+                        <div className="header-logo">
+                            <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
+                        </div>
+                        <div className="header-company-info">
+                            <div className="company-name font-display">
+                                {name.english}
+                            </div>
+                            <div className="company-subtitle">{name.tamil}</div>
+                        </div>
                     </div>
 
-                    {/* Right - Company Name & Bill Type */}
-                    <div className="header-company">
-                        <div className="company-name font-display">
-                            {name.english}
-                        </div>
-                        <div className="company-subtitle">{name.tamil}</div>
-                        <div className="bill-type-badge font-display">{billType}</div>
+                    {/* Right - Bill Type */}
+                    <div className="header-right">
+                        <div className="bill-type-badge font-tamil">{billType}</div>
                     </div>
                 </div>
+
+
 
                 {/* Divider Line */}
                 <div className="header-divider"></div>
 
                 {/* Bill Info Section */}
                 <div className="bill-info-section">
-                    <div className="bill-info-row">
-                        <span className="bill-to-badge">{labels.customerPrefix}</span>
+                    <div className="bill-meta-row">
                         <span className="bill-meta">{labels.billNo} : {billNo}</span>
                         <span className="bill-meta">{labels.date} : <strong>{date}</strong></span>
                     </div>
                     <div className="customer-info">
-                        <div className="customer-name">{customerName}</div>
-                        <div className="customer-address">
-                            {city}
-                            {address && (
-                                <>
-                                    <br />{address.line1}
-                                    <br />{address.line2}
-                                </>
-                            )}
+                        <div className="customer-name-simple">
+                            <span className="customer-label">{labels.customerPrefix}</span> {customerName}
+                        </div>
+                        <div className="customer-city-simple">
+                            <span className="customer-label">{labels.cityPrefix}</span> {city}
                         </div>
                     </div>
                 </div>
@@ -92,9 +93,9 @@ function BillPreview({
                         {items.map((item, i) => (
                             <tr key={i} className={i % 2 === 1 ? 'row-alt' : ''}>
                                 <td className="text-left">{item.porul}</td>
-                                <td className="text-center">{item.coolie ? `₹ ${item.coolie}` : ''}</td>
+                                <td className="text-center">{item.coolie || ''}</td>
                                 <td className="text-center">{item.kg ? formatWeight(item.kg) : ''}</td>
-                                <td className="text-center">{calcItemAmount(item.coolie, item.kg) ? `₹ ${calcItemAmount(item.coolie, item.kg)}` : ''}</td>
+                                <td className="text-center">{calcItemAmount(item.coolie, item.kg) || ''}</td>
                             </tr>
                         ))}
 
@@ -112,7 +113,7 @@ function BillPreview({
                                 <td className="text-left">{labels.courier}</td>
                                 <td className="text-center">-</td>
                                 <td className="text-center">-</td>
-                                <td className="text-center">₹ {courierRs}</td>
+                                <td className="text-center">{courierRs}</td>
                             </tr>
                         )}
                     </tbody>
@@ -132,37 +133,46 @@ function BillPreview({
                 {/* Footer */}
                 <div className="bill-footer-new">
                     <div className="footer-left">
-                        <div className="thank-you font-display">நன்றி</div>
+                        <div className="thank-you font-tamil">நன்றி</div>
                     </div>
                     <div className="footer-right">
-                        <div className="sign-line"></div>
+                        <div className="sign-company font-display">{name.english}</div>
+                        <div className="sign-space"></div>
                         <div className="sign-label">{labels.signature}</div>
                     </div>
                 </div>
 
-                {/* Contact Info Row */}
-                <div className="contact-row">
-                    <div className="contact-email">
-                        <IconMail size={14} /> {email}
-                    </div>
-                    <div className="contact-phones">
-                        {phone.map((num, i) => (
-                            <div key={i} className="phone-item-new">
-                                <IconPhone size={14} /> {num}
+                {/* Contact Section */}
+                <div className="contact-section">
+                    <div className="contact-title">தொடர்பு கொள்ள</div>
+                    <div className="contact-row">
+                        <div className="contact-left">
+                            <div className="contact-address">
+                                {address.line1}, {address.line2}, {address.line3}
                             </div>
-                        ))}
+                            <div className="contact-email">
+                                <IconMail size={14} /> {email}
+                            </div>
+                        </div>
+                        <div className="contact-phones">
+                            {phone.map((num, i) => (
+                                <div key={i} className="phone-item-new">
+                                    <IconPhone size={14} /> {num}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Floating Action Buttons */}
-            <div className="preview-actions">
-                <button className="fab fab-secondary" onClick={onEdit} aria-label="Edit">
-                    <IconEdit size={22} />
-                </button>
-                <button className="fab fab-primary" onClick={() => window.print()} aria-label="Print">
-                    <IconPrinter size={22} />
-                </button>
+                {/* Floating Action Buttons */}
+                <div className="preview-actions">
+                    <button className="fab fab-secondary" onClick={onEdit} aria-label="Edit">
+                        <IconEdit size={22} />
+                    </button>
+                    <button className="fab fab-primary" onClick={() => window.print()} aria-label="Print">
+                        <IconPrinter size={22} />
+                    </button>
+                </div>
             </div>
         </div>
     );

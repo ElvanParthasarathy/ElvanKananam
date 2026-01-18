@@ -20,21 +20,21 @@ const pvsConfig = {
 
   // Address
   address: {
-    line1: 'எண் 4/606 முதல் தெரு, சிவசக்தி நகர்',
-    line2: 'வந்தவாசி சாலை, ஆரணி - 632301',
-    line3: 'திருவண்ணாமலை மாவட்டம்'
+    line1: '4/606 முதல் தெரு, சிவசக்தி நகர்',
+    line2: 'ஆரணி - 632301',
+    line3: 'தி.மலை மாவட்டம்'
   },
 
   // Contact
-  phone: ['81446 04797', '93607 79191'],
+  phone: ['8144604797', '9360779191'],
   email: 'vrmshreesarathy@gmail.com',
 
   // Labels (Tamil)
   labels: {
     billNo: 'எண்',
     date: 'நாள்',
-    customerPrefix: 'திரு.',
-    cityPrefix: 'ஊர்.',
+    customerPrefix: 'திரு:',
+    cityPrefix: 'ஊர்:',
     rate: 'கூலி',
     itemName: 'பொருள் பெயர்',
     weight: 'எடை (Kg)',
