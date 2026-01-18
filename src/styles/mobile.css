@@ -329,12 +329,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--color-preview-bg);
+    background: #333;
     z-index: var(--z-overlay);
-    overflow-y: auto;
-    padding: var(--space-5);
-    display: flex;
-    justify-content: center;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-4);
+    touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* ========== FLOATING ACTION BUTTONS ========== */

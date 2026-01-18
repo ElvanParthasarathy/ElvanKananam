@@ -38,7 +38,7 @@ function BillPreview({
                         <div className="bill-logo">
                             <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
                         </div>
-                        {greeting}
+                        <span className="ph-left-greeting">{greeting}</span>
                     </div>
 
                     {/* Center - Business Info */}
