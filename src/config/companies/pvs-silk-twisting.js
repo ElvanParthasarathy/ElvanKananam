@@ -38,11 +38,11 @@ const pvsConfig = {
     rate: 'கூலி',
     itemName: 'பொருள் பெயர்',
     weight: 'எடை (Kg)',
-    amount: 'ரூ',
+    amount: 'ரூபாய்',
     total: 'மொத்தம்',
     inWords: 'எழுத்தில்',
     setharam: 'சேதாரம்',
-    courier: 'கொரியர்',
+    courier: 'கொரியர் கட்டணம்',
     signature: 'கையொப்பம்',
     forCompany: 'P.V.S. Silk Twisting'
   },

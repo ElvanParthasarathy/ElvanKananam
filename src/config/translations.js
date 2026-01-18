@@ -29,13 +29,13 @@ export const translations = {
         itemName: 'பொருள் பெயர்',
         enterItem: 'பொருள் உள்ளிடவும்',
         weight: 'எடை (கிலோ)',
-        rate: 'விலை',
+        rate: 'கூலி',
         addAnotherItem: 'மற்றொரு பொருளை சேர்க்க',
 
         // Extras
         extras: 'கூடுதல் கட்டணங்கள்',
         setharam: 'சேதாரம் (கிராம்)',
-        courier: 'அஞ்சல் கட்டணம் (₹)',
+        courier: 'கொரியர் கட்டணம் (₹)',
 
         // Preview
         previewBill: 'பில் முன்னோட்டம்',

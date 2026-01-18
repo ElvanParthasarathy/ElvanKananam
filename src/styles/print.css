@@ -35,21 +35,22 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 12px;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
     border-bottom: 2px solid var(--bill-primary);
 }
 
 .ph-left {
-    width: 15%;
+    width: 20%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
 }
 
 .bill-logo {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
 }
 
 .bill-logo img {
@@ -170,15 +171,13 @@
     color: #000;
 }
 
-/* ========== TABLE - Balanced Design ========== */
+/* ========== TABLE - Connected Grid ========== */
 .bill-table {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid var(--bill-primary);
     margin-top: 10px;
     margin-bottom: 10px;
-    border-radius: 6px;
-    overflow: hidden;
 }
 
 .bill-table th {
