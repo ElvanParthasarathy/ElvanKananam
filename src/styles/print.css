@@ -1,0 +1,237 @@
+/**
+ * Print Styles - A4 Paper Layout
+ * 
+ * Professional print-ready invoice styling
+ */
+
+/* ========== A4 PAPER ========== */
+.a4-paper {
+    background: white;
+    width: 210mm;
+    min-height: auto;
+    max-height: 297mm;
+    padding: 12mm 15mm;
+    position: relative;
+    color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+/* ========== HEADER ========== */
+.print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-5);
+}
+
+.ph-left {
+    width: 25%;
+    font-size: var(--text-sm);
+    padding-top: var(--space-1);
+}
+
+.ph-center {
+    width: 50%;
+    text-align: center;
+}
+
+.ph-right {
+    width: 25%;
+    text-align: right;
+}
+
+.biz-title {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: var(--space-1);
+    color: var(--color-primary);
+}
+
+.biz-sub {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.biz-addr {
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--color-text);
+}
+
+.biz-email {
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+    color: var(--color-text);
+}
+
+.bill-badge {
+    display: inline-block;
+    border: 2px solid var(--color-primary);
+    border-radius: 20px;
+    padding: var(--space-1) var(--space-5);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    margin-top: var(--space-3);
+}
+
+.phone-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-1);
+    color: var(--color-primary);
+}
+
+/* ========== CUSTOMER INFO ========== */
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    font-size: 15px;
+}
+
+.cust-row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+}
+
+.dotted-line {
+    flex: 1;
+    border-bottom: 2px dotted var(--color-primary);
+    margin-left: var(--space-3);
+    padding-left: var(--space-1);
+    font-weight: 600;
+    color: black;
+}
+
+/* ========== TABLE ========== */
+.bill-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid var(--color-primary);
+    margin-top: var(--space-4);
+}
+
+.bill-table th {
+    background: var(--color-header-bg);
+    border: 1px solid var(--color-primary);
+    padding: var(--space-3);
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+}
+
+.bill-table td {
+    border: 1px solid var(--color-primary);
+    padding: var(--space-2) var(--space-3);
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+.bill-table .text-left {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.bill-table .text-center {
+    text-align: center;
+}
+
+.bill-table tfoot tr {
+    background: var(--color-header-bg);
+    font-weight: 700;
+}
+
+/* ========== FOOTER ========== */
+.bill-footer {
+    margin-top: var(--space-5);
+}
+
+.words-line {
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: var(--space-1);
+    display: inline-block;
+}
+
+.sign-area {
+    text-align: right;
+    margin-top: 30px;
+}
+
+.sign-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.sign-label {
+    font-size: var(--text-xs);
+    margin-top: 25px;
+}
+
+/* ========== PRINT MEDIA QUERY ========== */
+@media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    html,
+    body {
+        width: 210mm;
+        height: 297mm;
+        overflow: hidden;
+    }
+
+    body {
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Hide editor UI */
+    .editor-wrapper,
+    .preview-actions,
+    .btn-fixed {
+        display: none !important;
+    }
+
+    /* Reset overlay */
+    .preview-overlay {
+        position: static;
+        background: white;
+        padding: 0;
+        overflow: visible;
+        display: block;
+    }
+
+    /* Paper fills page - single page only */
+    .a4-paper {
+        width: 100%;
+        height: auto;
+        max-height: 297mm;
+        margin: 0;
+        box-shadow: none;
+        padding: 12mm 15mm;
+        page-break-inside: avoid;
+        overflow: hidden;
+    }
+
+    /* Prevent page breaks */
+    .bill-table,
+    .bill-footer,
+    .print-header {
+        page-break-inside: avoid;
+    }
+}

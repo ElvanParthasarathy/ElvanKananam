@@ -1,0 +1,384 @@
+/**
+ * Mobile Styles - Mobile-First Editor UI
+ * 
+ * Touch-friendly, card-based layout optimized for phones
+ */
+
+/* ========== APP BRANDING ========== */
+.app-branding {
+    text-align: center;
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) 0;
+}
+
+.app-name-tamil {
+    display: block;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 1px;
+}
+
+.app-name-english {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ========== TOP BAR ========== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+/* ========== LANGUAGE SELECTOR ========== */
+.language-selector {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface-elevated);
+    border-radius: var(--radius-lg);
+    padding: 2px;
+    border: 1px solid var(--color-border);
+}
+
+.lang-btn {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.lang-btn:hover {
+    color: var(--color-accent);
+}
+
+.lang-btn.active {
+    background: var(--color-accent);
+    color: white;
+}
+
+/* ========== EDITOR LAYOUT ========== */
+.editor-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-5);
+    padding-bottom: 100px;
+    /* Space for fixed button */
+    min-height: 100vh;
+}
+
+.editor-title {
+    font-size: var(--text-2xl);
+    color: var(--color-accent);
+    margin-bottom: var(--space-5);
+    font-weight: 700;
+}
+
+/* ========== CARDS ========== */
+.card {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-card-border);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.card-title {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* ========== THEME TOGGLE ========== */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface-elevated);
+    border-radius: var(--radius-lg);
+    padding: 2px;
+    border: 1px solid var(--color-border);
+}
+
+.theme-btn {
+    width: 36px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-btn:hover {
+    color: var(--color-accent);
+}
+
+.theme-btn.active {
+    background: var(--color-accent);
+    color: white;
+}
+
+/* ========== FORM INPUTS ========== */
+.input-group {
+    margin-bottom: var(--space-3);
+}
+
+.input-label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.input-field {
+    width: 100%;
+    min-height: 48px;
+    /* Touch-friendly */
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-base);
+    font-family: var(--font-primary);
+    background: var(--color-input-bg);
+    color: var(--color-text);
+    transition: all var(--transition-base);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input-field:focus {
+    outline: none;
+    background: var(--color-surface);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(44, 68, 136, 0.1);
+}
+
+.input-field::placeholder {
+    color: var(--color-placeholder);
+}
+
+/* ========== AUTOCOMPLETE ========== */
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-input {
+    width: 100%;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: var(--z-dropdown);
+    list-style: none;
+    margin-top: var(--space-1);
+}
+
+.autocomplete-option {
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    font-size: var(--text-base);
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition-fast);
+}
+
+.autocomplete-option:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-option:hover {
+    background: var(--color-input-bg);
+}
+
+.autocomplete-option:active {
+    background: var(--color-accent);
+    color: var(--color-text-inverse);
+}
+
+/* Input Grid */
+.input-row {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.input-row-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.input-row-1-2 {
+    grid-template-columns: 1fr 2fr;
+}
+
+/* ========== ITEM ROWS ========== */
+.item-row {
+    background: var(--color-bg);
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-3);
+    position: relative;
+    border: 1px solid var(--color-border);
+}
+
+.item-row .input-field {
+    background: var(--color-surface);
+}
+
+.delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.delete-btn:active {
+    transform: scale(0.9);
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    min-height: 52px;
+    padding: var(--space-4);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: 700;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-add {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: white;
+    box-shadow: var(--shadow-btn);
+}
+
+/* Fixed Bottom Button */
+.btn-fixed {
+    position: fixed;
+    bottom: var(--space-5);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - var(--space-10));
+    max-width: 500px;
+    z-index: var(--z-sticky);
+}
+
+/* ========== PREVIEW OVERLAY ========== */
+.preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-preview-bg);
+    z-index: var(--z-overlay);
+    overflow-y: auto;
+    padding: var(--space-5);
+    display: flex;
+    justify-content: center;
+}
+
+/* ========== FLOATING ACTION BUTTONS ========== */
+.preview-actions {
+    position: fixed;
+    bottom: var(--space-6);
+    right: var(--space-6);
+    display: flex;
+    gap: var(--space-3);
+    z-index: var(--z-modal);
+}
+
+.fab {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    color: white;
+    font-size: var(--text-lg);
+    transition: transform var(--transition-fast);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+.fab-secondary {
+    background: var(--color-fab-secondary);
+}
+
+.fab-primary {
+    background: var(--color-accent);
+}
+
+/* ========== RESPONSIVE HELPERS ========== */
+.hide-mobile {
+    display: none;
+}
+
+.show-mobile {
+    display: block;
+}

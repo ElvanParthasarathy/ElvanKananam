@@ -1,0 +1,30 @@
+/**
+ * Default Data for Elvan Kananam
+ * 
+ * Pre-defined items and customers for quick selection
+ */
+
+// Default item names for billing
+export const defaultItems = [
+    { id: 1, name: 'ஒண்டி தடை செய்ய கூலி' },
+    { id: 2, name: 'ஜரி தடை செய்ய கூலி' },
+    { id: 3, name: 'மூன்று இழை சப்புரி செய்ய கூலி' },
+];
+
+// Default customers with their cities
+export const defaultCustomers = [
+    {
+        id: 1,
+        name: 'சுந்தரி சில்க்ஸ் இந்தியா',
+        city: 'திருச்சேறை, கும்பகோனம்',
+        displayName: 'சுந்தரி சில்க்ஸ் இந்தியா - திருச்சேறை'
+    },
+    {
+        id: 2,
+        name: 'சுந்தரி சில்க்ஸ் இந்தியா',
+        city: 'முல்லிப்படடு',
+        displayName: 'சுந்தரி சில்க்ஸ் இந்தியா - முல்லிப்படடு'
+    },
+];
+
+export default { defaultItems, defaultCustomers };
