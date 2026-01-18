@@ -2,17 +2,19 @@
  * Print Styles - A4 Paper Layout
  * 
  * Premium professional print-ready invoice styling
- * Green theme - Balanced ink usage, rounded corners
+ * New Design - Green theme with modern layout
  */
 
 /* ========== COLOR VARIABLES FOR BILL ========== */
 :root {
     --bill-primary: #1b5e20;
     --bill-primary-light: #e8f5e9;
+    --bill-primary-dark: #2d5a30;
     --bill-accent: #2e7d32;
     --bill-border: #1b5e20;
     --bill-text: #1b5e20;
     --bill-text-dark: #0d3d12;
+    --bill-row-alt: #f8faf8;
 }
 
 /* ========== A4 PAPER ========== */
@@ -21,7 +23,7 @@
     width: 210mm;
     min-height: auto;
     max-height: none;
-    padding: 10mm 12mm;
+    padding: 8mm 12mm;
     position: relative;
     color: var(--bill-text);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
@@ -29,27 +31,310 @@
     border-radius: 8px;
 }
 
-/* ========== HEADER ========== */
+/* ========== TOP GREETING ROW ========== */
+.top-greeting-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    margin-bottom: 15px;
+}
+
+.greeting-left,
+.greeting-right {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bill-primary);
+    letter-spacing: 0.5px;
+}
+
+/* ========== NEW HEADER ========== */
+.print-header-new {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.header-logo {
+    flex-shrink: 0;
+}
+
+.header-logo img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    filter: sepia(100%) saturate(300%) hue-rotate(85deg);
+}
+
+.header-company {
+    text-align: right;
+}
+
+.company-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--bill-primary);
+    line-height: 1.2;
+}
+
+.company-subtitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 4px;
+}
+
+.bill-type-badge {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--bill-primary);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ========== DIVIDER LINE ========== */
+.header-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--bill-primary), transparent);
+    margin: 15px 0 25px 0;
+}
+
+/* ========== BILL INFO SECTION ========== */
+.bill-info-section {
+    margin-bottom: 25px;
+}
+
+.bill-info-row {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 15px;
+}
+
+.bill-to-badge {
+    background: var(--bill-primary-dark);
+    color: white;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bill-meta {
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+}
+
+.bill-meta strong {
+    font-weight: 700;
+    color: #000;
+}
+
+.customer-info {
+    margin-top: 10px;
+    padding-left: 5px;
+}
+
+.customer-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 5px;
+}
+
+.customer-address {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* ========== NEW TABLE STYLES ========== */
+.bill-table-new {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.bill-table-new th {
+    background: var(--bill-primary-dark);
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    padding: 12px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bill-table-new td {
+    padding: 12px 10px;
+    font-size: 13px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.bill-table-new tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.bill-table-new .row-alt {
+    background: var(--bill-row-alt);
+}
+
+.bill-table-new .text-left {
+    text-align: left;
+    padding-left: 15px;
+    font-weight: 500;
+}
+
+.bill-table-new .text-center {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* ========== TOTAL ROW ========== */
+.total-row-new {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 30px;
+    padding: 12px 20px;
+    background: var(--bill-primary-light);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.total-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bill-text);
+}
+
+.total-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--bill-primary);
+}
+
+/* ========== WORDS SECTION ========== */
+.words-section {
+    font-size: 12px;
+    color: var(--bill-text);
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.words-line {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--bill-text-dark);
+    background: var(--bill-primary-light);
+    padding: 8px 15px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-left: 8px;
+    line-height: 1.4;
+}
+
+/* ========== NEW FOOTER ========== */
+.bill-footer-new {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 40px;
+    margin-bottom: 30px;
+}
+
+.footer-left {
+    flex: 1;
+}
+
+.thank-you {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bill-primary);
+    font-style: italic;
+}
+
+.footer-right {
+    text-align: center;
+    min-width: 200px;
+}
+
+.sign-line {
+    border-bottom: 1px solid var(--bill-primary);
+    min-width: 180px;
+    height: 40px;
+}
+
+.sign-label {
+    font-size: 12px;
+    margin-top: 8px;
+    color: #555;
+}
+
+/* ========== CONTACT ROW ========== */
+.contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.contact-email {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #444;
+}
+
+.contact-email svg {
+    color: var(--bill-accent);
+}
+
+.contact-phones {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.phone-item-new {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #444;
+}
+
+.phone-item-new svg {
+    color: var(--bill-accent);
+}
+
+/* ========== LEGACY STYLES (Keep for compatibility) ========== */
 .print-header {
     display: flex;
     justify-content: flex-start;
-    /* Align everything to start */
     align-items: center;
-    /* Vertically center logo and text */
     margin-bottom: 25px;
     padding-bottom: 20px;
     padding-top: 35px;
-    /* Added more space for greeting overlap */
     border-bottom: 2px solid var(--bill-primary);
     position: relative;
     gap: 20px;
 }
 
-/* Greeting - Absolute top center (kept as requested previously, or should it move?) 
-   User said "align ... with logo to the left side". 
-   But previously asked for top center.
-   I will keep it top center for now but ensure no overlap.
-*/
 .ph-left-greeting {
     position: absolute;
     top: 5px;
@@ -63,13 +348,11 @@
 }
 
 .ph-left {
-    /* Logo container */
     flex-shrink: 0;
 }
 
 .bill-logo {
     width: 140px;
-    /* Increased from 110px */
     height: 140px;
 }
 
@@ -81,28 +364,23 @@
 }
 
 .ph-center {
-    /* Business Info - Now Left Aligned next to logo */
     flex-grow: 1;
     text-align: left;
     padding-top: 10px;
 }
 
 .ph-right {
-    /* Phone numbers */
     flex-shrink: 0;
     text-align: right;
     align-self: flex-start;
     padding-top: 30px;
-    /* Align with text */
     display: flex;
     flex-direction: column;
     gap: 4px;
-    /* Uniform spacing */
 }
 
 .biz-title {
     font-size: 26px;
-    /* Larger */
     font-weight: 800;
     line-height: 1.2;
     margin-bottom: 5px;
@@ -120,7 +398,6 @@
 .biz-addr {
     font-size: 11px;
     line-height: 1.5;
-    /* Better spacing */
     color: #333;
     font-weight: 500;
 }
@@ -135,17 +412,12 @@
     color: var(--bill-primary);
 }
 
-/* Bill Badge - Pilled Filled No Outline */
 .bill-badge {
     display: inline-block;
     background: var(--bill-primary);
-    /* Solid fill */
     color: white;
-    /* White text */
     border: none;
-    /* No outline */
     border-radius: 50px;
-    /* Pilled */
     padding: 6px 20px;
     font-weight: 700;
     font-size: 11px;
@@ -181,7 +453,6 @@
     border-radius: 8px;
     color: var(--bill-text-dark);
     border: 1px solid var(--bill-primary-light);
-    /* Subtle border */
 }
 
 .cust-row {
@@ -203,7 +474,7 @@
     color: #000;
 }
 
-/* ========== TABLE - UNIFORM ROUNDED BORDERS ========== */
+/* ========== OLD TABLE STYLES (Legacy) ========== */
 .bill-table {
     width: 100%;
     border-collapse: separate;
@@ -213,18 +484,15 @@
     border: 1px solid var(--bill-primary);
     border-radius: 12px;
     overflow: hidden;
-    /* Clips corners */
 }
 
 .bill-table th,
 .bill-table td {
     padding: 10px 12px;
-    /* More breathing room */
     border-right: 1px solid var(--bill-primary);
     border-bottom: 1px solid var(--bill-primary);
 }
 
-/* Remove side/bottom borders for edges to prevent double borders with outer container */
 .bill-table tr:last-child td {
     border-bottom: none;
 }
@@ -270,15 +538,13 @@
     font-size: 13px;
 }
 
-/* ========== FOOTER & SIGNATURE ========== */
+/* ========== OLD FOOTER & SIGNATURE ========== */
 .bill-footer {
     margin-top: 40px;
-    /* Push to bottom area */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 150px;
-    /* Ensure space for signature */
 }
 
 .bill-footer>div:first-child {
@@ -287,22 +553,9 @@
     font-weight: 600;
 }
 
-.words-line {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--bill-text-dark);
-    background: var(--bill-primary-light);
-    padding: 8px 15px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-left: 8px;
-    line-height: 1.4;
-}
-
 .sign-area {
     text-align: right;
     margin-top: 60px;
-    /* Increased space before signature line */
     padding-right: 20px;
 }
 
@@ -311,18 +564,9 @@
     font-weight: 700;
     color: var(--bill-primary);
     padding-bottom: 50px;
-    /* Increased space for actual signature */
     border-bottom: 1px solid var(--bill-primary);
     display: inline-block;
     min-width: 200px;
-    text-align: center;
-}
-
-.sign-label {
-    font-size: 11px;
-    margin-top: 10px;
-    /* More space between line and label */
-    color: #555;
     text-align: center;
 }
 
@@ -369,19 +613,16 @@
     .a4-paper {
         width: 100%;
         height: 297mm;
-        /* Full A4 Height */
         margin: 0;
         box-shadow: none;
         padding: 15mm;
-        /* Safe print margin */
         border-radius: 0;
         display: flex;
         flex-direction: column;
     }
 
-    .bill-footer {
+    .bill-footer-new {
         margin-top: auto;
-        /* Push footer to bottom of page */
     }
 
     /* Hide UI */

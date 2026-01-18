@@ -1,12 +1,12 @@
 import React from 'react';
-import { IconPhone, IconPrinter, IconEdit } from '../common/Icons';
+import { IconPhone, IconPrinter, IconEdit, IconMail } from '../common/Icons';
 import { numberToWordsTamil } from '../../utils/tamilNumbers';
 import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight } from '../../utils/calculations';
 
 /**
  * BillPreview Component
  * 
- * A4-sized print preview of the bill
+ * A4-sized print preview of the bill - New Design
  */
 function BillPreview({
     config,
@@ -31,82 +31,77 @@ function BillPreview({
             {/* A4 Paper */}
             <div className="a4-paper font-tamil">
 
-                {/* Header */}
-                <div className="print-header">
-                    <span className="ph-left-greeting">{greeting}</span>
+                {/* Top Greeting Row */}
+                <div className="top-greeting-row">
+                    <span className="greeting-left">வாழ்க வையகம்</span>
+                    <span className="greeting-right">{greeting}</span>
+                </div>
 
+                {/* Header */}
+                <div className="print-header-new">
                     {/* Left - Logo */}
-                    <div className="ph-left">
-                        <div className="bill-logo">
-                            <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
-                        </div>
+                    <div className="header-logo">
+                        <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
                     </div>
 
-                    {/* Center - Business Info */}
-                    <div className="ph-center">
-                        <div className="biz-title font-display">
+                    {/* Right - Company Name & Bill Type */}
+                    <div className="header-company">
+                        <div className="company-name font-display">
                             {name.english}
                         </div>
-                        <div className="biz-sub">{name.tamil}</div>
-                        <div className="biz-addr">
-                            {address.line1}<br />
-                            {address.line2}<br />
-                            {address.line3}
-                        </div>
-                        <div className="biz-email">
-                            <strong>மின்னஞ்சல் முகவரி :</strong> {email}
-                        </div>
-                        <div className="bill-badge">{billType}</div>
-                    </div>
-
-                    {/* Right - Phone Numbers */}
-                    <div className="ph-right">
-                        {phone.map((num, i) => (
-                            <div key={i} className="phone-item">
-                                <IconPhone size={14} /> {num}
-                            </div>
-                        ))}
+                        <div className="company-subtitle">{name.tamil}</div>
+                        <div className="bill-type-badge font-display">{billType}</div>
                     </div>
                 </div>
 
-                {/* Meta Row */}
-                <div className="meta-row">
-                    <div>{labels.billNo} : {billNo}</div>
-                    <div>{labels.date} : {date}</div>
-                </div>
+                {/* Divider Line */}
+                <div className="header-divider"></div>
 
-                {/* Customer Info */}
-                <div className="cust-row">
-                    {labels.customerPrefix} <span className="dotted-line">{customerName}</span>
-                </div>
-                <div className="cust-row">
-                    {labels.cityPrefix} <span className="dotted-line">{city}</span>
+                {/* Bill Info Section */}
+                <div className="bill-info-section">
+                    <div className="bill-info-row">
+                        <span className="bill-to-badge">{labels.customerPrefix}</span>
+                        <span className="bill-meta">{labels.billNo} : {billNo}</span>
+                        <span className="bill-meta">{labels.date} : <strong>{date}</strong></span>
+                    </div>
+                    <div className="customer-info">
+                        <div className="customer-name">{customerName}</div>
+                        <div className="customer-address">
+                            {city}
+                            {address && (
+                                <>
+                                    <br />{address.line1}
+                                    <br />{address.line2}
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Table */}
-                <table className="bill-table">
+                <table className="bill-table-new">
                     <thead>
                         <tr>
-                            <th style={{ width: '15%' }}>{labels.rate}</th>
                             <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>{labels.itemName}</th>
-                            <th style={{ width: '20%' }}>{labels.weight}</th>
-                            <th style={{ width: '20%' }}>{labels.amount}</th>
+                            <th style={{ width: '15%' }}>{labels.rate}</th>
+                            <th style={{ width: '15%' }}>{labels.weight}</th>
+                            <th style={{ width: '25%' }}>{labels.amount}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {items.map((item, i) => (
-                            <tr key={i}>
-                                <td className="text-center">{item.coolie}</td>
+                            <tr key={i} className={i % 2 === 1 ? 'row-alt' : ''}>
                                 <td className="text-left">{item.porul}</td>
+                                <td className="text-center">{item.coolie ? `₹ ${item.coolie}` : ''}</td>
                                 <td className="text-center">{item.kg ? formatWeight(item.kg) : ''}</td>
-                                <td className="text-center">{calcItemAmount(item.coolie, item.kg) || ''}</td>
+                                <td className="text-center">{calcItemAmount(item.coolie, item.kg) ? `₹ ${calcItemAmount(item.coolie, item.kg)}` : ''}</td>
                             </tr>
                         ))}
 
                         {setharamGrams && (
-                            <tr>
-                                <td></td>
+                            <tr className={items.length % 2 === 1 ? 'row-alt' : ''}>
                                 <td className="text-left">{labels.setharam}</td>
+                                <td className="text-center">-</td>
                                 <td className="text-center">{formatWeight(setharamKg)}</td>
                                 <td className="text-center">-</td>
                             </tr>
@@ -114,34 +109,48 @@ function BillPreview({
 
                         {courierRs && (
                             <tr>
-                                <td></td>
                                 <td className="text-left">{labels.courier}</td>
                                 <td className="text-center">-</td>
-                                <td className="text-center">{courierRs}</td>
+                                <td className="text-center">-</td>
+                                <td className="text-center">₹ {courierRs}</td>
                             </tr>
                         )}
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colSpan={2} style={{ textAlign: 'right', paddingRight: '15px' }}>
-                                {labels.total}
-                            </td>
-                            <td className="text-center">{formatWeight(totalKg)}</td>
-                            <td className="text-center"><span style={{ fontSize: '14px', marginRight: '2px' }}>ரூ</span> {totalRs}</td>
-                        </tr>
-                    </tfoot>
                 </table>
 
+                {/* Total Row */}
+                <div className="total-row-new">
+                    <span className="total-label">{labels.total}</span>
+                    <span className="total-value">₹ {totalRs}</span>
+                </div>
+
+                {/* Amount in Words */}
+                <div className="words-section">
+                    {labels.inWords}: <span className="words-line">{numberToWordsTamil(totalRs)}</span>
+                </div>
+
                 {/* Footer */}
-                <div className="bill-footer">
-                    <div>
-                        {labels.inWords}: <span className="words-line">{numberToWordsTamil(totalRs)}</span>
+                <div className="bill-footer-new">
+                    <div className="footer-left">
+                        <div className="thank-you font-display">நன்றி</div>
                     </div>
-                    <div className="sign-area">
-                        <div className="sign-title font-display">
-                            {labels.forCompany}
-                        </div>
+                    <div className="footer-right">
+                        <div className="sign-line"></div>
                         <div className="sign-label">{labels.signature}</div>
+                    </div>
+                </div>
+
+                {/* Contact Info Row */}
+                <div className="contact-row">
+                    <div className="contact-email">
+                        <IconMail size={14} /> {email}
+                    </div>
+                    <div className="contact-phones">
+                        {phone.map((num, i) => (
+                            <div key={i} className="phone-item-new">
+                                <IconPhone size={14} /> {num}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
