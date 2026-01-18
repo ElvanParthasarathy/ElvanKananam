@@ -1,7 +1,7 @@
 /**
  * Print Styles - A4 Paper Layout
  * 
- * Professional print-ready invoice styling
+ * Premium professional print-ready invoice styling
  */
 
 /* ========== A4 PAPER ========== */
@@ -10,11 +10,12 @@
     width: 210mm;
     min-height: auto;
     max-height: 297mm;
-    padding: 12mm 15mm;
+    padding: 15mm 18mm;
     position: relative;
-    color: var(--color-primary);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    color: #1a237e;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     overflow: hidden;
+    font-family: var(--font-primary);
 }
 
 /* ========== HEADER ========== */
@@ -22,70 +23,88 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-5);
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #1a237e;
 }
 
 .ph-left {
-    width: 25%;
-    font-size: var(--text-sm);
-    padding-top: var(--space-1);
+    width: 22%;
+    font-size: 14px;
+    padding-top: 5px;
+    color: #1a237e;
+    font-weight: 600;
 }
 
 .ph-center {
-    width: 50%;
+    width: 56%;
     text-align: center;
 }
 
 .ph-right {
-    width: 25%;
+    width: 22%;
     text-align: right;
 }
 
 .biz-title {
-    font-size: var(--text-4xl);
+    font-size: 28px;
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: var(--space-1);
-    color: var(--color-primary);
+    margin-bottom: 4px;
+    color: #1a237e;
+    letter-spacing: 1px;
 }
 
 .biz-sub {
-    font-size: var(--text-xl);
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: var(--space-2);
+    margin-bottom: 8px;
+    color: #333;
 }
 
 .biz-addr {
-    font-size: var(--text-sm);
-    line-height: 1.4;
-    color: var(--color-text);
+    font-size: 12px;
+    line-height: 1.5;
+    color: #444;
 }
 
 .biz-email {
-    font-size: var(--text-sm);
-    margin-top: var(--space-1);
-    color: var(--color-text);
+    font-size: 11px;
+    margin-top: 5px;
+    color: #555;
+}
+
+.biz-email strong {
+    color: #1a237e;
 }
 
 .bill-badge {
     display: inline-block;
-    border: 2px solid var(--color-primary);
-    border-radius: 20px;
-    padding: var(--space-1) var(--space-5);
+    background: linear-gradient(135deg, #1a237e 0%, #303f9f 100%);
+    color: white;
+    border-radius: 25px;
+    padding: 6px 25px;
     font-weight: 700;
-    font-size: var(--text-sm);
-    margin-top: var(--space-3);
+    font-size: 13px;
+    margin-top: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 2px 8px rgba(26, 35, 126, 0.3);
 }
 
 .phone-item {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--space-2);
+    gap: 8px;
     font-weight: 700;
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-1);
-    color: var(--color-primary);
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #1a237e;
+}
+
+.phone-item svg {
+    color: #303f9f;
 }
 
 /* ========== CUSTOMER INFO ========== */
@@ -93,91 +112,136 @@
     display: flex;
     justify-content: space-between;
     font-weight: 700;
-    margin-bottom: var(--space-4);
-    font-size: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    padding: 10px 15px;
+    background: #f5f5ff;
+    border-radius: 8px;
+    color: #1a237e;
 }
 
 .cust-row {
     display: flex;
     align-items: baseline;
-    margin-bottom: var(--space-3);
-    font-size: var(--text-base);
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #1a237e;
+    font-weight: 600;
 }
 
 .dotted-line {
     flex: 1;
-    border-bottom: 2px dotted var(--color-primary);
-    margin-left: var(--space-3);
-    padding-left: var(--space-1);
-    font-weight: 600;
-    color: black;
+    border-bottom: 2px dotted #1a237e;
+    margin-left: 10px;
+    padding-left: 5px;
+    padding-bottom: 2px;
+    font-weight: 700;
+    color: #000;
 }
 
 /* ========== TABLE ========== */
 .bill-table {
     width: 100%;
     border-collapse: collapse;
-    border: 2px solid var(--color-primary);
-    margin-top: var(--space-4);
+    border: 2px solid #1a237e;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .bill-table th {
-    background: var(--color-header-bg);
-    border: 1px solid var(--color-primary);
-    padding: var(--space-3);
+    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    border: 2px solid #1a237e;
+    padding: 12px 10px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
+    color: #1a237e;
 }
 
 .bill-table td {
-    border: 1px solid var(--color-primary);
-    padding: var(--space-2) var(--space-3);
-    font-size: 15px;
+    border: 1px solid #1a237e;
+    padding: 10px 12px;
+    font-size: 14px;
     vertical-align: middle;
+    color: #000;
+}
+
+.bill-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.bill-table tbody tr:hover {
+    background: #f0f0ff;
 }
 
 .bill-table .text-left {
     text-align: left;
     padding-left: 15px;
+    font-weight: 500;
 }
 
 .bill-table .text-center {
     text-align: center;
+    font-weight: 600;
 }
 
 .bill-table tfoot tr {
-    background: var(--color-header-bg);
+    background: linear-gradient(135deg, #1a237e 0%, #303f9f 100%);
     font-weight: 700;
+    color: white;
+}
+
+.bill-table tfoot td {
+    border: 2px solid #1a237e;
+    padding: 12px;
+    color: white;
 }
 
 /* ========== FOOTER ========== */
 .bill-footer {
-    margin-top: var(--space-5);
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+}
+
+.bill-footer>div:first-child {
+    font-size: 14px;
+    color: #1a237e;
+    font-weight: 600;
 }
 
 .words-line {
     font-weight: 700;
     font-size: 15px;
-    border-bottom: 1px dotted #ccc;
-    padding-bottom: var(--space-1);
+    color: #000;
+    background: #f5f5ff;
+    padding: 8px 15px;
+    border-radius: 5px;
     display: inline-block;
+    margin-left: 10px;
 }
 
 .sign-area {
     text-align: right;
-    margin-top: 30px;
+    margin-top: 40px;
+    padding-right: 20px;
 }
 
 .sign-title {
-    font-size: var(--text-base);
+    font-size: 16px;
     font-weight: 700;
-    color: var(--color-primary);
+    color: #1a237e;
+    padding-bottom: 35px;
+    border-bottom: 2px solid #1a237e;
+    display: inline-block;
+    min-width: 180px;
 }
 
 .sign-label {
-    font-size: var(--text-xs);
-    margin-top: 25px;
+    font-size: 12px;
+    margin-top: 8px;
+    color: #666;
+    font-style: italic;
 }
 
 /* ========== PRINT MEDIA QUERY ========== */
@@ -203,7 +267,9 @@
     /* Hide editor UI */
     .editor-wrapper,
     .preview-actions,
-    .btn-fixed {
+    .btn-fixed,
+    .logout-btn,
+    .login-container {
         display: none !important;
     }
 
@@ -226,6 +292,25 @@
         padding: 12mm 15mm;
         page-break-inside: avoid;
         overflow: hidden;
+    }
+
+    /* Ensure colors print correctly */
+    .bill-badge {
+        background: #1a237e !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .bill-table tfoot tr {
+        background: #1a237e !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .bill-table th {
+        background: #e8eaf6 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     /* Prevent page breaks */
