@@ -33,8 +33,13 @@ function BillPreview({
 
                 {/* Header */}
                 <div className="print-header">
-                    {/* Left - Greeting */}
-                    <div className="ph-left">{greeting}</div>
+                    {/* Left - Logo & Greeting */}
+                    <div className="ph-left">
+                        <div className="bill-logo">
+                            <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
+                        </div>
+                        {greeting}
+                    </div>
 
                     {/* Center - Business Info */}
                     <div className="ph-center">

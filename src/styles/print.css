@@ -2,7 +2,19 @@
  * Print Styles - A4 Paper Layout
  * 
  * Premium professional print-ready invoice styling
+ * Green theme - Ink efficient for printing
  */
+
+/* ========== COLOR VARIABLES FOR BILL ========== */
+:root {
+    --bill-primary: #1b5e20;
+    --bill-primary-light: #4caf50;
+    --bill-accent: #2e7d32;
+    --bill-border: #1b5e20;
+    --bill-header-bg: #e8f5e9;
+    --bill-text: #1b5e20;
+    --bill-text-dark: #0d3d12;
+}
 
 /* ========== A4 PAPER ========== */
 .a4-paper {
@@ -10,9 +22,9 @@
     width: 210mm;
     min-height: auto;
     max-height: 297mm;
-    padding: 15mm 18mm;
+    padding: 12mm 15mm;
     position: relative;
-    color: #1a237e;
+    color: var(--bill-text);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     font-family: var(--font-primary);
@@ -23,21 +35,36 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #1a237e;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--bill-primary);
 }
 
 .ph-left {
-    width: 22%;
-    font-size: 14px;
+    width: 18%;
+    font-size: 13px;
     padding-top: 5px;
-    color: #1a237e;
+    color: var(--bill-text);
     font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bill-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 5px;
+}
+
+.bill-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .ph-center {
-    width: 56%;
+    width: 60%;
     text-align: center;
 }
 
@@ -47,64 +74,65 @@
 }
 
 .biz-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 4px;
-    color: #1a237e;
+    margin-bottom: 3px;
+    color: var(--bill-primary);
     letter-spacing: 1px;
 }
 
 .biz-sub {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #333;
 }
 
 .biz-addr {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 11px;
+    line-height: 1.4;
     color: #444;
 }
 
 .biz-email {
-    font-size: 11px;
-    margin-top: 5px;
+    font-size: 10px;
+    margin-top: 4px;
     color: #555;
 }
 
 .biz-email strong {
-    color: #1a237e;
+    color: var(--bill-primary);
 }
 
+/* Bill Badge - Outline only for ink efficiency */
 .bill-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #1a237e 0%, #303f9f 100%);
-    color: white;
-    border-radius: 25px;
-    padding: 6px 25px;
+    border: 2px solid var(--bill-primary);
+    color: var(--bill-primary);
+    background: transparent;
+    border-radius: 20px;
+    padding: 5px 20px;
     font-weight: 700;
-    font-size: 13px;
-    margin-top: 12px;
+    font-size: 12px;
+    margin-top: 10px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    box-shadow: 0 2px 8px rgba(26, 35, 126, 0.3);
 }
 
 .phone-item {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 5px;
-    color: #1a237e;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: var(--bill-text);
 }
 
 .phone-item svg {
-    color: #303f9f;
+    color: var(--bill-accent);
 }
 
 /* ========== CUSTOMER INFO ========== */
@@ -112,71 +140,64 @@
     display: flex;
     justify-content: space-between;
     font-weight: 700;
-    margin-bottom: 15px;
-    font-size: 14px;
-    padding: 10px 15px;
-    background: #f5f5ff;
-    border-radius: 8px;
-    color: #1a237e;
+    margin-bottom: 12px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1px solid var(--bill-primary);
+    border-radius: 5px;
+    color: var(--bill-text);
+    background: transparent;
 }
 
 .cust-row {
     display: flex;
     align-items: baseline;
-    margin-bottom: 12px;
-    font-size: 15px;
-    color: #1a237e;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--bill-text);
     font-weight: 600;
 }
 
 .dotted-line {
     flex: 1;
-    border-bottom: 2px dotted #1a237e;
-    margin-left: 10px;
+    border-bottom: 1px dotted var(--bill-primary);
+    margin-left: 8px;
     padding-left: 5px;
     padding-bottom: 2px;
     font-weight: 700;
     color: #000;
 }
 
-/* ========== TABLE ========== */
+/* ========== TABLE - Ink Efficient ========== */
 .bill-table {
     width: 100%;
     border-collapse: collapse;
-    border: 2px solid #1a237e;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    border: 2px solid var(--bill-primary);
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 .bill-table th {
-    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
-    border: 2px solid #1a237e;
-    padding: 12px 10px;
+    background: transparent;
+    border: 1px solid var(--bill-primary);
+    padding: 10px 8px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     text-align: center;
-    color: #1a237e;
+    color: var(--bill-primary);
 }
 
 .bill-table td {
-    border: 1px solid #1a237e;
-    padding: 10px 12px;
-    font-size: 14px;
+    border: 1px solid var(--bill-primary);
+    padding: 8px 10px;
+    font-size: 13px;
     vertical-align: middle;
     color: #000;
 }
 
-.bill-table tbody tr:nth-child(even) {
-    background: #fafafa;
-}
-
-.bill-table tbody tr:hover {
-    background: #f0f0ff;
-}
-
 .bill-table .text-left {
     text-align: left;
-    padding-left: 15px;
+    padding-left: 12px;
     font-weight: 500;
 }
 
@@ -185,63 +206,64 @@
     font-weight: 600;
 }
 
+/* Footer row - Border only, no fill */
 .bill-table tfoot tr {
-    background: linear-gradient(135deg, #1a237e 0%, #303f9f 100%);
+    background: transparent;
     font-weight: 700;
-    color: white;
 }
 
 .bill-table tfoot td {
-    border: 2px solid #1a237e;
-    padding: 12px;
-    color: white;
+    border: 2px solid var(--bill-primary);
+    padding: 10px;
+    color: var(--bill-primary);
+    font-size: 14px;
 }
 
 /* ========== FOOTER ========== */
 .bill-footer {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px dashed #ccc;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--bill-primary);
 }
 
 .bill-footer>div:first-child {
-    font-size: 14px;
-    color: #1a237e;
+    font-size: 13px;
+    color: var(--bill-text);
     font-weight: 600;
 }
 
 .words-line {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
     color: #000;
-    background: #f5f5ff;
-    padding: 8px 15px;
-    border-radius: 5px;
+    border: 1px solid var(--bill-primary);
+    padding: 6px 12px;
+    border-radius: 4px;
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 8px;
+    background: transparent;
 }
 
 .sign-area {
     text-align: right;
-    margin-top: 40px;
-    padding-right: 20px;
+    margin-top: 35px;
+    padding-right: 15px;
 }
 
 .sign-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
-    color: #1a237e;
-    padding-bottom: 35px;
-    border-bottom: 2px solid #1a237e;
+    color: var(--bill-primary);
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--bill-primary);
     display: inline-block;
-    min-width: 180px;
+    min-width: 160px;
 }
 
 .sign-label {
-    font-size: 12px;
-    margin-top: 8px;
-    color: #666;
-    font-style: italic;
+    font-size: 11px;
+    margin-top: 6px;
+    color: #555;
 }
 
 /* ========== PRINT MEDIA QUERY ========== */
@@ -282,35 +304,16 @@
         display: block;
     }
 
-    /* Paper fills page - single page only */
+    /* Paper fills page */
     .a4-paper {
         width: 100%;
         height: auto;
         max-height: 297mm;
         margin: 0;
         box-shadow: none;
-        padding: 12mm 15mm;
+        padding: 10mm 12mm;
         page-break-inside: avoid;
         overflow: hidden;
-    }
-
-    /* Ensure colors print correctly */
-    .bill-badge {
-        background: #1a237e !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .bill-table tfoot tr {
-        background: #1a237e !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .bill-table th {
-        background: #e8eaf6 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 
     /* Prevent page breaks */

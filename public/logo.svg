@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Hand holding silk spindle - Simplified for print -->
+  <g fill="#1b5e20">
+    <!-- Wrist -->
+    <ellipse cx="62" cy="18" rx="8" ry="4"/>
+    <rect x="54" y="14" width="16" height="8" rx="2"/>
+    
+    <!-- Palm -->
+    <path d="M35 45 Q30 35 40 25 Q50 18 60 22 Q70 26 65 40 Q62 50 55 55 L40 55 Q30 52 35 45Z"/>
+    
+    <!-- Thumb -->
+    <path d="M35 45 Q25 48 22 58 Q20 65 25 68 Q30 70 35 65 Q40 58 40 55Z"/>
+    
+    <!-- Index finger -->
+    <path d="M28 42 Q20 38 12 45 Q8 50 10 55 Q12 58 18 56 Q25 52 30 48Z"/>
+    
+    <!-- Middle finger pressing -->
+    <ellipse cx="52" cy="68" rx="6" ry="4"/>
+    <path d="M48 55 Q46 60 48 68 Q50 72 54 72 Q58 70 56 65 Q55 58 55 55Z"/>
+    
+    <!-- Spindle base -->
+    <ellipse cx="50" cy="75" rx="30" ry="6"/>
+    <ellipse cx="50" cy="75" rx="25" ry="4" fill="#2e7d32"/>
+    
+    <!-- Spindle points -->
+    <polygon points="15,75 8,77 15,79" fill="#1b5e20"/>
+    <polygon points="85,75 92,77 85,79" fill="#1b5e20"/>
+    
+    <!-- Thread holes -->
+    <circle cx="30" cy="75" r="2" fill="white"/>
+    <circle cx="70" cy="75" r="2" fill="white"/>
+  </g>
+</svg>
