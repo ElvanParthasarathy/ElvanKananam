@@ -34,6 +34,7 @@ function BillPreview({
                 {/* Top Greeting Row */}
                 <div className="top-greeting-row">
                     <span className="greeting-left">வாழ்க வையகம்</span>
+                    <span className="greeting-center">உ</span>
                     <span className="greeting-right">{greeting}</span>
                 </div>
 
@@ -64,7 +65,7 @@ function BillPreview({
                 {/* Bill Info Section */}
                 <div className="bill-info-section">
                     <div className="bill-meta-row">
-                        <span className="bill-meta">{labels.billNo} : {billNo}</span>
+                        <span className="bill-meta">{labels.billNo} : <strong>{billNo}</strong></span>
                         <span className="bill-meta">{labels.date} : <strong>{date}</strong></span>
                     </div>
                     <div className="customer-info">
@@ -81,8 +82,8 @@ function BillPreview({
                 <table className="bill-table-new">
                     <thead>
                         <tr>
-                            <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>{labels.itemName}</th>
                             <th style={{ width: '15%' }}>{labels.rate}</th>
+                            <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>{labels.itemName}</th>
                             <th style={{ width: '15%' }}>{labels.weight}</th>
                             <th style={{ width: '25%' }}>{labels.amount}</th>
                         </tr>
@@ -90,8 +91,8 @@ function BillPreview({
                     <tbody>
                         {items.map((item, i) => (
                             <tr key={i} className={i % 2 === 1 ? 'row-alt' : ''}>
-                                <td className="text-left">{item.porul}</td>
                                 <td className="text-center">{item.coolie || ''}</td>
+                                <td className="text-left">{item.porul}</td>
                                 <td className="text-center">{item.kg ? formatWeight(item.kg) : ''}</td>
                                 <td className="text-center">{calcItemAmount(item.coolie, item.kg) || ''}</td>
                             </tr>
@@ -99,8 +100,8 @@ function BillPreview({
 
                         {setharamGrams && (
                             <tr className={items.length % 2 === 1 ? 'row-alt' : ''}>
-                                <td className="text-left">{labels.setharam}</td>
                                 <td className="text-center">-</td>
+                                <td className="text-left">{labels.setharam}</td>
                                 <td className="text-center">{formatWeight(setharamKg)}</td>
                                 <td className="text-center">-</td>
                             </tr>
@@ -108,8 +109,8 @@ function BillPreview({
 
                         {courierRs && (
                             <tr>
-                                <td className="text-left">{labels.courier}</td>
                                 <td className="text-center">-</td>
+                                <td className="text-left">{labels.courier}</td>
                                 <td className="text-center">-</td>
                                 <td className="text-center">{courierRs}</td>
                             </tr>
@@ -152,7 +153,9 @@ function BillPreview({
                     <div className="contact-row">
                         <div className="contact-left">
                             <div className="contact-address">
-                                {address.line1}, {address.line2}, {address.line3}
+                                {address.line1}, {address.line2}
+                                <br />
+                                {address.line3}
                             </div>
                             <div className="contact-email">
                                 <IconMail size={14} /> {email}

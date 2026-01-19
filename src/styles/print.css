@@ -40,7 +40,8 @@
 }
 
 .greeting-left,
-.greeting-right {
+.greeting-right,
+.greeting-center {
     font-size: 13px;
     font-weight: 700;
     color: var(--bill-primary);
@@ -100,7 +101,7 @@
 
 .bill-type-badge {
     display: inline-block;
-    font-size: 28px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--bill-primary);
     margin: 0;
@@ -133,9 +134,8 @@
 }
 
 .bill-meta {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--bill-text-dark);
 }
 
 .bill-meta strong {
@@ -188,7 +188,7 @@
     background: var(--bill-primary-light);
     color: var(--bill-text-dark);
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
     padding: 12px 10px;
     text-transform: uppercase;
@@ -197,10 +197,10 @@
 
 .bill-table-new td {
     padding: 12px 10px;
-    font-size: 13px;
+    font-size: 15px;
     color: #333;
     border-bottom: 1px solid #eee;
-    font-family: var(--font-numbers);
+    font-family: var(--font-primary);
 }
 
 .bill-table-new tbody tr:last-child td {
@@ -226,10 +226,10 @@
 .total-footer-row td {
     background: var(--bill-primary-light);
     padding: 12px 10px;
-    border-top: 2px solid var(--bill-border);
+    border-top: none;
     font-weight: 700;
     color: var(--bill-primary);
-    font-family: var(--font-numbers);
+    font-family: var(--font-primary);
 }
 
 .total-label-cell {
@@ -283,7 +283,7 @@
 }
 
 .thank-you {
-    font-size: 28px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--bill-primary);
     font-style: normal;
@@ -344,7 +344,7 @@
 }
 
 .contact-address {
-    font-size: 11px;
+    font-size: 13px;
     color: #333;
     font-weight: 500;
 }
@@ -353,7 +353,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: 13px;
     color: #444;
 }
 

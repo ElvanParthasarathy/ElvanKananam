@@ -31,7 +31,7 @@ const pvsConfig = {
 
   // Labels (Tamil)
   labels: {
-    billNo: 'எண்',
+    billNo: 'பில் எண்',
     date: 'நாள்',
     customerPrefix: 'திரு:',
     cityPrefix: 'ஊர்:',
