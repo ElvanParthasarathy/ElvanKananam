@@ -9,12 +9,12 @@
  */
 
 import pvsConfig from './companies/pvs-silk-twisting.js';
+import vrmConfig from './companies/vrm-silk-twisting.js';
 
 // All available companies
 export const companies = {
     'pvs-silk-twisting': pvsConfig,
-    // Future companies can be added here:
-    // 'another-company': anotherConfig,
+    'vrm-silk-twisting': vrmConfig
 };
 
 // Default company (used when no company is selected)

@@ -160,3 +160,19 @@ export const IconAuto = ({ size = 18, className = '' }) => (
         <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path>
     </svg>
 );
+
+export const IconChevronDown = ({ size = 16, className = '' }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+    >
+        <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+);

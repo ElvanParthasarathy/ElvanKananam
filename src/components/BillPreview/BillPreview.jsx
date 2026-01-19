@@ -41,9 +41,7 @@ function BillPreview({
                 <div className="print-header-new">
                     {/* Left - Logo + Company Name */}
                     <div className="header-left">
-                        <div className="header-logo">
-                            <img src="/icons/SJSFMTT (Large).png" alt="Logo" />
-                        </div>
+
                         <div className="header-company-info">
                             <div className="company-name font-display">
                                 {name.english}
@@ -117,13 +115,19 @@ function BillPreview({
                             </tr>
                         )}
                     </tbody>
+                    {/* Total Row in Footer for Alignment */}
+                    <tfoot>
+                        <tr className="total-footer-row">
+                            <td colSpan="2" className="text-right total-label-cell">{labels.total}</td>
+                            <td className="text-center total-weight-cell">
+                                {formatWeight(totalKg)} Kg
+                            </td>
+                            <td className="text-center total-amount-cell">
+                                ₹ {totalRs}
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-
-                {/* Total Row */}
-                <div className="total-row-new">
-                    <span className="total-label">{labels.total}</span>
-                    <span className="total-value">₹ {totalRs}</span>
-                </div>
 
                 {/* Amount in Words */}
                 <div className="words-section">

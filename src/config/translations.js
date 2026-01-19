@@ -11,6 +11,8 @@ export const translations = {
         appName: 'எல்வன் கணனம்',
         appNameEnglish: 'Elvan Kananam',
         createBill: 'பில் உருவாக்கு',
+        test: 'மாதிரி',
+        reset: 'மீட்டமை',
 
         // Invoice Details
         invoiceDetails: 'பில் விவரங்கள்',
@@ -46,7 +48,7 @@ export const translations = {
         weightKg: 'கிலோ நிறை (Kg)',
         amount: 'ரூபாய்',
         total: 'மொத்தம்',
-        inWords: 'எழுத்தில்',
+        inWords: 'எழுத்தில் மொத்தத் தொகை',
         signature: '(கையொப்பம்)',
 
         // Language
@@ -60,6 +62,8 @@ export const translations = {
         appName: 'எல்வன் கணனம்',
         appNameEnglish: 'Elvan Kananam',
         createBill: 'Create Bill',
+        test: 'Test',
+        reset: 'Reset',
 
         // Invoice Details
         invoiceDetails: 'Invoice Details',
@@ -95,7 +99,7 @@ export const translations = {
         weightKg: 'கிலோ நிறை (Kg)',
         amount: 'ரூபாய்',
         total: 'மொத்தம்',
-        inWords: 'எழுத்தில்',
+        inWords: 'எழுத்தில் மொத்தத் தொகை',
         signature: '(கையொப்பம்)',
 
         // Language

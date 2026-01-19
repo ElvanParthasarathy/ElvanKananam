@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import BillEditor from './components/BillEditor/BillEditor';
 import BillPreview from './components/BillPreview/BillPreview';
 import Login from './components/Login/Login';
-import companyConfig from './config';
+import { getCompanyConfig, getCompanyOptions, DEFAULT_COMPANY_ID } from './config';
 import { getTranslation, DEFAULT_LANGUAGE } from './config/translations';
 import { isAuthenticated, login, logout } from './config/auth';
 import { getCurrentDate } from './utils/calculations';
@@ -56,11 +56,16 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  // View Mode
+  // View State
   const [viewMode, setViewMode] = useState('edit'); // 'edit' | 'preview'
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
-  // Language
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE); // 'ta' | 'en'
+  // Company State
+  const [companyId, setCompanyId] = useState(DEFAULT_COMPANY_ID);
+  const companyConfig = getCompanyConfig(companyId);
+  const companyOptions = getCompanyOptions();
+
+  // Translation
   const t = getTranslation(language);
 
   // Theme - 'light' | 'auto' | 'dark'
@@ -83,6 +88,31 @@ function App() {
   const [items, setItems] = useState([{ porul: '', coolie: '', kg: '' }]);
   const [setharamGrams, setSetharamGrams] = useState('');
   const [courierRs, setCourierRs] = useState('');
+
+  // Load Test Data Helper
+  const loadTestData = () => {
+    setBillNo('13');
+    setDate('15/12/2025');
+    setCustomerName('சுந்தரி சில்க்ஸ் இந்தியா');
+    setCity('திருச்சேறை, கும்பகோனம்');
+    setItems([
+      { porul: 'ஒண்டி தடை செய்ய கூலி', kg: '13.850', coolie: '660' },
+      { porul: 'மூன்று இழை சப்புரி செய்ய கூலி', kg: '21.720', coolie: '430' }
+    ]);
+    setSetharamGrams('1680');
+    setCourierRs('760');
+  };
+
+  // Reset Data Helper
+  const resetData = () => {
+    setBillNo(companyConfig.defaultBillNo);
+    setDate(getCurrentDate());
+    setCustomerName('');
+    setCity('');
+    setItems([{ porul: '', coolie: '', kg: '' }]);
+    setSetharamGrams('');
+    setCourierRs('');
+  };
 
   // Show login if not authenticated
   if (!isLoggedIn) {
@@ -124,6 +154,11 @@ function App() {
           courierRs={courierRs}
           setCourierRs={setCourierRs}
           onPreview={() => setViewMode('preview')}
+          onLoadTestData={loadTestData}
+          onResetData={resetData}
+          companyId={companyId}
+          setCompanyId={setCompanyId}
+          companyOptions={companyOptions}
         />
       )}
 

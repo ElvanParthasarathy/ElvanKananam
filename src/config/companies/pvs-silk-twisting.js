@@ -22,7 +22,7 @@ const pvsConfig = {
   address: {
     line1: '4/606 முதல் தெரு, சிவசக்தி நகர்',
     line2: 'ஆரணி - 632301',
-    line3: 'தி.மலை மாவட்டம்'
+    line3: 'திருவண்ணாமலை மாவட்டம்'
   },
 
   // Contact
@@ -40,7 +40,7 @@ const pvsConfig = {
     weight: 'எடை (Kg)',
     amount: 'ரூபாய்',
     total: 'மொத்தம்',
-    inWords: 'எழுத்தில்',
+    inWords: 'எழுத்தில் மொத்தத் தொகை',
     setharam: 'சேதாரம்',
     courier: 'கொரியர் கட்டணம்',
     signature: 'கையொப்பம்',

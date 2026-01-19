@@ -35,7 +35,7 @@
 .top-greeting-row {
     display: flex;
     justify-content: space-between;
-    padding: 0 10px;
+    padding: 0;
     margin-bottom: 15px;
 }
 
@@ -61,16 +61,7 @@
     gap: 15px;
 }
 
-.header-logo {
-    flex-shrink: 0;
-}
 
-.header-logo img {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-    filter: invert(42%) sepia(61%) saturate(545%) hue-rotate(85deg) brightness(89%) contrast(88%);
-}
 
 .header-company-info {
     text-align: left;
@@ -194,8 +185,8 @@
 }
 
 .bill-table-new th {
-    background: var(--bill-primary-dark);
-    color: white;
+    background: var(--bill-primary-light);
+    color: var(--bill-text-dark);
     font-weight: 700;
     font-size: 12px;
     text-align: center;
@@ -209,6 +200,7 @@
     font-size: 13px;
     color: #333;
     border-bottom: 1px solid #eee;
+    font-family: var(--font-numbers);
 }
 
 .bill-table-new tbody tr:last-child td {
@@ -231,28 +223,30 @@
 }
 
 /* ========== TOTAL ROW ========== */
-.total-row-new {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 30px;
-    padding: 12px 20px;
+.total-footer-row td {
     background: var(--bill-primary-light);
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.total-label {
-    font-size: 14px;
+    padding: 12px 10px;
+    border-top: 2px solid var(--bill-border);
     font-weight: 700;
-    color: var(--bill-text);
+    color: var(--bill-primary);
+    font-family: var(--font-numbers);
 }
 
-.total-value {
+.total-label-cell {
+    text-align: right;
+    padding-right: 20px !important;
+    font-size: 14px;
+    color: var(--bill-text-dark) !important;
+}
+
+.total-weight-cell {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.total-amount-cell {
     font-size: 18px;
-    font-weight: 800;
-    color: var(--bill-primary);
+    font-weight: 800 !important;
 }
 
 /* ========== WORDS SECTION ========== */
@@ -377,8 +371,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 600;
     color: #444;
+    font-family: var(--font-numbers);
 }
 
 .phone-item-new svg {

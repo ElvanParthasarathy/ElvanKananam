@@ -29,7 +29,12 @@ function BillEditor({
     setSetharamGrams,
     courierRs,
     setCourierRs,
-    onPreview
+    onPreview,
+    onLoadTestData,
+    onResetData,
+    companyId,
+    setCompanyId,
+    companyOptions
 }) {
     // Handlers
     const handleAddItem = () => {
@@ -105,7 +110,39 @@ function BillEditor({
                 <span className="app-name-tamil">{t.appName}</span>
                 <span className="app-name-english">{t.appNameEnglish}</span>
             </div>
-            <h1 className="editor-title">{t.createBill}</h1>
+            {/* Header Actions */}
+            <div className="editor-header-wrapper">
+                <h1 className="editor-title">{t.createBill}</h1>
+                <div className="editor-header-actions">
+                    {/* Company Selector */}
+                    <select
+                        value={companyId}
+                        onChange={(e) => setCompanyId(e.target.value)}
+                        className="company-select"
+                    >
+                        {companyOptions && companyOptions.map(opt => (
+                            <option key={opt.id} value={opt.id}>
+                                {language === 'ta' && opt.nameTamil ? opt.nameTamil : opt.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button
+                        type="button"
+                        onClick={onLoadTestData}
+                        className="header-action-btn"
+                    >
+                        {t.test}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onResetData}
+                        className="header-action-btn btn-muted"
+                    >
+                        {t.reset}
+                    </button>
+                </div>
+            </div>
 
             {/* Invoice Details Card */}
             <div className="card">

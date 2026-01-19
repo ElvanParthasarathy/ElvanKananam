@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { IconChevronDown } from './Icons';
 
 /**
  * Autocomplete Component
@@ -58,6 +59,12 @@ function Autocomplete({
         setIsOpen(true);
     };
 
+    const toggleDropdown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsOpen(!isOpen);
+    };
+
     return (
         <div className={`autocomplete-wrapper ${className}`} ref={wrapperRef}>
             <input
@@ -69,6 +76,16 @@ function Autocomplete({
                 placeholder={placeholder}
                 autoComplete="off"
             />
+
+            <button
+                type="button"
+                className="autocomplete-toggle-btn"
+                onClick={toggleDropdown}
+                tabIndex="-1"
+                aria-label="Toggle dropdown"
+            >
+                <IconChevronDown size={14} />
+            </button>
 
             {isOpen && filteredOptions.length > 0 && (
                 <ul className="autocomplete-dropdown">

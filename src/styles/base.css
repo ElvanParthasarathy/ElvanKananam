@@ -6,7 +6,7 @@
  */
 
 /* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Arima:wght@500;700&family=Mukta+Malar:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Arima:wght@500;700&family=Inter:wght@400;500;600;700;800&family=Mukta+Malar:wght@400;600;700&display=swap');
 
 /* ========== LIGHT THEME (Default) ========== */
 :root,
@@ -130,6 +130,7 @@
   /* Typography */
   --font-primary: 'Mukta Malar', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Arima', cursive;
+  --font-numbers: 'Inter', 'Mukta Malar', sans-serif;
 
   /* Font Sizes */
   --text-xs: 0.75rem;
@@ -242,4 +243,124 @@ body {
 
 .font-semibold {
   font-weight: 600;
+}
+
+/* ========== COMPONENT UTILITIES ========== */
+
+/* Remove touch highlight */
+button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+button:focus {
+  outline: none;
+}
+
+/* Header Action Buttons */
+/* Header Action Buttons */
+.header-action-btn {
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: var(--font-primary);
+  /* Enforce Mukta Malar */
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.header-action-btn:active {
+  transform: scale(0.95);
+  box-shadow: none;
+}
+
+.header-action-btn.btn-muted {
+  background: #9e9e9e;
+  /* Fallback or specific gray */
+  border-color: #9e9e9e;
+  color: #fff;
+}
+
+.header-action-btn.btn-muted:active {
+  background: #757575;
+}
+
+/* Autocomplete Toggle */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-input {
+  padding-right: 32px;
+  /* Space for toggle button */
+}
+
+.autocomplete-toggle-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.autocomplete-toggle-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Editor Header Layout */
+.editor-title {
+  margin-bottom: 0;
+  /* ensure h1 fits nicely */
+}
+
+.editor-header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.editor-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Company Selector */
+.company-select {
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  /* Matches theme */
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  font-family: var(--font-primary);
+  min-width: 160px;
+  height: 30px;
+  /* Aligned with buttons */
+  outline: none;
+  cursor: pointer;
+}
+
+.company-select:focus {
+  border-color: var(--color-primary);
 }

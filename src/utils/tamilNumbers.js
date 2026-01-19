@@ -73,44 +73,10 @@ function joinTamil(word1, word2) {
     if (!word1) return word2;
     if (!word2) return word1;
 
-    const vowels = ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ'];
-    const firstChar = Array.from(word2)[0];
+    // User Request: "sandhi should be there but not fully"
+    // Interpretation: Use oblique forms (passed as word1) but separated by spaces.
+    // Disable the vowel merging logic that combines them into single words.
 
-    // Check if word2 starts with a vowel
-    if (vowels.includes(firstChar)) {
-        let root = word1;
-        let base = '';
-
-        // Handle specific endings common in numbers (து, று, டு)
-        if (root.endsWith('து')) {
-            // Remove 'து', add 'த்'
-            base = root.substring(0, root.length - 'து'.length) + 'த்';
-        } else if (root.endsWith('று')) {
-            // Remove 'று', add 'ற்'
-            base = root.substring(0, root.length - 'று'.length) + 'ற்';
-        } else if (root.endsWith('டு')) {
-            // Remove 'டு', add 'ட்'
-            base = root.substring(0, root.length - 'டு'.length) + 'ட்';
-        } else {
-            // If no match, just space join (fallback)
-            return word1 + ' ' + word2;
-        }
-
-        // Now add the vowel sign to the base consonant
-        // The base ends with the consonant + virama.
-        // We assume valid Tamil unicode sequence (Consonant + Virama).
-        // e.g. 'த்' is 'த' + '்'.
-        // We remove the virama ('்') and add the vowel sign.
-
-        // Remove last char (virama)
-        let consonantBase = base.substring(0, base.length - 1);
-        let sign = vowelSigns[firstChar];
-
-        // Return Joined String: ConsonantBase + VowelSign + RestOfWord2
-        return consonantBase + sign + word2.substring(firstChar.length);
-    }
-
-    // Default: Join with space
     return word1 + ' ' + word2;
 }
 
