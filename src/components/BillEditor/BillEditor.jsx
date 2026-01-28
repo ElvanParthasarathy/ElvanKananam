@@ -28,7 +28,14 @@ function BillEditor({
     setharamGrams,
     setSetharamGrams,
     courierRs,
+
     setCourierRs,
+    ahimsaSilkRs,
+    setAhimsaSilkRs,
+    customChargeName,
+    setCustomChargeName,
+    customChargeRs,
+    setCustomChargeRs,
     onPreview,
     onLoadTestData,
     onResetData,
@@ -277,6 +284,43 @@ function BillEditor({
                             className="input-field"
                             value={courierRs}
                             onChange={(e) => setCourierRs(e.target.value)}
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+                <div className="input-row input-row-2">
+                    <div className="input-group">
+                        <label className="input-label">{t.ahimsaSilk}</label>
+                        <input
+                            type="number"
+                            className="input-field"
+                            value={ahimsaSilkRs}
+                            onChange={(e) => setAhimsaSilkRs(e.target.value)}
+                            placeholder="0"
+                        />
+                    </div>
+                    {/* Empty placeholder to keep alignment if needed, or remove if single row is fine */}
+                    <div className="input-group">
+                    </div>
+                </div>
+                <div className="input-row input-row-2">
+                    <div className="input-group">
+                        <label className="input-label">{t.otherName}</label>
+                        <input
+                            type="text"
+                            className="input-field"
+                            value={customChargeName}
+                            onChange={(e) => setCustomChargeName(e.target.value)}
+                            placeholder={t.otherName}
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label className="input-label">{t.otherAmount}</label>
+                        <input
+                            type="number"
+                            className="input-field"
+                            value={customChargeRs}
+                            onChange={(e) => setCustomChargeRs(e.target.value)}
                             placeholder="0"
                         />
                     </div>

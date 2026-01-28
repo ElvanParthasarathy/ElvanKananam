@@ -88,6 +88,9 @@ function App() {
   const [items, setItems] = useState([{ porul: '', coolie: '', kg: '' }]);
   const [setharamGrams, setSetharamGrams] = useState('');
   const [courierRs, setCourierRs] = useState('');
+  const [ahimsaSilkRs, setAhimsaSilkRs] = useState('');
+  const [customChargeName, setCustomChargeName] = useState('');
+  const [customChargeRs, setCustomChargeRs] = useState('');
 
   // Load Test Data Helper
   const loadTestData = () => {
@@ -101,6 +104,9 @@ function App() {
     ]);
     setSetharamGrams('1680');
     setCourierRs('760');
+    setAhimsaSilkRs(''); // Default empty for test
+    setCustomChargeName('');
+    setCustomChargeRs('');
   };
 
   // Reset Data Helper
@@ -112,6 +118,9 @@ function App() {
     setItems([{ porul: '', coolie: '', kg: '' }]);
     setSetharamGrams('');
     setCourierRs('');
+    setAhimsaSilkRs('');
+    setCustomChargeName('');
+    setCustomChargeRs('');
   };
 
   // Show login if not authenticated
@@ -153,6 +162,12 @@ function App() {
           setSetharamGrams={setSetharamGrams}
           courierRs={courierRs}
           setCourierRs={setCourierRs}
+          ahimsaSilkRs={ahimsaSilkRs}
+          setAhimsaSilkRs={setAhimsaSilkRs}
+          customChargeName={customChargeName}
+          setCustomChargeName={setCustomChargeName}
+          customChargeRs={customChargeRs}
+          setCustomChargeRs={setCustomChargeRs}
           onPreview={() => setViewMode('preview')}
           onLoadTestData={loadTestData}
           onResetData={resetData}
@@ -173,6 +188,9 @@ function App() {
           items={items}
           setharamGrams={setharamGrams}
           courierRs={courierRs}
+          ahimsaSilkRs={ahimsaSilkRs}
+          customChargeName={customChargeName}
+          customChargeRs={customChargeRs}
           onEdit={() => setViewMode('edit')}
         />
       )}

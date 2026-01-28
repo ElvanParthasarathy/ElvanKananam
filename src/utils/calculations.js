@@ -32,13 +32,15 @@ export function calcTotalKg(items, setharamGrams = 0) {
  * Calculate total amount from items and courier
  * @param {Array} items - Array of item objects
  * @param {number|string} courierRs - Courier charges in Rs
+ * @param {number|string} ahimsaSilkRs - Ahimsa Silk charges in Rs
+ * @param {number|string} customChargeRs - Custom extra charges in Rs
  * @returns {number} Total amount in Rs
  */
-export function calcTotalRs(items, courierRs = 0) {
+export function calcTotalRs(items, courierRs = 0, ahimsaSilkRs = 0, customChargeRs = 0) {
     const itemsTotal = items.reduce((sum, item) => {
         return sum + calcItemAmount(item.coolie, item.kg);
     }, 0);
-    return itemsTotal + (Number(courierRs) || 0);
+    return itemsTotal + (Number(courierRs) || 0) + (Number(ahimsaSilkRs) || 0) + (Number(customChargeRs) || 0);
 }
 
 /**
@@ -57,6 +59,16 @@ export function gramsToKg(grams) {
  */
 export function formatWeight(kg) {
     return Number(kg).toFixed(3);
+}
+
+/**
+ * Format currency with Indian commas (e.g. 1,00,000)
+ * @param {number|string} amount - Amount in Rs
+ * @returns {string} Formatted amount string
+ */
+export function formatCurrency(amount) {
+    if (!amount && amount !== 0) return '';
+    return Number(amount).toLocaleString('en-IN');
 }
 
 /**

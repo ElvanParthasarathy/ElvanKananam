@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconPhone, IconPrinter, IconEdit, IconMail } from '../common/Icons';
 import { numberToWordsTamil } from '../../utils/tamilNumbers';
-import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight } from '../../utils/calculations';
+import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight, formatCurrency } from '../../utils/calculations';
 
 /**
  * BillPreview Component
@@ -16,7 +16,12 @@ function BillPreview({
     city,
     items,
     setharamGrams,
+
     courierRs,
+
+    ahimsaSilkRs,
+    customChargeName,
+    customChargeRs,
     onEdit
 }) {
     const { name, greeting, billType, address, phone, email, labels } = config;
@@ -24,7 +29,7 @@ function BillPreview({
     // Calculations
     const setharamKg = gramsToKg(setharamGrams);
     const totalKg = calcTotalKg(items, setharamGrams);
-    const totalRs = calcTotalRs(items, courierRs);
+    const totalRs = calcTotalRs(items, courierRs, ahimsaSilkRs, customChargeRs);
 
     return (
         <div className="preview-overlay">
@@ -94,7 +99,7 @@ function BillPreview({
                                 <td className="text-center">{item.coolie || ''}</td>
                                 <td className="text-left">{item.porul}</td>
                                 <td className="text-center">{item.kg ? formatWeight(item.kg) : ''}</td>
-                                <td className="text-center">{calcItemAmount(item.coolie, item.kg) || ''}</td>
+                                <td className="text-center">{item.kg ? formatCurrency(calcItemAmount(item.coolie, item.kg)) : ''}</td>
                             </tr>
                         ))}
 
@@ -112,7 +117,25 @@ function BillPreview({
                                 <td className="text-center">-</td>
                                 <td className="text-left">{labels.courier}</td>
                                 <td className="text-center">-</td>
-                                <td className="text-center">{courierRs}</td>
+                                <td className="text-center">{formatCurrency(courierRs)}</td>
+                            </tr>
+                        )}
+
+                        {ahimsaSilkRs && (
+                            <tr>
+                                <td className="text-center">-</td>
+                                <td className="text-left">{labels.ahimsaSilk}</td>
+                                <td className="text-center">-</td>
+                                <td className="text-center">{formatCurrency(ahimsaSilkRs)}</td>
+                            </tr>
+                        )}
+
+                        {customChargeRs && (
+                            <tr>
+                                <td className="text-center">-</td>
+                                <td className="text-left">{customChargeName || (labels.otherName || 'More')}</td>
+                                <td className="text-center">-</td>
+                                <td className="text-center">{formatCurrency(customChargeRs)}</td>
                             </tr>
                         )}
                     </tbody>
@@ -124,7 +147,7 @@ function BillPreview({
                                 {formatWeight(totalKg)} Kg
                             </td>
                             <td className="text-center total-amount-cell">
-                                ₹ {totalRs}
+                                ₹ {formatCurrency(totalRs)}
                             </td>
                         </tr>
                     </tfoot>

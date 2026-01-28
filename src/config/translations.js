@@ -38,6 +38,9 @@ export const translations = {
         extras: 'கூடுதல் கட்டணங்கள்',
         setharam: 'சேதாரம் (கிராம்)',
         courier: 'கொரியர் கட்டணம் (₹)',
+        ahimsaSilk: 'அகிம்சா பட்டு (₹)',
+        otherName: 'பிற விபரம்',
+        otherAmount: 'தொகை (₹)',
 
         // Preview
         previewBill: 'பில் முன்னோட்டம்',
@@ -89,6 +92,9 @@ export const translations = {
         extras: 'Extra Charges',
         setharam: 'Setharam (g)',
         courier: 'Courier (₹)',
+        ahimsaSilk: 'Ahimsa Silk (₹)',
+        otherName: 'Other Details',
+        otherAmount: 'Amount (₹)',
 
         // Preview
         previewBill: 'PREVIEW BILL',
