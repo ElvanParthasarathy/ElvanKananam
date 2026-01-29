@@ -83,7 +83,7 @@ function BillPreview({
     return (
         <div className="preview-overlay" style={{ overflow: 'auto', textAlign: scale < 1 ? 'center' : 'left' }}>
             {/* Wrapper to handle scaling and scrolling */}
-            <div style={{
+            <div className="zoom-wrapper" style={{
                 width: '210mm',
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left', // Pivot from top-left for predictable scrolling

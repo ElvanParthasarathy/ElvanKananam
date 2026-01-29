@@ -683,6 +683,14 @@
         /* Reset zoom scale */
     }
 
+    /* Reset width/transform on the wrapper so it doesn't shrink the page */
+    .zoom-wrapper {
+        transform: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        overflow: visible !important;
+    }
+
     .bill-footer-new {
         margin-top: auto;
     }
