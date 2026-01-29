@@ -17,6 +17,9 @@
   --color-success: #2e7d32;
   --color-success-bg: #e8f5e9;
   --color-danger: #dc3545;
+  --color-warning: #E5993E;
+  --color-info: #2980b9;
+  --color-brand-silks: #24AE61;
 
   /* Colors - Neutral */
   --color-bg: #f0f2f5;
@@ -55,6 +58,9 @@
   --color-success: #66bb6a;
   --color-success-bg: #1b3d1f;
   --color-danger: #ef5350;
+  --color-warning: #f0ad4e;
+  --color-info: #64b5f6;
+  --color-brand-silks: #24AE61;
 
   /* Colors - Neutral */
   --color-bg: #121212;
@@ -94,6 +100,8 @@
     --color-success: #66bb6a;
     --color-success-bg: #1b3d1f;
     --color-danger: #ef5350;
+    --color-warning: #f0ad4e;
+    --color-info: #64b5f6;
 
     /* Colors - Neutral */
     --color-bg: #121212;

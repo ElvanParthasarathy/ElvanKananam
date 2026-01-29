@@ -1,0 +1,417 @@
+.elvan-invoice-wrapper {
+    font-family: var(--font-primary), Helvetica, Arial, sans-serif;
+    color: #333;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    /* A4 Size */
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    margin: 0 auto;
+    box-sizing: border-box;
+    position: relative;
+    font-size: 13px;
+    /* Standardize base font size */
+    line-height: 1.5;
+}
+
+@media print {
+    body {
+        margin: 0;
+        background: white;
+    }
+
+    .elvan-invoice-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 10mm;
+        /* Reduced print padding */
+        box-shadow: none;
+        min-height: auto;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .elvan-content-border {
+        border: 1px solid #000 !important;
+        /* Ensure border prints */
+    }
+}
+
+/* --- Top "Vazhga" Header --- */
+.elvan-top-motto {
+    display: flex;
+    justify-content: space-between;
+    color: #00796b;
+    /* Teal color from image */
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.elvan-guru-image {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
+    height: 60px;
+    /* Adjust based on actual image */
+}
+
+/* --- Main Content Border Box --- */
+.elvan-content-border {
+    border: 1px solid #ccc;
+    height: 100%;
+    position: relative;
+}
+
+/* --- Header Section --- */
+.elvan-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+    border-bottom: 1px solid #ccc;
+}
+
+.elvan-logo-section {
+    display: flex;
+    gap: 20px;
+}
+
+.elvan-logo {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+}
+
+.elvan-company-details h1 {
+    font-family: var(--font-display);
+    color: #008f51;
+    /* The specific Green from "Sri Jaipriya Silks" */
+    font-size: 24px;
+    margin: 0 0 5px 0;
+    font-weight: 700;
+}
+
+.elvan-company-details h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.elvan-company-details p {
+    font-size: 13px;
+    margin: 2px 0;
+    color: #555;
+    line-height: 1.4;
+}
+
+.elvan-company-details a {
+    color: #00796b;
+    text-decoration: none;
+}
+
+.elvan-invoice-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Space out header content */
+    min-height: 120px;
+}
+
+.elvan-tax-invoice-label {
+    color: #00a651;
+    /* Green */
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-align: right;
+}
+
+.elvan-invoice-number-large {
+    font-size: 16px;
+    color: #333;
+    text-align: right;
+    width: 100%;
+    display: block;
+}
+
+.elvan-invoice-number-large span {
+    font-weight: 700;
+}
+
+/* --- Info Strip (Date, Terms, etc.) --- */
+.elvan-info-strip {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+}
+
+.elvan-info-left {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    padding: 10px 15px;
+}
+
+.elvan-info-right {
+    flex: 1;
+    padding: 10px 15px;
+}
+
+.elvan-info-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.elvan-info-label {
+    width: 120px;
+    color: #00a651;
+    /* Green labels */
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.elvan-info-value {
+    color: #333;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* --- Bill To Section --- */
+.elvan-bill-to-section {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ccc;
+    background: #fdfdfd;
+}
+
+.elvan-bill-to-label {
+    color: #00a651;
+    font-weight: 700;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.elvan-customer-name {
+    color: #00a651;
+    /* Customer Name Green as per image */
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.elvan-customer-address {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* --- Items Table --- */
+.elvan-items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.elvan-items-table th {
+    background: white;
+    /* Match image, assuming white bg per description re-read, or very light */
+    color: #00a651;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    font-size: 13px;
+}
+
+.elvan-items-table th:last-child {
+    text-align: right;
+}
+
+.elvan-items-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    font-size: 13px;
+    color: #333;
+}
+
+.elvan-items-table tr:last-child td {
+    border-bottom: none;
+}
+
+.elvan-items-table .text-right {
+    text-align: right;
+}
+
+/* Column Widths to match image */
+.col-no {
+    width: 5%;
+    text-align: center;
+}
+
+.col-item {
+    width: 55%;
+}
+
+.col-qty {
+    width: 10%;
+    text-align: right;
+}
+
+.col-rate {
+    width: 15%;
+    text-align: right;
+}
+
+.col-amount {
+    width: 15%;
+    text-align: right;
+}
+
+/* Item Description Styling */
+.item-main-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.item-sub-desc {
+    color: #777;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+/* --- Footer Section (Totals & Notes) --- */
+.elvan-footer-grid {
+    display: flex;
+    border-top: 1px solid #ccc;
+    /* Top of footer/totals area */
+    min-height: 150px;
+}
+
+.elvan-footer-left {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.elvan-footer-right {
+    flex: 0 0 320px;
+    /* Fixed width for totals */
+    padding: 20px;
+}
+
+/* Totals styling */
+.elvan-totals-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.elvan-totals-label {
+    color: #333;
+    text-align: right;
+    flex: 1;
+    padding-right: 20px;
+}
+
+.elvan-totals-value {
+    color: #333;
+    text-align: right;
+    width: 100px;
+}
+
+.elvan-total-final {
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.elvan-balance-due {
+    color: #00a651;
+    font-weight: 700;
+    font-size: 14px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    margin-top: 5px;
+}
+
+/* Words & Notes */
+.elvan-total-words {
+    font-weight: 700;
+    font-style: italic;
+    color: #333;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.elvan-notes h4 {
+    color: #00a651;
+    margin: 0 0 5px 0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.elvan-notes p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+/* --- Signatures --- */
+.elvan-signatures {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px 30px 20px 30px;
+    /* Spacing for signature area */
+    border-top: 1px solid #ccc;
+}
+
+.elvan-sig-block {
+    text-align: center;
+}
+
+.elvan-sig-title {
+    font-size: 13px;
+    color: #333;
+    margin-top: 40px;
+    /* Space above signature content */
+}
+
+.elvan-sig-company {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 60px;
+    /* Matches the space in image "VANITHASREE P" ... space ... "For SRI JAIPRIYA SILKS" */
+    text-align: center;
+}
+
+.elvan-authorized {
+    text-align: center;
+    font-size: 13px;
+    color: #333;
+}
+
+/* --- Branding Footer --- */
+.elvan-branding-footer {
+    text-align: center;
+    font-size: 11px;
+    color: #777;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+}

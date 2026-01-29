@@ -3,30 +3,17 @@ import BillEditor from './components/BillEditor/BillEditor';
 import BillPreview from './components/BillPreview/BillPreview';
 import Home from './components/Home/Home';
 import Login from './components/Login/Login';
+import SilksEditor from './components/Silks/SilksEditor';
+import SilksPreview from './components/Silks/SilksPreview';
+import ElvanInvoice from './components/Silks/ElvanInvoice';
+import ElvanEditor from './components/Silks/ElvanEditor';
+import SilksDashboard from './components/Silks/SilksDashboard';
 import { getCompanyConfig, getCompanyOptions, DEFAULT_COMPANY_ID } from './config';
 import { getTranslation, DEFAULT_LANGUAGE } from './config/translations';
 import { isAuthenticated, login, logout } from './config/auth';
 import { getCurrentDate } from './utils/calculations';
 
-/**
- * Logout Icon Component
- */
-const IconLogout = ({ size = 20 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-    <polyline points="16 17 21 12 16 7" />
-    <line x1="21" y1="12" x2="9" y2="12" />
-  </svg>
-);
+// ... (Rest of imports unchanged)
 
 /**
  * Main App Component
@@ -92,6 +79,9 @@ function App() {
   const [ahimsaSilkRs, setAhimsaSilkRs] = useState('');
   const [customChargeName, setCustomChargeName] = useState('');
   const [customChargeRs, setCustomChargeRs] = useState('');
+
+  // State for Silks Bill
+  const [silksData, setSilksData] = useState(null);
 
   // Load Test Data Helper
   const loadTestData = () => {
@@ -194,6 +184,71 @@ function App() {
           customChargeRs={customChargeRs}
           onEdit={() => setViewMode('edit')}
         />
+      )}
+
+      {viewMode === 'silks-dashboard' && (
+        <SilksDashboard
+          onHome={() => setViewMode('home')}
+          onNewInvoice={() => {
+            setSilksData(null);
+            setViewMode('elvan-editor'); // Direct to New Elvan Editor
+          }}
+          onSelectInvoice={(invoice) => {
+            setSilksData(invoice);
+            // setViewMode('elvan-editor'); // Old: Direct to Edit
+            setViewMode('invoice-viewer'); // New: View Preview first
+          }}
+        />
+      )}
+
+      {viewMode === 'silks-editor' && (
+        <SilksEditor
+          onHome={() => setViewMode('silks-dashboard')}
+          onPreview={() => setViewMode('silks-preview')}
+          setData={setSilksData}
+          initialData={silksData}
+        />
+      )}
+
+      {viewMode === 'elvan-editor' && (
+        <ElvanEditor
+          onHome={() => setViewMode('silks-dashboard')}
+          onPreview={() => setViewMode('silks-preview')}
+          setData={setSilksData}
+          initialData={silksData}
+        />
+      )}
+
+      {/* Preview from Editor (Back goes to Editor) */}
+      {viewMode === 'silks-preview' && (
+        silksData?.template === 'elvan' ? (
+          <ElvanInvoice
+            data={silksData}
+            onEdit={() => setViewMode('elvan-editor')} // Back to Elvan Editor
+            onBack={() => setViewMode('elvan-editor')}
+          />
+        ) : (
+          <SilksPreview
+            data={silksData}
+            onEdit={() => setViewMode('silks-editor')} // Back to Classic Editor
+          />
+        )
+      )}
+
+      {/* Viewer from Dashboard (Back goes to Dashboard) */}
+      {viewMode === 'invoice-viewer' && (
+        silksData?.template === 'elvan' || !silksData?.template ? ( // Default to Elvan if template missing
+          <ElvanInvoice
+            data={silksData}
+            onEdit={() => setViewMode('elvan-editor')}
+            onBack={() => setViewMode('silks-dashboard')}
+          />
+        ) : (
+          <SilksPreview
+            data={silksData}
+            onEdit={() => setViewMode('silks-editor')}
+          />
+        )
       )}
     </>
   );

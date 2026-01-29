@@ -1,0 +1,292 @@
+/* Elvan Editor - Zoho Replica - Themed */
+.elvan-editor-container {
+    font-family: var(--font-primary, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+    background-color: var(--color-bg, #f8f8f8);
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    color: var(--color-text, #333);
+}
+
+/* Constants - Mapped to Global Theme Variables */
+/* Local overrides or fallbacks can be defined here if strictly needed, but prefer global vars */
+.elvan-editor-container {
+    --local-primary: #24AE61;
+    /* Green for Zoho Invoice Brand */
+    --local-header-bg: var(--color-surface, #fff);
+    --local-border: var(--color-border, #eee);
+    --local-input-bg: var(--color-input-bg, #fff);
+}
+
+/* Header */
+.elvan-editor-header {
+    background: var(--local-header-bg);
+    padding: 15px 30px;
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--local-border);
+}
+
+.elvan-back-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-muted, #666);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.elvan-back-link:hover {
+    color: var(--local-primary);
+}
+
+.elvan-editor-title {
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0;
+    color: var(--color-text, #333);
+}
+
+/* Main Content */
+.elvan-editor-content {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: var(--color-surface, #fff);
+    padding: 30px;
+    border: 1px solid var(--local-border);
+    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.02));
+    border-radius: 4px;
+}
+
+/* Form Sections */
+.elvan-section {
+    margin-bottom: 30px;
+}
+
+.elvan-form-group {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.elvan-label {
+    width: 150px;
+    font-size: 13px;
+    color: var(--color-danger, #e54649);
+    /* Required red from Zoho - keep as brand color? or use error color? Keep for now */
+    font-weight: 500;
+    text-align: right;
+    margin-right: 20px;
+}
+
+.elvan-label.optional {
+    color: var(--color-text, #333);
+}
+
+.elvan-input-wrapper {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+}
+
+.elvan-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 3px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: var(--local-input-bg);
+    color: var(--color-text, #333);
+}
+
+.elvan-input:focus {
+    border-color: var(--local-primary);
+    outline: none;
+    box-shadow: 0 0 5px rgba(36, 174, 97, 0.2);
+}
+
+/* Customer Select */
+.elvan-customer-select {
+    display: flex;
+    gap: 10px;
+}
+
+.elvan-customer-info {
+    font-size: 13px;
+    color: var(--color-text-muted, #666);
+    margin-top: 5px;
+    background: var(--color-bg, #f9f9f9);
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--local-border);
+}
+
+/* Invoice Details Grid */
+.elvan-inv-details {
+    display: flex;
+    gap: 40px;
+}
+
+/* Items Table */
+.elvan-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+.elvan-items-table th {
+    background: var(--color-bg, #f8f9fb);
+    border-top: 1px solid var(--local-border);
+    border-bottom: 1px solid var(--local-border);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted, #777);
+    text-transform: uppercase;
+}
+
+.elvan-items-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--local-border);
+    vertical-align: top;
+    color: var(--color-text, #333);
+}
+
+/* Item Inputs */
+.elvan-table-input {
+    width: 100%;
+    border: 1px solid transparent;
+    padding: 5px;
+    font-size: 13px;
+    resize: none;
+    background: transparent;
+    color: var(--color-text, #333);
+}
+
+.elvan-table-input:hover,
+.elvan-table-input:focus {
+    border: 1px solid var(--color-border, #ccc);
+    background: var(--local-input-bg);
+    border-radius: 2px;
+}
+
+.elvan-table-input:focus {
+    border-color: var(--local-primary);
+}
+
+.elvan-trash-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-muted, #888);
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.elvan-trash-btn:hover {
+    background: var(--color-danger, #ffebee);
+    color: var(--color-danger, #d32f2f);
+}
+
+.elvan-add-line-btn {
+    color: var(--color-accent, #408dfb);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    padding: 5px 0;
+}
+
+.elvan-add-line-btn:hover {
+    text-decoration: underline;
+}
+
+/* Footer Section */
+.elvan-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--local-border);
+}
+
+.elvan-notes-section {
+    width: 50%;
+}
+
+.elvan-totals-section {
+    width: 40%;
+    background: var(--color-bg, #fcfcfc);
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--local-border);
+}
+
+.elvan-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--color-text, #333);
+}
+
+.elvan-total-row.final {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text, #333);
+    border-top: 1px solid var(--local-border);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* Action Bar */
+.elvan-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--local-header-bg);
+    padding: 10px 30px;
+    border-top: 1px solid var(--local-border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+}
+
+.btn-zoho-save {
+    background: var(--local-primary);
+    color: white;
+    border: 1px solid var(--local-primary);
+    padding: 7px 15px;
+    font-size: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-zoho-cancel {
+    background: var(--local-header-bg);
+    color: var(--color-text, #333);
+    border: 1px solid var(--color-border, #ccc);
+    padding: 7px 15px;
+    font-size: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-zoho-save:hover {
+    background: #1d9652;
+}
+
+.btn-zoho-cancel:hover {
+    background: var(--color-bg, #f0f0f0);
+}

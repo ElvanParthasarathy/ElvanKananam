@@ -33,9 +33,10 @@ function Home({ t, onNavigate, onLogout, theme, setTheme, language, setLanguage 
                 {/* Option 2: Silks Bill (Future) */}
                 <button
                     className="btn"
+                    onClick={() => onNavigate('silks-dashboard')}
                     style={{
-                        background: 'var(--color-bg)',
-                        color: 'var(--color-text-muted)',
+                        background: 'var(--color-card)',
+                        color: 'var(--color-text)',
                         height: 'auto',
                         padding: '20px',
                         borderRadius: '50px',
@@ -43,16 +44,13 @@ function Home({ t, onNavigate, onLogout, theme, setTheme, language, setLanguage 
                         flexDirection: 'column',
                         gap: '5px',
                         border: '1px solid var(--color-border)',
-                        cursor: 'not-allowed',
-                        opacity: 0.7
+                        cursor: 'pointer'
                     }}
-                    disabled
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <IconLock size={16} />
                         <span style={{ fontSize: '1.2rem' }}>Silks Bill</span>
                     </div>
-                    <span style={{ fontSize: '0.8rem', background: '#eee', padding: '2px 8px', borderRadius: '10px', color: '#666' }}>Coming Soon</span>
                 </button>
             </div>
 
