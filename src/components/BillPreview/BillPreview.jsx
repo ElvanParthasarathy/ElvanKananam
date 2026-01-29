@@ -270,7 +270,10 @@ function BillPreview({
                 <button className="fab fab-secondary" onClick={onEdit} aria-label="Edit">
                     <IconEdit size={22} />
                 </button>
-                <button className="fab fab-primary" onClick={() => window.print()} aria-label="Print">
+                <button className="fab fab-primary" onClick={() => {
+                    document.title = `${billNo} - ${name.english}`;
+                    window.print();
+                }} aria-label="Print">
                     <IconPrinter size={22} />
                 </button>
             </div>
