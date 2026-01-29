@@ -264,7 +264,7 @@ button:focus {
   border: 1px solid var(--color-primary);
   color: #fff;
   padding: 4px 12px;
-  border-radius: 4px;
+  border-radius: 50px;
   font-family: var(--font-primary);
   /* Enforce Mukta Malar */
   font-size: 12px;
@@ -348,7 +348,7 @@ button:focus {
 .company-select {
   padding: 4px 8px;
   font-size: 13px;
-  border-radius: 4px;
+  border-radius: 50px;
   border: 1px solid var(--color-border);
   /* Matches theme */
   background: var(--color-input-bg);

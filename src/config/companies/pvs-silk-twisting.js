@@ -50,14 +50,14 @@ const pvsConfig = {
 
   // Theme Colors
   colors: {
-    primary: '#1a237e',
-    accent: '#2c4488',
-    headerBg: '#e8eaf6',
-    text: '#1a237e',
-    textDark: '#000000',
-    border: '#1a237e',
+    primary: '#388e3c',
+    accent: '#4caf50',
+    headerBg: '#e8f5e9',
+    text: '#388e3c',
+    textDark: '#2e7d32',
+    border: '#388e3c',
     inputBg: '#f9f9f9',
-    inputFocus: '#2c4488'
+    inputFocus: '#4caf50'
   },
 
   // Default Bill Number (can be overridden)

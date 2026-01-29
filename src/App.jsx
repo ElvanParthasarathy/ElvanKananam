@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BillEditor from './components/BillEditor/BillEditor';
 import BillPreview from './components/BillPreview/BillPreview';
+import Home from './components/Home/Home';
 import Login from './components/Login/Login';
 import { getCompanyConfig, getCompanyOptions, DEFAULT_COMPANY_ID } from './config';
 import { getTranslation, DEFAULT_LANGUAGE } from './config/translations';
@@ -57,7 +58,7 @@ function App() {
   };
 
   // View State
-  const [viewMode, setViewMode] = useState('edit'); // 'edit' | 'preview'
+  const [viewMode, setViewMode] = useState('home'); // 'home' | 'edit' | 'preview'
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
   // Company State
@@ -131,14 +132,13 @@ function App() {
   return (
     <>
       {/* Logout Button */}
-      <button
-        className="logout-btn"
-        onClick={handleLogout}
-        aria-label="Logout"
-        title="Logout"
-      >
-        <IconLogout size={18} />
-      </button>
+      {viewMode === 'home' && (
+        <Home
+          t={t}
+          onNavigate={setViewMode}
+          onLogout={handleLogout}
+        />
+      )}
 
       {viewMode === 'edit' && (
         <BillEditor
@@ -169,6 +169,7 @@ function App() {
           customChargeRs={customChargeRs}
           setCustomChargeRs={setCustomChargeRs}
           onPreview={() => setViewMode('preview')}
+          onHome={() => setViewMode('home')} // Add onHome prop
           onLoadTestData={loadTestData}
           onResetData={resetData}
           companyId={companyId}

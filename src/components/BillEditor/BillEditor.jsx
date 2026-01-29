@@ -1,7 +1,8 @@
-import React from 'react';
-import { IconTrash, IconPlus, IconPrinter, IconSun, IconMoon, IconAuto } from '../common/Icons';
+import { IconTrash, IconPlus, IconPrinter, IconSun, IconMoon, IconAuto, IconHome, IconMenu } from '../common/Icons'; // Added IconMenu
 import Autocomplete from '../common/Autocomplete';
 import { defaultItems, defaultCustomers } from '../../config/defaults';
+import Sidebar from '../common/Sidebar'; // Import Sidebar
+import { useState } from 'react'; // Import useState for sidebar
 
 /**
  * BillEditor Component
@@ -37,12 +38,16 @@ function BillEditor({
     customChargeRs,
     setCustomChargeRs,
     onPreview,
+    onHome,
     onLoadTestData,
     onResetData,
     companyId,
     setCompanyId,
     companyOptions
 }) {
+    // Sidebar State
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     // Handlers
     const handleAddItem = () => {
         setItems([...items, { porul: '', coolie: '', kg: '' }]);
@@ -64,54 +69,49 @@ function BillEditor({
         setCity(customer.city);
     };
 
-    return (
-        <div className="editor-wrapper">
-            {/* Top Bar - Language & Theme */}
-            <div className="top-bar">
-                {/* Language Selector */}
-                <div className="language-selector">
-                    <button
-                        className={`lang-btn ${language === 'ta' ? 'active' : ''}`}
-                        onClick={() => setLanguage('ta')}
-                    >
-                        த
-                    </button>
-                    <button
-                        className={`lang-btn ${language === 'en' ? 'active' : ''}`}
-                        onClick={() => setLanguage('en')}
-                    >
-                        A
-                    </button>
-                </div>
+    // Generate CSS variables for dynamic editor theming based on company config
+    const editorStyles = {
+        '--color-primary': config.colors.primary,
+        '--color-accent': config.colors.accent,
+        // Make "Add Item" button look like the Primary button (Solid Accent + White Text)
+        '--color-success': '#ffffff',
+        '--color-success-bg': config.colors.accent,
+    };
 
-                {/* Theme Toggle - 3 way slider */}
-                <div className="theme-toggle">
-                    <button
-                        className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
-                        onClick={() => setTheme('light')}
-                        aria-label="Light mode"
-                        title="Light"
-                    >
-                        <IconSun size={16} />
-                    </button>
-                    <button
-                        className={`theme-btn ${theme === 'auto' ? 'active' : ''}`}
-                        onClick={() => setTheme('auto')}
-                        aria-label="Auto mode"
-                        title="Auto"
-                    >
-                        <IconAuto size={16} />
-                    </button>
-                    <button
-                        className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
-                        onClick={() => setTheme('dark')}
-                        aria-label="Dark mode"
-                        title="Dark"
-                    >
-                        <IconMoon size={16} />
-                    </button>
-                </div>
+    return (
+        <div className="editor-wrapper" style={editorStyles}>
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                t={t}
+                language={language}
+                setLanguage={setLanguage}
+                theme={theme}
+                setTheme={setTheme}
+            />
+
+            {/* Top Bar - Navigation & Menu */}
+            <div className="top-bar">
+                {/* Home Button */}
+                <button
+                    className="lang-btn"
+                    onClick={onHome}
+                    title="Home"
+                    style={{ marginRight: 'auto' }}
+                >
+                    <IconHome size={20} />
+                </button>
+
+                {/* Sidebar Trigger (Menu) */}
+                <button
+                    className="lang-btn"
+                    onClick={() => setIsSidebarOpen(true)}
+                    title="Settings"
+                >
+                    <IconMenu size={24} />
+                </button>
             </div>
+
 
             <div className="app-branding">
                 <span className="app-name-tamil">{t.appName}</span>
@@ -122,17 +122,7 @@ function BillEditor({
                 <h1 className="editor-title">{t.createBill}</h1>
                 <div className="editor-header-actions">
                     {/* Company Selector */}
-                    <select
-                        value={companyId}
-                        onChange={(e) => setCompanyId(e.target.value)}
-                        className="company-select"
-                    >
-                        {companyOptions && companyOptions.map(opt => (
-                            <option key={opt.id} value={opt.id}>
-                                {language === 'ta' && opt.nameTamil ? opt.nameTamil : opt.name}
-                            </option>
-                        ))}
-                    </select>
+
 
                     <button
                         type="button"
@@ -154,6 +144,23 @@ function BillEditor({
             {/* Invoice Details Card */}
             <div className="card">
                 <div className="card-title">{t.invoiceDetails}</div>
+
+                {/* Company Selector Moved Here */}
+                <div className="input-group" style={{ marginBottom: '16px' }}>
+                    <label className="input-label">{t.company}</label>
+                    <select
+                        value={companyId}
+                        onChange={(e) => setCompanyId(e.target.value)}
+                        className="input-field"
+                        style={{ width: '100%', appearance: 'none' }}
+                    >
+                        {companyOptions && companyOptions.map(opt => (
+                            <option key={opt.id} value={opt.id}>
+                                {language === 'ta' && opt.nameTamil ? opt.nameTamil : opt.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div className="input-row input-row-2">
                     <div className="input-group">
                         <label className="input-label">{t.billNo}</label>
@@ -332,7 +339,7 @@ function BillEditor({
                 <IconPrinter size={20} />
                 {t.previewBill}
             </button>
-        </div>
+        </div >
     );
 }
 

@@ -18,6 +18,7 @@ export const translations = {
         invoiceDetails: 'பில் விவரங்கள்',
         billNo: 'பில் எண்',
         date: 'தேதி',
+        company: 'நிறுவனம்',
 
         // Customer
         customer: 'வாடிக்கையாளர்',
@@ -72,6 +73,7 @@ export const translations = {
         invoiceDetails: 'Invoice Details',
         billNo: 'Bill No',
         date: 'Date',
+        company: 'Company',
 
         // Customer
         customer: 'Customer',

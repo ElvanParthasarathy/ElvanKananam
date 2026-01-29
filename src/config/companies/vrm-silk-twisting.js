@@ -49,14 +49,14 @@ const vrmConfig = {
 
     // Theme Colors
     colors: {
-        primary: '#1a237e',
-        accent: '#2c4488',
-        headerBg: '#e8eaf6',
-        text: '#1a237e',
-        textDark: '#000000',
-        border: '#1a237e',
+        primary: '#8E24AA',
+        accent: '#BA68C8',
+        headerBg: '#F3E5F5',
+        text: '#6A1B9A',
+        textDark: '#4A148C',
+        border: '#7B1FA2',
         inputBg: '#f9f9f9',
-        inputFocus: '#2c4488'
+        inputFocus: '#AB47BC'
     },
 
     // Default Bill Number
