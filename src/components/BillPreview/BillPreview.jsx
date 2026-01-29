@@ -271,8 +271,12 @@ function BillPreview({
                     <IconEdit size={22} />
                 </button>
                 <button className="fab fab-primary" onClick={() => {
+                    const originalTitle = document.title;
                     document.title = `${billNo} - ${name.english}`;
-                    window.print();
+                    setTimeout(() => {
+                        window.print();
+                        setTimeout(() => document.title = originalTitle, 500);
+                    }, 100);
                 }} aria-label="Print">
                     <IconPrinter size={22} />
                 </button>
