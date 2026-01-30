@@ -166,7 +166,11 @@ function BillPreview({
 
         } catch (error) {
             console.error('PDF Download Error:', error);
-            alert('Failed to generate PDF. Is the PDF Server running?');
+            if (window.innerWidth < 1024) {
+                alert('Cloud PDF generation requires a separate hosted server.\n\nTIP: Use the "Printer" icon instead! On your phone, it lets you "Save as PDF" directly in high quality!');
+            } else {
+                alert('PDF Server unreachable. If you are using our online version (Vercel), please ensure the PDF service is hosted and configured in your Vercel settings.');
+            }
         } finally {
             if (activeInterval) clearInterval(activeInterval);
             setTimeout(() => {
