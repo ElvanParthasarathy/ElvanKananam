@@ -5,9 +5,9 @@ import Home from './components/Home/Home';
 import Login from './components/Login/Login';
 import SilksEditor from './components/Silks/SilksEditor';
 import SilksPreview from './components/Silks/SilksPreview';
-import ElvanInvoice from './components/Silks/ElvanInvoice';
-import ElvanEditor from './components/Silks/ElvanEditor';
 import SilksDashboard from './components/Silks/SilksDashboard';
+import CoolieDashboard from './components/Coolie/CoolieDashboard';
+import Layout from './components/common/Layout';
 import { getCompanyConfig, getCompanyOptions, DEFAULT_COMPANY_ID } from './config';
 import { getTranslation, DEFAULT_LANGUAGE } from './config/translations';
 import { isAuthenticated, login, logout } from './config/auth';
@@ -44,8 +44,13 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  // View State
-  const [viewMode, setViewMode] = useState('home'); // 'home' | 'edit' | 'preview'
+  // View State - Load from URL hash or localStorage or default
+  const [viewMode, setViewMode] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) return hash;
+    return localStorage.getItem('elvan-viewMode') || 'home';
+  });
+
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
   // Company State
@@ -68,20 +73,81 @@ function App() {
     localStorage.setItem('elvan-theme', theme);
   }, [theme]);
 
-  // Bill Data State
-  const [billNo, setBillNo] = useState(companyConfig.defaultBillNo);
-  const [date, setDate] = useState(getCurrentDate());
-  const [customerName, setCustomerName] = useState('');
-  const [city, setCity] = useState('');
-  const [items, setItems] = useState([{ porul: '', coolie: '', kg: '' }]);
-  const [setharamGrams, setSetharamGrams] = useState('');
-  const [courierRs, setCourierRs] = useState('');
-  const [ahimsaSilkRs, setAhimsaSilkRs] = useState('');
-  const [customChargeName, setCustomChargeName] = useState('');
-  const [customChargeRs, setCustomChargeRs] = useState('');
+  // Bill Data State - Load from localStorage if available
+  const [billNo, setBillNo] = useState(() => localStorage.getItem('elvan-billNo') || companyConfig.defaultBillNo);
+  const [date, setDate] = useState(() => localStorage.getItem('elvan-date') || getCurrentDate());
+  const [customerName, setCustomerName] = useState(() => localStorage.getItem('elvan-customerName') || '');
+  const [city, setCity] = useState(() => localStorage.getItem('elvan-city') || '');
+  const [items, setItems] = useState(() => {
+    const saved = localStorage.getItem('elvan-items');
+    return saved ? JSON.parse(saved) : [{ porul: '', coolie: '', kg: '' }];
+  });
+  const [setharamGrams, setSetharamGrams] = useState(() => localStorage.getItem('elvan-setharamGrams') || '');
+  const [courierRs, setCourierRs] = useState(() => localStorage.getItem('elvan-courierRs') || '');
+  const [ahimsaSilkRs, setAhimsaSilkRs] = useState(() => localStorage.getItem('elvan-ahimsaSilkRs') || '');
+  const [customChargeName, setCustomChargeName] = useState(() => localStorage.getItem('elvan-customChargeName') || '');
+  const [customChargeRs, setCustomChargeRs] = useState(() => localStorage.getItem('elvan-customChargeRs') || '');
+  const [bankDetails, setBankDetails] = useState(() => localStorage.getItem('elvan-bankDetails') || '');
+  const [accountNo, setAccountNo] = useState(() => localStorage.getItem('elvan-accountNo') || '');
 
   // State for Silks Bill
-  const [silksData, setSilksData] = useState(null);
+  const [silksData, setSilksData] = useState(() => {
+    const saved = localStorage.getItem('elvan-silksData');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Persist State to localStorage on Change
+  useEffect(() => {
+    localStorage.setItem('elvan-viewMode', viewMode);
+    localStorage.setItem('elvan-billNo', billNo);
+    localStorage.setItem('elvan-date', date);
+    localStorage.setItem('elvan-customerName', customerName);
+    localStorage.setItem('elvan-city', city);
+    localStorage.setItem('elvan-items', JSON.stringify(items));
+    localStorage.setItem('elvan-setharamGrams', setharamGrams);
+    localStorage.setItem('elvan-courierRs', courierRs);
+    localStorage.setItem('elvan-ahimsaSilkRs', ahimsaSilkRs);
+    localStorage.setItem('elvan-customChargeName', customChargeName);
+    localStorage.setItem('elvan-customChargeRs', customChargeRs);
+    localStorage.setItem('elvan-bankDetails', bankDetails);
+    localStorage.setItem('elvan-accountNo', accountNo);
+    localStorage.setItem('elvan-silksData', JSON.stringify(silksData));
+
+    // Update URL Hash for back button support
+    if (window.location.hash !== `#${viewMode}`) {
+      window.history.pushState({ viewMode }, '', `#${viewMode}`);
+    }
+  }, [viewMode, billNo, date, customerName, city, items, setharamGrams, courierRs, ahimsaSilkRs, customChargeName, customChargeRs, silksData]);
+
+  // Handle Browser Back Button (popstate)
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (event.state && event.state.viewMode) {
+        setViewMode(event.state.viewMode);
+      } else {
+        // Fallback to hash if state is missing
+        const hash = window.location.hash.replace('#', '');
+        if (hash) setViewMode(hash);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Prevent accidental data loss on refresh/close
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      const hasData = customerName || (items.length > 0 && items[0].porul);
+      if (hasData && (viewMode === 'edit' || viewMode === 'coolie-new' || viewMode === 'silks-new')) {
+        e.preventDefault();
+        e.returnValue = ''; // Standard way to show confirmation
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [customerName, items, viewMode]);
 
   // Load Test Data Helper
   const loadTestData = () => {
@@ -98,6 +164,8 @@ function App() {
     setAhimsaSilkRs(''); // Default empty for test
     setCustomChargeName('');
     setCustomChargeRs('');
+    setBankDetails('Indian Bank, Arni');
+    setAccountNo('1234567890');
   };
 
   // Reset Data Helper
@@ -112,6 +180,8 @@ function App() {
     setAhimsaSilkRs('');
     setCustomChargeName('');
     setCustomChargeRs('');
+    setBankDetails('');
+    setAccountNo('');
   };
 
   // Show login if not authenticated
@@ -121,135 +191,130 @@ function App() {
 
   return (
     <>
-      {/* Logout Button */}
-      {viewMode === 'home' && (
-        <Home
-          t={t}
-          onNavigate={setViewMode}
-          onLogout={handleLogout}
-        />
-      )}
+      {/* Layout Wrapper */}
+      <Layout
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        onLogout={handleLogout}
+        t={t}
+      >
 
-      {viewMode === 'edit' && (
-        <BillEditor
-          config={companyConfig}
-          t={t}
-          language={language}
-          setLanguage={setLanguage}
-          theme={theme}
-          setTheme={setTheme}
-          billNo={billNo}
-          setBillNo={setBillNo}
-          date={date}
-          setDate={setDate}
-          customerName={customerName}
-          setCustomerName={setCustomerName}
-          city={city}
-          setCity={setCity}
-          items={items}
-          setItems={setItems}
-          setharamGrams={setharamGrams}
-          setSetharamGrams={setSetharamGrams}
-          courierRs={courierRs}
-          setCourierRs={setCourierRs}
-          ahimsaSilkRs={ahimsaSilkRs}
-          setAhimsaSilkRs={setAhimsaSilkRs}
-          customChargeName={customChargeName}
-          setCustomChargeName={setCustomChargeName}
-          customChargeRs={customChargeRs}
-          setCustomChargeRs={setCustomChargeRs}
-          onPreview={() => setViewMode('preview')}
-          onHome={() => setViewMode('home')} // Add onHome prop
-          onLoadTestData={loadTestData}
-          onResetData={resetData}
-          companyId={companyId}
-          setCompanyId={setCompanyId}
-          companyOptions={companyOptions}
-        />
-      )}
-
-      {viewMode === 'preview' && (
-        <BillPreview
-          config={companyConfig}
-          t={t}
-          billNo={billNo}
-          date={date}
-          customerName={customerName}
-          city={city}
-          items={items}
-          setharamGrams={setharamGrams}
-          courierRs={courierRs}
-          ahimsaSilkRs={ahimsaSilkRs}
-          customChargeName={customChargeName}
-          customChargeRs={customChargeRs}
-          onEdit={() => setViewMode('edit')}
-        />
-      )}
-
-      {viewMode === 'silks-dashboard' && (
-        <SilksDashboard
-          onHome={() => setViewMode('home')}
-          onNewInvoice={() => {
-            setSilksData(null);
-            setViewMode('elvan-editor'); // Direct to New Elvan Editor
-          }}
-          onSelectInvoice={(invoice) => {
-            setSilksData(invoice);
-            // setViewMode('elvan-editor'); // Old: Direct to Edit
-            setViewMode('invoice-viewer'); // New: View Preview first
-          }}
-        />
-      )}
-
-      {viewMode === 'silks-editor' && (
-        <SilksEditor
-          onHome={() => setViewMode('silks-dashboard')}
-          onPreview={() => setViewMode('silks-preview')}
-          setData={setSilksData}
-          initialData={silksData}
-        />
-      )}
-
-      {viewMode === 'elvan-editor' && (
-        <ElvanEditor
-          onHome={() => setViewMode('silks-dashboard')}
-          onPreview={() => setViewMode('silks-preview')}
-          setData={setSilksData}
-          initialData={silksData}
-        />
-      )}
-
-      {/* Preview from Editor (Back goes to Editor) */}
-      {viewMode === 'silks-preview' && (
-        silksData?.template === 'elvan' ? (
-          <ElvanInvoice
-            data={silksData}
-            onEdit={() => setViewMode('elvan-editor')} // Back to Elvan Editor
-            onBack={() => setViewMode('elvan-editor')}
+        {/* VIEW: HOME */}
+        {viewMode === 'home' && (
+          <Home
+            t={t}
+            onNavigate={setViewMode}
           />
-        ) : (
+        )}
+
+        {/* VIEW: COOLIE BILL (Dashboard) */}
+        {viewMode === 'coolie-dashboard' && (
+          <CoolieDashboard
+            onNewBill={() => setViewMode('coolie-new')}
+            onHome={() => setViewMode('home')}
+          />
+        )}
+
+        {/* VIEW: COOLIE BILL (New/Edit) */}
+        {(viewMode === 'coolie-new' || viewMode === 'edit') && (
+          <BillEditor
+            config={companyConfig}
+            t={t}
+            language={language}
+            setLanguage={setLanguage}
+            theme={theme}
+            setTheme={setTheme}
+            billNo={billNo}
+            setBillNo={setBillNo}
+            date={date}
+            setDate={setDate}
+            customerName={customerName}
+            setCustomerName={setCustomerName}
+            city={city}
+            setCity={setCity}
+            items={items}
+            setItems={setItems}
+            setharamGrams={setharamGrams}
+            setSetharamGrams={setSetharamGrams}
+            courierRs={courierRs}
+            setCourierRs={setCourierRs}
+            ahimsaSilkRs={ahimsaSilkRs}
+            setAhimsaSilkRs={setAhimsaSilkRs}
+            customChargeName={customChargeName}
+            setCustomChargeName={setCustomChargeName}
+            customChargeRs={customChargeRs}
+            setCustomChargeRs={setCustomChargeRs}
+            bankDetails={bankDetails}
+            setBankDetails={setBankDetails}
+            accountNo={accountNo}
+            setAccountNo={setAccountNo}
+            onPreview={() => setViewMode('coolie-preview')}
+            onHome={() => setViewMode('home')}
+            onLoadTestData={loadTestData}
+            onResetData={resetData}
+            companyId={companyId}
+            setCompanyId={setCompanyId}
+            companyOptions={companyOptions}
+          />
+        )}
+
+        {/* VIEW: COOLIE BILL (Preview) */}
+        {(viewMode === 'coolie-preview' || viewMode === 'preview') && (
+          <BillPreview
+            config={companyConfig}
+            t={t}
+            billNo={billNo}
+            date={date}
+            customerName={customerName}
+            city={city}
+            items={items}
+            setharamGrams={setharamGrams}
+            courierRs={courierRs}
+            ahimsaSilkRs={ahimsaSilkRs}
+            customChargeName={customChargeName}
+            customChargeRs={customChargeRs}
+            bankDetails={bankDetails}
+            accountNo={accountNo}
+            onEdit={() => setViewMode('coolie-new')}
+          />
+        )}
+
+        {/* VIEW: SILKS (Dashboard/List) */}
+        {(viewMode === 'silks-dashboard' || viewMode === 'silks-items' || viewMode === 'silks-customers' || viewMode === 'silks-business') && (
+          <SilksDashboard
+            activeTab={viewMode.split('-')[1] || 'home'}
+            onHome={() => setViewMode('home')}
+            onNewInvoice={() => {
+              setSilksData(null);
+              setViewMode('silks-new');
+            }}
+            onSelectInvoice={(invoice) => {
+              setSilksData(invoice);
+              setViewMode('silks-viewer');
+            }}
+          />
+        )}
+
+        {/* VIEW: SILKS (New/Edit) */}
+        {(viewMode === 'silks-new' || viewMode === 'elvan-editor' || viewMode === 'silks-editor') && (
+          <SilksEditor
+            onHome={() => setViewMode('silks-dashboard')}
+            onPreview={() => setViewMode('silks-preview')}
+            setData={setSilksData}
+            initialData={silksData}
+          />
+        )}
+
+        {/* VIEW: SILKS (Preview/Viewer) */}
+        {(viewMode === 'silks-preview' || viewMode === 'silks-viewer' || viewMode === 'invoice-viewer') && (
           <SilksPreview
             data={silksData}
-            onEdit={() => setViewMode('silks-editor')} // Back to Classic Editor
-          />
-        )
-      )}
-
-      {/* Viewer from Dashboard (Back goes to Dashboard) */}
-      {viewMode === 'invoice-viewer' && (
-        silksData?.template === 'elvan' || !silksData?.template ? ( // Default to Elvan if template missing
-          <ElvanInvoice
-            data={silksData}
-            onEdit={() => setViewMode('elvan-editor')}
+            onEdit={() => setViewMode('silks-new')}
             onBack={() => setViewMode('silks-dashboard')}
           />
-        ) : (
-          <SilksPreview
-            data={silksData}
-            onEdit={() => setViewMode('silks-editor')}
-          />
-        )
-      )}
+        )}
+
+      </Layout>
     </>
   );
 }

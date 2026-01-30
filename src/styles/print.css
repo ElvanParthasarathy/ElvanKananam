@@ -55,6 +55,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
+    margin-bottom: 41px;
 }
 
 .header-left {
@@ -112,13 +113,6 @@
     font-family: var(--font-primary);
 }
 
-/* ========== DIVIDER LINE ========== */
-.header-divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--bill-primary), transparent);
-    margin: 15px 0 25px 0;
-}
-
 /* ========== BILL INFO SECTION ========== */
 .bill-info-section {
     margin-bottom: 20px;
@@ -145,26 +139,35 @@
 }
 
 .customer-info {
-    padding-left: 5px;
+    padding-left: 15px;
+    /* Matched to PDF marginLeft: 15 */
+    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 .customer-name-simple {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 14px;
+    /* Matched to PDF 12pt approx */
+    font-weight: 600;
+    /* Matched to PDF 600 */
     color: #000;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    /* Matched to PDF marginBottom: 6 */
 }
 
 .customer-city-simple {
-    font-size: 16px;
+    font-size: 14px;
+    /* Matched to PDF 12pt approx */
     font-weight: 600;
     color: #000;
 }
 
 .customer-label {
     font-weight: 700;
+    /* Matched to PDF 700 */
     color: var(--bill-primary);
-    margin-right: 5px;
+    margin-right: 4px;
+    /* Matched to PDF single space */
 }
 
 .customer-address {
@@ -291,8 +294,13 @@
     font-family: var(--font-primary);
 }
 
-.footer-right {
+/* Renamed to avoid BillEditor conflict */
+.preview-footer-right {
     text-align: right;
+    background: none;
+    border: none;
+    padding: 0;
+    width: auto;
 }
 
 .sign-company {
@@ -696,11 +704,25 @@
         margin-top: auto;
     }
 
+    /* Reset Main Content Layout for Print */
+    .main-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
     /* Hide UI */
     .editor-wrapper,
     .preview-actions,
     .login-container,
-    .logout-btn {
+    .logout-btn,
+    .sidebar,
+    .bottom-nav,
+    .top-bar,
+    .app-branding,
+    .nav-item,
+    .sidebar-overlay {
         display: none !important;
     }
 

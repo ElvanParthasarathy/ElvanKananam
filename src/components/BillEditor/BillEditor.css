@@ -1,0 +1,560 @@
+/* BillEditor.css - Zoho Style Clone */
+
+/* ========== CONTAINER ========== */
+.bill-editor-container {
+    background: transparent !important;
+    color: var(--color-text) !important;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    padding-bottom: 120px;
+}
+
+/* ========== HEADER SECTION ========== */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.page-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.page-toggle-view {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+/* Form Groups */
+.zoho-form-group {
+    margin-bottom: 24px;
+}
+
+.zoho-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-danger);
+    /* Zoho usage of red for mandatory labels */
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.zoho-label-normal {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.zoho-input,
+.zoho-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: var(--color-input-bg) !important;
+    color: var(--color-text) !important;
+    transition: border-color 0.2s;
+}
+
+.zoho-input:focus,
+.zoho-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Customer Section */
+.customer-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.customer-field-col {
+    flex: 0 0 500px;
+}
+
+/* Invoice Details Row */
+.invoice-details-row {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.detail-field-group {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+}
+
+/* ========== TABLE SECTION ========== */
+.bill-table-wrapper {
+    margin-bottom: 40px;
+    overflow: visible;
+}
+
+.bill-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.85rem;
+    border: 1px solid var(--color-border);
+}
+
+.bill-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--color-header-bg);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-border);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-right: 1px solid var(--color-border);
+}
+
+.bill-table th:last-child {
+    border-right: none;
+}
+
+.bill-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    vertical-align: top;
+    position: static;
+}
+
+.bill-table td:focus-within {
+    position: relative;
+    z-index: 10000;
+}
+
+.bill-table tr:focus-within {
+    position: relative;
+    z-index: 9999;
+}
+
+.bill-table td:last-child {
+    border-right: none;
+}
+
+.bill-table tr:last-child td {
+    border-bottom: none;
+}
+
+.table-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--color-text);
+}
+
+.table-input:hover {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+}
+
+.table-input:focus {
+    outline: none;
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-primary);
+}
+
+.btn-add-new-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: var(--color-header-bg);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-add-new-row:hover {
+    background: var(--color-surface-elevated);
+}
+
+/* ========== FOOTER SECTION ========== */
+.bill-footer {
+    display: flex;
+    gap: 40px;
+}
+
+.footer-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.notes-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.notes-area {
+    width: 100%;
+    max-width: 500px;
+    height: 80px;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+.footer-right {
+    width: 400px;
+    background: var(--color-header-bg);
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid var(--color-border);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.summary-value {
+    min-width: 100px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.summary-total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ========== STICKY ACTION BAR ========== */
+.sticky-footer-bar {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    padding: 12px 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    z-index: 900;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+@media (min-width: 1024px) {
+    .sticky-footer-bar {
+        left: 260px;
+    }
+}
+
+.btn-save {
+    background: var(--color-success);
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-save:hover {
+    opacity: 0.9;
+}
+
+.btn-cancel {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* ========== AUTOCOMPLETE OVERRIDES ========== */
+.bill-editor-container .autocomplete-input {
+    width: 100%;
+    padding: 8px 12px;
+    padding-right: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: var(--color-input-bg) !important;
+    color: var(--color-text) !important;
+    transition: border-color 0.2s;
+    height: 38px;
+}
+
+.bill-editor-container .autocomplete-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-surface) !important;
+}
+
+.bill-table .autocomplete-wrapper .autocomplete-input {
+    border: 1px solid transparent;
+    background: transparent !important;
+    padding: 8px;
+    border-radius: 2px;
+}
+
+.bill-table .autocomplete-wrapper .autocomplete-input:hover {
+    background: var(--color-bg) !important;
+    border-color: var(--color-border);
+}
+
+.bill-table .autocomplete-wrapper .autocomplete-input:focus {
+    background: var(--color-surface) !important;
+    border-color: var(--color-primary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-surface-elevated) !important;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    box-shadow: var(--shadow-lg);
+    z-index: 20000 !important;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.autocomplete-option {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    cursor: pointer;
+    background: var(--color-surface-elevated) !important;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.autocomplete-option:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-option:hover {
+    background: var(--color-header-bg) !important;
+    color: var(--color-text-primary);
+}
+
+.autocomplete-toggle-btn {
+    color: var(--color-text-muted) !important;
+}
+
+/* ========== MOBILE OPTIMIZATIONS (Dual View & Fixed Overlap) ========== */
+.mobile-only-view {
+    display: none;
+}
+
+.desktop-only-view {
+    display: block;
+}
+
+@media (max-width: 1023px) {
+    .bill-editor-container {
+        padding: 12px;
+        padding-bottom: 180px;
+    }
+
+    .customer-row,
+    .invoice-details-row,
+    .bill-footer {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .footer-right {
+        width: 100%;
+    }
+
+    .detail-field-group {
+        width: 100%;
+    }
+
+    .customer-field-col {
+        flex: auto;
+        width: 100%;
+    }
+
+    .sticky-footer-bar {
+        left: 0;
+        bottom: 64px;
+        /* Move UP to sit above the global BottomNav */
+        padding: 10px 16px;
+        gap: 8px;
+        z-index: 1005;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        background: var(--color-surface);
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-only-view {
+        display: none !important;
+    }
+
+    .mobile-only-view {
+        display: block !important;
+    }
+
+    .mobile-item-card {
+        background: var(--color-surface-elevated);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed var(--color-border);
+        margin-bottom: 12px;
+    }
+
+    .item-number {
+        font-weight: 700;
+        color: var(--color-text-primary);
+    }
+
+    .btn-remove-card {
+        background: var(--color-danger);
+        color: white;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+    }
+
+    .card-field {
+        margin-bottom: 10px;
+    }
+
+    .card-field label {
+        display: block;
+        font-size: 11px;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .card-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .flex-1 {
+        flex: 1;
+    }
+
+    .card-amount {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--color-border);
+        font-weight: 700;
+    }
+
+    .amount-val {
+        color: var(--color-success);
+        font-size: 1.1rem;
+    }
+
+    .btn-save {
+        flex: 2;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+/* Footer Helper Buttons */
+.footer-helper-btns {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-helper {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-helper:hover {
+    background: var(--color-surface-elevated);
+    color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+    .footer-helper-btns {
+        display: none;
+    }
+
+    /* Hide on very small screens to save space for primary actions */
+}

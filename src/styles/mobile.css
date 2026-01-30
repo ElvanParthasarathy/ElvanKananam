@@ -340,7 +340,8 @@
 /* ========== FLOATING ACTION BUTTONS ========== */
 .preview-actions {
     position: fixed;
-    bottom: var(--space-6);
+    bottom: 84px;
+    /* Lifted to stay above global BottomNav */
     right: var(--space-6);
     display: flex;
     gap: var(--space-3);

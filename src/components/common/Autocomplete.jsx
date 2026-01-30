@@ -66,7 +66,7 @@ function Autocomplete({
     };
 
     return (
-        <div className={`autocomplete-wrapper ${className}`} ref={wrapperRef}>
+        <div className={`autocomplete-wrapper ${className} ${isOpen ? 'open' : ''}`} ref={wrapperRef}>
             <input
                 type="text"
                 className="input-field autocomplete-input"
