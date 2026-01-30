@@ -551,10 +551,53 @@
     color: var(--color-primary);
 }
 
-@media (max-width: 480px) {
-    .footer-helper-btns {
-        display: none;
+@media (max-width: 1023px) {
+    .sticky-footer-bar {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 64px !important;
+        padding: 8px 12px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        z-index: 1010 !important;
+        background: var(--color-surface) !important;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2) !important;
     }
 
-    /* Hide on very small screens to save space for primary actions */
+    .sticky-footer-bar .btn-save {
+        flex: 1.5 !important;
+        padding: 10px 4px !important;
+        font-size: 0.8rem !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    .sticky-footer-bar .btn-cancel {
+        flex: 1 !important;
+        padding: 10px 4px !important;
+        font-size: 0.8rem !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    .footer-helper-btns {
+        flex: 2 !important;
+        display: flex !important;
+        gap: 4px !important;
+        margin: 0 !important;
+        justify-content: flex-end !important;
+    }
+
+    .btn-helper {
+        flex: 1 !important;
+        padding: 10px 2px !important;
+        font-size: 0.75rem !important;
+        text-align: center !important;
+        background: var(--color-surface-elevated) !important;
+        border: 1px solid var(--color-border) !important;
+        white-space: nowrap !important;
+    }
 }

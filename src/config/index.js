@@ -20,6 +20,13 @@ export const companies = {
 // Default company (used when no company is selected)
 export const DEFAULT_COMPANY_ID = 'pvs-silk-twisting';
 
+/**
+ * PDF Server Configuration
+ * For local development: http://localhost:3001
+ * For production (Vercel): Set VITE_PDF_SERVER_URL in environment variables
+ */
+export const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:3001';
+
 // Get company config by ID
 export const getCompanyConfig = (companyId) => {
     return companies[companyId] || companies[DEFAULT_COMPANY_ID];

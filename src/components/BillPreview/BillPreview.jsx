@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { IconPhone, IconPrinter, IconEdit, IconMail, IconZoomIn, IconZoomOut, IconSave, IconLoader } from '../common/Icons';
-import { PDFDownloadLink } from '@react-pdf/renderer'; // Keep for now if needed, or remove fully
-// import BillPDF from './BillPDF'; // Removed
 import { numberToWordsTamil } from '../../utils/tamilNumbers';
 import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight, formatCurrency } from '../../utils/calculations';
+import { PDF_SERVER_URL } from '../../config/index';
 
 /**
  * BillPreview Component
@@ -116,8 +115,9 @@ function BillPreview({
 
         try {
             const fullHtml = document.documentElement.outerHTML;
+            const endpoint = `${PDF_SERVER_URL}/generate-pdf`;
 
-            const response = await fetch('/generate-pdf', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ html: fullHtml })
