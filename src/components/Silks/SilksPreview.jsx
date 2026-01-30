@@ -84,7 +84,12 @@ function SilksPreview({ data, onEdit, onBack }) {
     };
 
     return (
-        <div className="preview-overlay" style={{ overflow: 'auto', textAlign: scale < 1 ? 'center' : 'left' }}>
+        <div className="preview-overlay" style={{
+            overflow: 'auto',
+            textAlign: scale < 1 ? 'center' : 'left',
+            background: 'var(--color-preview-bg)',
+            zIndex: 2000
+        }}>
 
             {/* Toolbar Top (Mobile Friendly) */}
             <div className="no-print" style={{

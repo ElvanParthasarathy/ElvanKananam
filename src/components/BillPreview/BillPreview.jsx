@@ -166,11 +166,7 @@ function BillPreview({
 
         } catch (error) {
             console.error('PDF Download Error:', error);
-            if (window.innerWidth < 1024) {
-                alert('Cloud PDF generation requires a separate hosted server.\n\nTIP: Use the "Printer" icon instead! On your phone, it lets you "Save as PDF" directly in high quality!');
-            } else {
-                alert('PDF Server unreachable. If you are using our online version (Vercel), please ensure the PDF service is hosted and configured in your Vercel settings.');
-            }
+            alert('Failed to generate PDF. Is the PDF Server running?');
         } finally {
             if (activeInterval) clearInterval(activeInterval);
             setTimeout(() => {
@@ -181,7 +177,12 @@ function BillPreview({
     };
 
     return (
-        <div className="preview-overlay" style={{ overflow: 'auto', textAlign: scale < 1 ? 'center' : 'left' }}>
+        <div className="preview-overlay" style={{
+            overflow: 'auto',
+            textAlign: scale < 1 ? 'center' : 'left',
+            background: 'var(--color-preview-bg)',
+            zIndex: 2000
+        }}>
 
             {/* Download Progress Overlay */}
             {isGenerating && (

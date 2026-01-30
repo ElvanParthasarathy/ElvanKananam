@@ -646,7 +646,7 @@
     right: 0;
     bottom: 0;
     background: #444;
-    z-index: var(--z-modal);
+    z-index: 2000;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     padding: 20px;
