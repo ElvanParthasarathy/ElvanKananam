@@ -187,6 +187,53 @@
     border-top: 1px solid var(--color-border);
 }
 
+.pref-section {
+    padding: 0 12px;
+}
+
+.pref-label {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.pref-toggle-group {
+    display: flex;
+    background-color: var(--color-bg);
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+}
+
+.pref-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pref-btn:hover {
+    color: var(--color-text);
+}
+
+.pref-btn.active {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
 /* ==========================================================================
    BOTTOM NAV (Mobile)
    ========================================================================== */

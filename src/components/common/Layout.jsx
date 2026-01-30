@@ -4,7 +4,7 @@ import BottomNav from './BottomNav';
 import { IconMenu } from './Icons';
 import './Layout.css';
 
-const Layout = ({ children, viewMode, setViewMode, onLogout, t }) => {
+const Layout = ({ children, viewMode, setViewMode, onLogout, language, setLanguage, theme, setTheme, t }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Close sidebar on navigation (mobile)
@@ -32,6 +32,10 @@ const Layout = ({ children, viewMode, setViewMode, onLogout, t }) => {
                 viewMode={viewMode}
                 onViewChange={setViewMode}
                 onLogout={onLogout}
+                language={language}
+                setLanguage={setLanguage}
+                theme={theme}
+                setTheme={setTheme}
                 t={t}
             />
 

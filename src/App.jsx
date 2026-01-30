@@ -196,6 +196,10 @@ function App() {
         viewMode={viewMode}
         setViewMode={setViewMode}
         onLogout={handleLogout}
+        language={language}
+        setLanguage={setLanguage}
+        theme={theme}
+        setTheme={setTheme}
         t={t}
       >
 

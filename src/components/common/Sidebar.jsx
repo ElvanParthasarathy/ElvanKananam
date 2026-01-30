@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
     IconHome,
     IconBox,
@@ -8,10 +7,13 @@ import {
     IconFiles,
     IconLogout,
     IconChevronDown,
-    IconX
+    IconX,
+    IconSun,
+    IconMoon,
+    IconAuto
 } from './Icons';
 
-const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose }) => {
+const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, language, setLanguage, theme, setTheme }) => {
 
     // Helper to check if a section is active
     const isActive = (mode) => viewMode.startsWith(mode);
@@ -61,50 +63,50 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose }) => {
                     {/* Home */}
                     <NavItem
                         icon={IconHome}
-                        label="Home"
+                        label={t.home}
                         value="home"
                         onClick={onViewChange}
                     />
 
-                    <div className="nav-section-title">Main Modules</div>
+                    <div className="nav-section-title">{t.mainModules}</div>
 
                     {/* Coolie Bill */}
                     <NavItem
                         icon={IconBox}
-                        label="Coolie Bill"
+                        label={t.coolieBill}
                         value="coolie"
                         onClick={() => onViewChange('coolie-dashboard')} // Default to dashboard
                     />
                     {isActive('coolie') && (
                         <>
-                            <SubItem label="+ New Bill" value="coolie-new" onClick={onViewChange} />
-                            <SubItem label="All Bills" value="coolie-dashboard" onClick={onViewChange} />
-                            <SubItem label="Customers" value="coolie-customers" onClick={onViewChange} />
+                            <SubItem label={"+ " + t.newBill} value="coolie-new" onClick={onViewChange} />
+                            <SubItem label={t.allBills} value="coolie-dashboard" onClick={onViewChange} />
+                            <SubItem label={t.customers} value="coolie-customers" onClick={onViewChange} />
                         </>
                     )}
 
                     {/* Silks Bill */}
                     <NavItem
                         icon={IconFileText}
-                        label="Silks Bill"
+                        label={t.silksBill}
                         value="silks"
                         onClick={() => onViewChange('silks-dashboard')}
                     />
                     {isActive('silks') && (
                         <>
-                            <SubItem label="+ New Invoice" value="silks-new" onClick={onViewChange} />
-                            <SubItem label="All Invoices" value="silks-dashboard" onClick={onViewChange} />
-                            <SubItem label="Customers" value="silks-customers" onClick={onViewChange} />
-                            <SubItem label="Inventory / Items" value="silks-items" onClick={onViewChange} />
-                            <SubItem label="Business Settings" value="silks-business" onClick={onViewChange} />
+                            <SubItem label={"+ " + t.newBill} value="silks-new" onClick={onViewChange} />
+                            <SubItem label={t.allBills} value="silks-dashboard" onClick={onViewChange} />
+                            <SubItem label={t.customers} value="silks-customers" onClick={onViewChange} />
+                            <SubItem label={t.inventory} value="silks-items" onClick={onViewChange} />
+                            <SubItem label={t.businessSettings} value="silks-business" onClick={onViewChange} />
                         </>
                     )}
 
-                    <div className="nav-section-title">Extras</div>
+                    <div className="nav-section-title">{t.extrasMenu}</div>
 
                     <NavItem
                         icon={IconSettings}
-                        label="Settings"
+                        label={t.settings}
                         value="settings"
                         onClick={onViewChange}
                     />
@@ -112,9 +114,56 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose }) => {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <button className="nav-item" onClick={onLogout} style={{ color: 'var(--color-danger)' }}>
+                    {/* Language Toggles */}
+                    <div className="pref-section">
+                        <div className="pref-label">{t.language}</div>
+                        <div className="pref-toggle-group">
+                            <button
+                                className={`pref-btn ${language === 'en' ? 'active' : ''}`}
+                                onClick={() => setLanguage('en')}
+                            >
+                                English
+                            </button>
+                            <button
+                                className={`pref-btn ${language === 'ta' ? 'active' : ''}`}
+                                onClick={() => setLanguage('ta')}
+                            >
+                                தமிழ்
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Theme Toggles */}
+                    <div className="pref-section" style={{ marginTop: '12px', marginBottom: '12px' }}>
+                        <div className="pref-label">{t.display}</div>
+                        <div className="pref-toggle-group">
+                            <button
+                                className={`pref-btn ${theme === 'light' ? 'active' : ''}`}
+                                onClick={() => setTheme('light')}
+                                title="Light Mode"
+                            >
+                                <IconSun size={16} />
+                            </button>
+                            <button
+                                className={`pref-btn ${theme === 'dark' ? 'active' : ''}`}
+                                onClick={() => setTheme('dark')}
+                                title="Dark Mode"
+                            >
+                                <IconMoon size={16} />
+                            </button>
+                            <button
+                                className={`pref-btn ${theme === 'auto' ? 'active' : ''}`}
+                                onClick={() => setTheme('auto')}
+                                title="Auto"
+                            >
+                                <IconAuto size={16} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <button className="nav-item" onClick={onLogout} style={{ color: 'var(--color-danger)', marginTop: '8px' }}>
                         <IconLogout size={20} />
-                        <span>Logout</span>
+                        <span>{t.logout}</span>
                     </button>
                 </div>
             </aside>

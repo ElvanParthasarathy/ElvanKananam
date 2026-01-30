@@ -58,7 +58,22 @@ export const translations = {
         // Language
         language: 'மொழி',
         tamil: 'தமிழ்',
-        english: 'English'
+        english: 'English',
+
+        // Sidebar / Menu
+        home: 'முகப்பு',
+        coolieBill: 'கூலி பில்',
+        silksBill: 'சில்க்ஸ் பில்',
+        newBill: 'புதிய பில்',
+        allBills: 'அனைத்து பில்கள்',
+        customers: 'வாடிக்கையாளர்கள்',
+        inventory: 'பொருட்கள் பட்டியல்',
+        businessSettings: 'அமைப்புகள்',
+        settings: 'அமைப்புகள்',
+        mainModules: 'முக்கிய பிரிவுகள்',
+        extrasMenu: 'கூடுதல்',
+        display: 'திரை அமைப்புகள்',
+        logout: 'வெளியேறு'
     },
 
     en: {
@@ -112,8 +127,23 @@ export const translations = {
 
         // Language
         language: 'Language',
-        tamil: 'தமிழ்',
-        english: 'English'
+        tamil: 'Tamil',
+        english: 'English',
+
+        // Sidebar / Menu
+        home: 'Home',
+        coolieBill: 'Coolie Bill',
+        silksBill: 'Silks Bill',
+        newBill: 'New Bill',
+        allBills: 'All Bills',
+        customers: 'Customers',
+        inventory: 'Inventory / Items',
+        businessSettings: 'Business Settings',
+        settings: 'Settings',
+        mainModules: 'Main Modules',
+        extrasMenu: 'Extras',
+        display: 'Display',
+        logout: 'Logout'
     }
 };
 
