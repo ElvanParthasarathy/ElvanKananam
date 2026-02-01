@@ -497,15 +497,9 @@ function App() {
 
     // Validation
     if (!billNo || !customerName) {
-      showToast('Please enter at least a Bill Number and Customer Name to save.', 'warning');
+      if (!silent) showToast('Please enter at least a Bill Number and Customer Name to save.', 'warning');
       return;
     }
-
-    // Calculate Grand Total for indexing
-    // (Recalculating here roughly or trusting passed value? A quick recalc is safer or pass from preview)
-    // Note: Better to pass explicit total, but for now we rely on inputs.
-    // Let's import calculateGrandTotal logic or just save 0 if not needed for exact search sort.
-    // For sorting, we can update it properly. For now we just save.
 
     const billData = {
       bill_no: billNo,
@@ -524,56 +518,65 @@ function App() {
       account_no: accountNo,
     };
 
-    // Check for existing bill with same number (if inserting)
-    if (!currentBillId) {
-      // Use maybeSingle() to avoid 406 if not found
-      const { data: existing } = await supabase
-        .from('coolie_bills')
-        .select('id')
-        .eq('bill_no', billNo)
-        .maybeSingle();
-
-      if (existing) {
-        // Confirm Overwrite
-        const shouldOverwrite = await confirm({
-          title: 'நகல் பில் கண்டறியப்பட்டது',
-          message: `Bill No ${billNo} ஏற்கனவே உள்ளது. அதை மேலெழுத விரும்புகிறீர்களா? \n(Bill No ${billNo} already exists. Do you want to overwrite it?)`,
-          confirmText: 'மேலெழுத / Overwrite',
-          cancelText: 'ரத்து / Cancel',
-          type: 'danger'
-        });
-
-        if (shouldOverwrite) {
-          // Update Existing
-          const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
-          if (error) showToast('Error saving: ' + error.message, 'error');
-          else {
-            showToast('Bill Overwritten Successfully!', 'success');
-            setCurrentBillId(existing.id);
-            localStorage.removeItem('coolie-draft');
-          }
-          return;
-        } else {
-          return; // User cancelled
-        }
+    // If editing an existing bill, just update it
+    if (currentBillId) {
+      const { error } = await supabase.from('coolie_bills').update(billData).eq('id', currentBillId);
+      if (error) {
+        if (!silent) showToast('Error saving: ' + error.message, 'error');
+      } else if (!silent) {
+        showToast('Bill Updated Successfully!', 'success');
       }
+      return;
     }
 
-    if (currentBillId) {
-      // Update
-      const { error } = await supabase.from('coolie_bills').update(billData).eq('id', currentBillId);
-      if (error) showToast('Error saving: ' + error.message, 'error');
-      else if (!silent) showToast('Bill Updated Successfully!', 'success');
-    } else {
-      // Insert
-      const { data, error } = await supabase.from('coolie_bills').insert([billData]).select().single();
-      if (error) showToast('Error saving: ' + error.message, 'error');
-      else {
-        if (!silent) showToast('Bill Saved Successfully!', 'success');
-        setCurrentBillId(data.id);
-        // Clear draft
-        localStorage.removeItem('coolie-draft');
+    // New bill - Check for existing bill with same bill number
+    const { data: existing } = await supabase
+      .from('coolie_bills')
+      .select('id')
+      .eq('bill_no', billNo)
+      .maybeSingle();
+
+    if (existing) {
+      // Bill with same number already exists
+      if (silent) {
+        // Auto-save: Silently update the existing bill instead of creating duplicate
+        const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
+        if (!error) {
+          setCurrentBillId(existing.id); // Track this as the current bill
+          localStorage.removeItem('coolie-draft');
+        }
+        return;
       }
+
+      // Manual save: Ask user if they want to overwrite
+      const shouldOverwrite = await confirm({
+        title: 'நகல் பில் கண்டறியப்பட்டது',
+        message: `Bill No ${billNo} ஏற்கனவே உள்ளது. அதை மேலெழுத விரும்புகிறீர்களா? \n(Bill No ${billNo} already exists. Do you want to overwrite it?)`,
+        confirmText: 'மேலெழுத / Overwrite',
+        cancelText: 'ரத்து / Cancel',
+        type: 'danger'
+      });
+
+      if (shouldOverwrite) {
+        const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
+        if (error) showToast('Error saving: ' + error.message, 'error');
+        else {
+          showToast('Bill Overwritten Successfully!', 'success');
+          setCurrentBillId(existing.id);
+          localStorage.removeItem('coolie-draft');
+        }
+      }
+      return; // Exit regardless of user's choice
+    }
+
+    // No duplicate - Insert new bill
+    const { data, error } = await supabase.from('coolie_bills').insert([billData]).select().single();
+    if (error) {
+      if (!silent) showToast('Error saving: ' + error.message, 'error');
+    } else {
+      if (!silent) showToast('Bill Saved Successfully!', 'success');
+      setCurrentBillId(data.id);
+      localStorage.removeItem('coolie-draft');
     }
   };
 

@@ -299,79 +299,49 @@ function BillEditor({
             {/* 1. Customer Name Row (Full Width) */}
             <div className="customer-row">
                 <div className="customer-field-col">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '5px' }}>
+                    <div className="merchant-type-header">
                         <label className="zoho-label" style={{ marginBottom: 0 }}>
                             <div>
-                                {nameDisplayMode === 'individual' ? t.name : t.company} <span style={{ color: 'red' }}>*</span>
+                                {nameDisplayMode === 'individual' ? t.name : (nameDisplayMode === 'both' ? t.both : t.company)} <span style={{ color: 'red' }}>*</span>
                             </div>
                             {showSubs && (
                                 <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 'normal' }}>
-                                    {nameDisplayMode === 'individual' ? 'Name' : 'Business'}
+                                    {nameDisplayMode === 'individual' ? 'Name' : (nameDisplayMode === 'both' ? 'Both (Business + Person)' : 'Business')}
                                 </div>
                             )}
                         </label>
 
                         {/* Name Format Toggles */}
-                        <div style={{ display: 'flex', gap: '8px', fontSize: '10px' }}>
+                        <div className="merchant-type-toggles">
                             <button
                                 onClick={() => {
                                     if (setNameDisplayMode) setNameDisplayMode('company');
                                     if (selectedCustomer) updateCustomerName(selectedCustomer, 'company');
                                 }}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '4px 8px',
-                                    borderRadius: '6px',
-                                    border: '1px solid var(--color-border)',
-                                    background: nameDisplayMode === 'company' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: nameDisplayMode === 'company' ? 'white' : 'var(--color-text)',
-                                    cursor: 'pointer',
-                                    minWidth: '60px'
-                                }}>
-                                <span style={{ fontWeight: '600', lineHeight: '1.2' }}>{t.company}</span>
-                                {showSubs && <span style={{ fontSize: '9px', opacity: 0.8, fontWeight: 'normal' }}>Business</span>}
+                                className={`type-toggle-btn ${nameDisplayMode === 'company' ? 'active' : ''}`}
+                            >
+                                <span className="type-main-label">{t.company}</span>
+                                {showSubs && <span className="type-sub-label">Business</span>}
                             </button>
                             <button
                                 onClick={() => {
                                     if (setNameDisplayMode) setNameDisplayMode('both');
                                     if (selectedCustomer) updateCustomerName(selectedCustomer, 'both');
                                 }}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '4px 8px',
-                                    borderRadius: '6px',
-                                    border: '1px solid var(--color-border)',
-                                    background: nameDisplayMode === 'both' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: nameDisplayMode === 'both' ? 'white' : 'var(--color-text)',
-                                    cursor: 'pointer',
-                                    minWidth: '60px'
-                                }}>
-                                <span style={{ fontWeight: '600', lineHeight: '1.2' }}>{t.both}</span>
-                                {showSubs && <span style={{ fontSize: '9px', opacity: 0.8, fontWeight: 'normal' }}>Both</span>}
+                                className={`type-toggle-btn ${nameDisplayMode === 'both' ? 'active' : ''}`}
+                            >
+                                <span className="type-main-label">{t.both}</span>
+                                {showSubs && <span className="type-sub-label">Both</span>}
                             </button>
                             <button
                                 onClick={() => {
                                     if (setNameDisplayMode) setNameDisplayMode('individual');
                                     if (selectedCustomer) updateCustomerName(selectedCustomer, 'individual');
                                 }}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '4px 8px',
-                                    borderRadius: '6px',
-                                    border: '1px solid var(--color-border)',
-                                    background: nameDisplayMode === 'individual' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: nameDisplayMode === 'individual' ? 'white' : 'var(--color-text)',
-                                    cursor: 'pointer',
-                                    minWidth: '60px'
-                                }}>
-                                <span style={{ fontWeight: '600', lineHeight: '1.2' }}>{t.name}</span>
-                                {showSubs && <span style={{ fontSize: '9px', opacity: 0.8, fontWeight: 'normal' }}>Name</span>}
+                                className={`type-toggle-btn ${nameDisplayMode === 'individual' ? 'active' : ''}`}
+                            >
+                                <span className="type-main-label">{t.name}</span>
+                                {showSubs && <span className="type-sub-label">Name</span>}
                             </button>
                         </div>
                     </div>

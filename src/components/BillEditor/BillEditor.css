@@ -67,6 +67,56 @@
     font-weight: 500;
 }
 
+/* Merchant Type Selection Layout */
+.merchant-type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.merchant-type-toggles {
+    display: flex;
+    gap: 8px;
+}
+
+.type-toggle-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    min-width: 70px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.type-toggle-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.type-main-label {
+    font-weight: 700;
+    line-height: 1.2;
+    font-size: 11px;
+}
+
+.type-sub-label {
+    font-size: 9px;
+    opacity: 0.8;
+    font-weight: 400;
+    margin-top: 2px;
+}
+
 .zoho-input,
 .zoho-select {
     width: 100%;
@@ -618,6 +668,27 @@
         color: var(--color-text-muted);
         text-transform: uppercase;
         margin-bottom: 4px;
+    }
+
+    /* Merchant Toggle Stacking on Mobile */
+    .merchant-type-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .merchant-type-toggles {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .type-toggle-btn {
+        min-width: 0;
+        padding: 8px 4px;
+        height: 48px;
     }
 
     .card-row {
