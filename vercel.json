@@ -1,6 +1,8 @@
 {
+    "version": 2,
     "functions": {
-        "api/*.js": {
+        "api/pdf.js": {
+            "runtime": "nodejs20.x",
             "maxDuration": 30
         }
     }
