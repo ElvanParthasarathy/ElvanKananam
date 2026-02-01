@@ -7,11 +7,14 @@ import SilksEditor from './components/Silks/SilksEditor';
 import SilksPreview from './components/Silks/SilksPreview';
 import SilksDashboard from './components/Silks/SilksDashboard';
 import CoolieDashboard from './components/Coolie/CoolieDashboard';
+import Settings from './components/Settings/Settings';
 import Layout from './components/common/Layout';
-import { getCompanyConfig, getCompanyOptions, DEFAULT_COMPANY_ID } from './config';
-import { getTranslation, DEFAULT_LANGUAGE } from './config/translations';
+import { DEFAULT_COMPANY_ID } from './config';
+import { getTranslation, DEFAULT_LANGUAGE, showSubtitles } from './config/translations';
 import { isAuthenticated, login, logout } from './config/auth';
 import { getCurrentDate } from './utils/calculations';
+import { useToast } from './context/ToastContext';
+import { useConfirm } from './context/ConfirmContext';
 
 // ... (Rest of imports unchanged)
 
@@ -21,6 +24,8 @@ import { getCurrentDate } from './utils/calculations';
  * Manages authentication, view state, language, theme, and bill data
  */
 function App() {
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -44,22 +49,199 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  // View State - Load from URL hash or localStorage or default
+  // View State - Load from URL hash or default to home
   const [viewMode, setViewMode] = useState(() => {
     const hash = window.location.hash.replace('#', '');
     if (hash) return hash;
-    return localStorage.getItem('elvan-viewMode') || 'home';
+    return 'home';
   });
 
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const [language, setLanguage] = useState(() => {
+    let saved = localStorage.getItem('elvan-language');
+    // Migrate legacy keys to new modular modes
+    if (saved === 'ta') saved = 'ta_mixed';
+    if (saved === 'tg') saved = 'tg_mixed';
+    if (saved === 'en') saved = 'en_only';
+
+    return saved || DEFAULT_LANGUAGE;
+  });
+
+  const t = getTranslation(language);
+
+  // Persist language change
+  useEffect(() => {
+    localStorage.setItem('elvan-language', language);
+  }, [language]);
+
+  // Update Document Title based on language
+  useEffect(() => {
+    document.title = t.appName || 'Kananam';
+  }, [t.appName]);
 
   // Company State
   const [companyId, setCompanyId] = useState(DEFAULT_COMPANY_ID);
-  const companyConfig = getCompanyConfig(companyId);
-  const companyOptions = getCompanyOptions();
+  const [companyConfig, setCompanyConfig] = useState(null);
+  const [companyOptions, setCompanyOptions] = useState([]);
 
-  // Translation
-  const t = getTranslation(language);
+  // Fetch Company Function (can be called manually to refresh)
+  const fetchCompany = async () => {
+    const { supabase } = await import('./config/supabaseClient');
+
+    let orgs = [];
+    try {
+      const { data, error } = await supabase.from('coolie_settings').select('*');
+      if (error) {
+        console.warn("Could not fetch organizations. Tables might be missing.", error);
+      } else {
+        orgs = data;
+      }
+
+      if (orgs && orgs.length > 0) {
+        // Map to options
+        const options = orgs.map(org => ({
+          id: org.id,
+          name: org.organization_name,
+          nameTamil: org.marketing_title,
+          type: org.type || 'coolie' // Default to coolie if null
+        }));
+        setCompanyOptions(options);
+      }
+    } catch (err) {
+      console.warn("Supabase fetch failed", err);
+    }
+
+    // Find selected company
+    let selected;
+    if (orgs && orgs.length > 0) {
+      selected = orgs.find(o => o.organization_name.includes('P.V.S.'));
+      if (companyId && companyId !== DEFAULT_COMPANY_ID && companyId.length > 20) {
+        selected = orgs.find(o => o.id === companyId);
+      }
+      if (!selected) selected = orgs[0]; // Fallback
+    }
+
+    // Default mock if DB is empty to prevent crash
+    if (!selected) {
+      selected = {
+        id: DEFAULT_COMPANY_ID,
+        organization_name: 'Default Organization',
+        marketing_title: 'Marketing Title',
+        address_line1: 'Address',
+        address_line2: '',
+        city: 'City',
+        pincode: '000000',
+        phone: '0000000000',
+        email: 'email@example.com',
+        cgst_rate: 2.5,
+        sgst_rate: 2.5
+      };
+    }
+
+    // Parse Bank Data from New Columns
+    let bankInfo = {
+      bankName: selected.bank_name || '',
+      bankNameTamil: selected.bank_name_tamil || '',
+      accountNo: selected.account_no || '',
+      ifsc: selected.ifsc_code || '',
+      place: selected.branch || '',
+      placeTamil: selected.branch_tamil || '',
+      cityTamil: selected.city_tamil || ''
+    };
+
+    // Legacy fallback
+    if (!bankInfo.bankName && selected.website) {
+      try {
+        const json = JSON.parse(selected.website);
+        if (typeof json === 'object') {
+          bankInfo = { ...bankInfo, ...json };
+        }
+      } catch (e) { }
+    }
+
+    const bankParts = [];
+    const displayBankName = bankInfo.bankNameTamil || bankInfo.bankName;
+    const displayBranch = bankInfo.placeTamil || bankInfo.place;
+    if (displayBankName) bankParts.push(displayBankName);
+    if (displayBranch) bankParts.push(displayBranch);
+    const bankDetailsString = bankParts.join(', ');
+
+    const themeColor = selected.theme_color || '#388e3c';
+
+    // Theme mapping for professional look
+    const themeMap = {
+      '#388e3c': { // Green
+        primary: '#388e3c',
+        headerBg: '#e8f5e9'
+      },
+      '#6a1b9a': { // Violet
+        primary: '#6a1b9a',
+        headerBg: '#f3e5f5'
+      }
+    };
+
+    const currentTheme = themeMap[themeColor] || { primary: themeColor, headerBg: `${themeColor}15` };
+
+    const config = {
+      id: selected.id,
+      name: {
+        english: selected.organization_name,
+        tamil: selected.marketing_title || 'பி.வி.எஸ். சில்க் டுவிஸ்டிங்'
+      },
+      greeting: 'வாழ்க வளமுடன்',
+      billType: 'கூலி பில்',
+      address: {
+        line1: selected.address_line1 || '',
+        line2: selected.address_line2 ? `${selected.address_line2}, ${selected.city_tamil || bankInfo.cityTamil} - ${selected.pincode}` : '',
+        line3: selected.district_tamil || ''
+      },
+      phone: selected.phone ? selected.phone.split(',') : [],
+      email: selected.email,
+      bankDetails: bankDetailsString,
+      accountNo: bankInfo.accountNo || '',
+      ifscCode: bankInfo.ifsc || '',
+      labels: {
+        billNo: 'பில் எண்',
+        date: 'நாள்',
+        customerPrefix: 'திரு:',
+        cityPrefix: 'ஊர்:',
+        rate: 'கூலி',
+        itemName: 'பொருள் பெயர்',
+        weight: 'எடை (Kg)',
+        amount: 'ரூபாய்',
+        total: 'மொத்தம்',
+        inWords: 'எழுத்தில் மொத்தத் தொகை',
+        setharam: 'சேதாரம்',
+        courier: 'கொரியர் கட்டணம்',
+        ahimsaSilk: 'அகிம்சா பட்டு',
+        signature: 'கையொப்பம்',
+        forCompany: selected.organization_name
+      },
+      colors: {
+        primary: currentTheme.primary,
+        accent: currentTheme.primary,
+        headerBg: currentTheme.headerBg,
+        text: currentTheme.primary,
+        textDark: currentTheme.primary,
+        border: currentTheme.primary,
+        inputBg: '#f9f9f9',
+        inputFocus: currentTheme.primary
+      },
+      defaultBillNo: '1',
+      cgst_rate: selected.cgst_rate || 0,
+      sgst_rate: selected.sgst_rate || 0
+    };
+    setCompanyConfig(config);
+    setCompanyId(selected.id);
+  };
+
+  // Load Company from DB on mount or ID change
+  useEffect(() => {
+    fetchCompany();
+  }, [companyId]);
+
+  // Wait for config
+  // MOVED TO BOTTOM TO PREVENT HOOK ERRORS
+  // if (!companyConfig) return <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>Loading Configuration...</div>;
 
   // Theme - 'light' | 'auto' | 'dark'
   const [theme, setTheme] = useState(() => {
@@ -73,51 +255,110 @@ function App() {
     localStorage.setItem('elvan-theme', theme);
   }, [theme]);
 
-  // Bill Data State - Load from localStorage if available
-  const [billNo, setBillNo] = useState(() => localStorage.getItem('elvan-billNo') || companyConfig.defaultBillNo);
-  const [date, setDate] = useState(() => localStorage.getItem('elvan-date') || getCurrentDate());
-  const [customerName, setCustomerName] = useState(() => localStorage.getItem('elvan-customerName') || '');
-  const [city, setCity] = useState(() => localStorage.getItem('elvan-city') || '');
-  const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem('elvan-items');
-    return saved ? JSON.parse(saved) : [{ porul: '', coolie: '', kg: '' }];
-  });
-  const [setharamGrams, setSetharamGrams] = useState(() => localStorage.getItem('elvan-setharamGrams') || '');
-  const [courierRs, setCourierRs] = useState(() => localStorage.getItem('elvan-courierRs') || '');
-  const [ahimsaSilkRs, setAhimsaSilkRs] = useState(() => localStorage.getItem('elvan-ahimsaSilkRs') || '');
-  const [customChargeName, setCustomChargeName] = useState(() => localStorage.getItem('elvan-customChargeName') || '');
-  const [customChargeRs, setCustomChargeRs] = useState(() => localStorage.getItem('elvan-customChargeRs') || '');
-  const [bankDetails, setBankDetails] = useState(() => localStorage.getItem('elvan-bankDetails') || '');
-  const [accountNo, setAccountNo] = useState(() => localStorage.getItem('elvan-accountNo') || '');
+  // Bill Data State
+  const [billNo, setBillNo] = useState(''); // Initialize empty, update when config loads
+  const [date, setDate] = useState(getCurrentDate());
+  const [customerName, setCustomerName] = useState('');
+  const [contactPerson, setContactPerson] = useState(''); // Secondary name for 'Both' mode
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // Store full customer object
+  const [nameDisplayMode, setNameDisplayMode] = useState('both');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [items, setItems] = useState([{ porul: '', coolie: '', kg: '' }]);
+  const [setharamGrams, setSetharamGrams] = useState('');
+  const [courierRs, setCourierRs] = useState('');
+  const [ahimsaSilkRs, setAhimsaSilkRs] = useState('');
+  const [customChargeName, setCustomChargeName] = useState('');
+  const [customChargeRs, setCustomChargeRs] = useState('');
+  const [bankDetails, setBankDetails] = useState('');
+  const [accountNo, setAccountNo] = useState('');
 
   // State for Silks Bill
-  const [silksData, setSilksData] = useState(() => {
-    const saved = localStorage.getItem('elvan-silksData');
-    return saved ? JSON.parse(saved) : null;
+  const [silksData, setSilksData] = useState(null);
+
+  // Coolie Bill ID (for editing)
+  const [currentBillId, setCurrentBillId] = useState(null);
+
+  // State for IFSC Visibility in Preview (Persisted)
+  const [showIFSC, setShowIFSC] = useState(() => {
+    const saved = localStorage.getItem('elvan-show-ifsc');
+    return saved !== null ? JSON.parse(saved) : true;
   });
 
-  // Persist State to localStorage on Change
   useEffect(() => {
-    localStorage.setItem('elvan-viewMode', viewMode);
-    localStorage.setItem('elvan-billNo', billNo);
-    localStorage.setItem('elvan-date', date);
-    localStorage.setItem('elvan-customerName', customerName);
-    localStorage.setItem('elvan-city', city);
-    localStorage.setItem('elvan-items', JSON.stringify(items));
-    localStorage.setItem('elvan-setharamGrams', setharamGrams);
-    localStorage.setItem('elvan-courierRs', courierRs);
-    localStorage.setItem('elvan-ahimsaSilkRs', ahimsaSilkRs);
-    localStorage.setItem('elvan-customChargeName', customChargeName);
-    localStorage.setItem('elvan-customChargeRs', customChargeRs);
-    localStorage.setItem('elvan-bankDetails', bankDetails);
-    localStorage.setItem('elvan-accountNo', accountNo);
-    localStorage.setItem('elvan-silksData', JSON.stringify(silksData));
+    localStorage.setItem('elvan-show-ifsc', JSON.stringify(showIFSC));
+  }, [showIFSC]);
 
-    // Update URL Hash for back button support
+  // State for Bank Details Visibility in Preview (Persisted)
+  const [showBankDetails, setShowBankDetails] = useState(() => {
+    const saved = localStorage.getItem('elvan-show-bank-details');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elvan-show-bank-details', JSON.stringify(showBankDetails));
+  }, [showBankDetails]);
+
+  // Update defaults when config loads (or company changes)
+  useEffect(() => {
+    if (companyConfig) {
+      // For general defaults, only set if empty (prevents overwriting during manual edit)
+      setBillNo(prev => prev || companyConfig.defaultBillNo);
+
+      // FOR BANK DETAILS: If we are not editing an existing bill (no currentBillId), 
+      // ALWAYS update bank details to match the selected organization
+      if (!currentBillId) {
+        setBankDetails(companyConfig.bankDetails);
+        setAccountNo(companyConfig.accountNo || '');
+      } else {
+        // If editing an existing bill, only set if current state is empty
+        setBankDetails(prev => prev || companyConfig.bankDetails);
+        setAccountNo(prev => prev || companyConfig.accountNo || '');
+      }
+    }
+  }, [companyConfig, currentBillId]);
+
+  // ... (rest of code)
+
+  {/* VIEW: COOLIE BILL (New/Edit) */ }
+  {
+    (viewMode === 'coolie-new' || viewMode === 'edit') && (
+      <BillEditor
+        config={companyConfig}
+        t={t}
+        language={language}
+        // ... (other props)
+        accountNo={accountNo}
+        setAccountNo={setAccountNo}
+        showIFSC={showIFSC}
+        setShowIFSC={setShowIFSC}
+        onPreview={() => setViewMode('coolie-preview')}
+      // ...
+      />
+    )
+  }
+
+  {/* VIEW: COOLIE BILL (Preview) */ }
+  {
+    (viewMode === 'coolie-preview' || viewMode === 'preview') && (
+      <BillPreview
+        config={companyConfig}
+        // ...
+        accountNo={accountNo}
+        showIFSC={showIFSC}
+
+        onEdit={() => setViewMode('coolie-new')}
+      />
+    )
+  }
+
+
+  // Update URL Hash for back button support
+  useEffect(() => {
     if (window.location.hash !== `#${viewMode}`) {
       window.history.pushState({ viewMode }, '', `#${viewMode}`);
     }
-  }, [viewMode, billNo, date, customerName, city, items, setharamGrams, courierRs, ahimsaSilkRs, customChargeName, customChargeRs, silksData]);
+  }, [viewMode]);
 
   // Handle Browser Back Button (popstate)
   useEffect(() => {
@@ -135,19 +376,24 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Prevent accidental data loss on refresh/close
+  // View Transition Cleanup: Clear data when "going out" of editor
+  const prevViewMode = React.useRef(viewMode);
   useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      const hasData = customerName || (items.length > 0 && items[0].porul);
-      if (hasData && (viewMode === 'edit' || viewMode === 'coolie-new' || viewMode === 'silks-new')) {
-        e.preventDefault();
-        e.returnValue = ''; // Standard way to show confirmation
-      }
-    };
+    const prev = prevViewMode.current;
+    const curr = viewMode;
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [customerName, items, viewMode]);
+    const isEditor = (mode) => mode === 'coolie-new' || mode === 'edit';
+    const isPreview = (mode) => mode === 'coolie-preview' || mode === 'preview';
+
+    // If we were in Editor, and we are NOT going to Preview (and not staying in Editor e.g. mode switch)
+    if (isEditor(prev) && !isPreview(curr) && !isEditor(curr)) {
+      resetData();
+    }
+
+    prevViewMode.current = curr;
+  }, [viewMode]);
+
+
 
   // Load Test Data Helper
   const loadTestData = () => {
@@ -164,15 +410,19 @@ function App() {
     setAhimsaSilkRs(''); // Default empty for test
     setCustomChargeName('');
     setCustomChargeRs('');
-    setBankDetails('Indian Bank, Arni');
-    setAccountNo('1234567890');
+    // Keep existing bank details from config
+    // setBankDetails('Indian Bank, Arni'); 
+    // setAccountNo('1234567890');
   };
 
-  // Reset Data Helper
   const resetData = () => {
-    setBillNo(companyConfig.defaultBillNo);
+    setCurrentBillId(null);
+    setBillNo(companyConfig?.defaultBillNo || '1');
     setDate(getCurrentDate());
     setCustomerName('');
+    setContactPerson('');
+    setNameDisplayMode('both');
+    setAddress('');
     setCity('');
     setItems([{ porul: '', coolie: '', kg: '' }]);
     setSetharamGrams('');
@@ -184,10 +434,155 @@ function App() {
     setAccountNo('');
   };
 
+  // Load Coolie Bill
+  const loadCoolieBill = (bill) => {
+    setCurrentBillId(bill.id);
+    setBillNo(bill.bill_no);
+    setDate(bill.date);
+    setCustomerName(bill.customer_name);
+    setContactPerson(bill.contact_person || '');
+    setAddress(bill.address || '');
+    setCity(bill.city);
+    setItems(bill.items || []);
+    setSetharamGrams(bill.setharam_grams || '');
+    setCourierRs(bill.courier_rs || '');
+    setAhimsaSilkRs(bill.ahimsa_silk_rs || '');
+    setCustomChargeName(bill.custom_charge_name || '');
+    setCustomChargeRs(bill.custom_charge_rs || '');
+    setAccountNo(bill.account_no || '');
+    setBankDetails(bill.bank_details || '');
+  };
+
+  // Local Storage Auto-Save (Crash Safety)
+  useEffect(() => {
+    if (viewMode === 'coolie-new' || viewMode === 'edit') {
+      const draft = {
+        billNo, customerName, contactPerson, nameDisplayMode, address, city, items, setharamGrams, courierRs,
+        ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo
+      };
+      localStorage.setItem('coolie-draft', JSON.stringify(draft));
+    }
+  }, [billNo, customerName, contactPerson, nameDisplayMode, address, city, items, setharamGrams, courierRs, ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo, viewMode]);
+
+  // Draft restoration disabled per user request
+  // useEffect(() => {
+  //   if (viewMode === 'coolie-new' && !currentBillId) {
+  //     const saved = localStorage.getItem('coolie-draft');
+  //     if (saved) { ... }
+  //   }
+  // }, [viewMode, currentBillId]);
+
+
+  // Auto-Save Effect (Coolie Bill)
+  useEffect(() => {
+    // Only auto-save if we are in an editor view
+    if (viewMode !== 'coolie-new' && viewMode !== 'edit') return;
+
+    const timer = setTimeout(() => {
+      if (billNo && customerName) {
+        saveCoolieBill(true); // Silent save
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [
+    billNo, customerName, contactPerson, address, city, items, setharamGrams, courierRs,
+    ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo,
+    viewMode // vital: only save when editing
+  ]);
+
+  // Save Coolie Bill
+  const saveCoolieBill = async (silent = false) => {
+    const { supabase } = await import('./config/supabaseClient');
+
+    // Validation
+    if (!billNo || !customerName) {
+      showToast('Please enter at least a Bill Number and Customer Name to save.', 'warning');
+      return;
+    }
+
+    // Calculate Grand Total for indexing
+    // (Recalculating here roughly or trusting passed value? A quick recalc is safer or pass from preview)
+    // Note: Better to pass explicit total, but for now we rely on inputs.
+    // Let's import calculateGrandTotal logic or just save 0 if not needed for exact search sort.
+    // For sorting, we can update it properly. For now we just save.
+
+    const billData = {
+      bill_no: billNo,
+      date,
+      customer_name: customerName,
+      contact_person: contactPerson,
+      address,
+      city,
+      items,
+      setharam_grams: setharamGrams,
+      courier_rs: courierRs,
+      ahimsa_silk_rs: ahimsaSilkRs,
+      custom_charge_name: customChargeName,
+      custom_charge_rs: customChargeRs,
+      bank_details: bankDetails,
+      account_no: accountNo,
+    };
+
+    // Check for existing bill with same number (if inserting)
+    if (!currentBillId) {
+      // Use maybeSingle() to avoid 406 if not found
+      const { data: existing } = await supabase
+        .from('coolie_bills')
+        .select('id')
+        .eq('bill_no', billNo)
+        .maybeSingle();
+
+      if (existing) {
+        // Confirm Overwrite
+        const shouldOverwrite = await confirm({
+          title: 'நகல் பில் கண்டறியப்பட்டது',
+          message: `Bill No ${billNo} ஏற்கனவே உள்ளது. அதை மேலெழுத விரும்புகிறீர்களா? \n(Bill No ${billNo} already exists. Do you want to overwrite it?)`,
+          confirmText: 'மேலெழுத / Overwrite',
+          cancelText: 'ரத்து / Cancel',
+          type: 'danger'
+        });
+
+        if (shouldOverwrite) {
+          // Update Existing
+          const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
+          if (error) showToast('Error saving: ' + error.message, 'error');
+          else {
+            showToast('Bill Overwritten Successfully!', 'success');
+            setCurrentBillId(existing.id);
+            localStorage.removeItem('coolie-draft');
+          }
+          return;
+        } else {
+          return; // User cancelled
+        }
+      }
+    }
+
+    if (currentBillId) {
+      // Update
+      const { error } = await supabase.from('coolie_bills').update(billData).eq('id', currentBillId);
+      if (error) showToast('Error saving: ' + error.message, 'error');
+      else if (!silent) showToast('Bill Updated Successfully!', 'success');
+    } else {
+      // Insert
+      const { data, error } = await supabase.from('coolie_bills').insert([billData]).select().single();
+      if (error) showToast('Error saving: ' + error.message, 'error');
+      else {
+        if (!silent) showToast('Bill Saved Successfully!', 'success');
+        setCurrentBillId(data.id);
+        // Clear draft
+        localStorage.removeItem('coolie-draft');
+      }
+    }
+  };
+
   // Show login if not authenticated
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} t={t} />;
   }
+
+  if (!companyConfig) return <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>Loading Configuration...</div>;
 
   return (
     <>
@@ -207,15 +602,27 @@ function App() {
         {viewMode === 'home' && (
           <Home
             t={t}
+            language={language}
             onNavigate={setViewMode}
           />
         )}
 
         {/* VIEW: COOLIE BILL (Dashboard) */}
-        {viewMode === 'coolie-dashboard' && (
+        {(viewMode === 'coolie-dashboard' || viewMode === 'coolie-bills' || viewMode === 'coolie-items' || viewMode === 'coolie-customers' || viewMode === 'coolie-business') && (
           <CoolieDashboard
-            onNewBill={() => setViewMode('coolie-new')}
+            activeTab={viewMode.split('-')[1] || 'dashboard'}
+            t={t}
+            language={language}
+            onNewBill={() => {
+              resetData();
+              setViewMode('coolie-new');
+            }}
             onHome={() => setViewMode('home')}
+            onSelectBill={(bill) => {
+              loadCoolieBill(bill);
+              setViewMode('coolie-new'); // Go straight to editor
+            }}
+            onRefreshConfig={fetchCompany}
           />
         )}
 
@@ -234,6 +641,14 @@ function App() {
             setDate={setDate}
             customerName={customerName}
             setCustomerName={setCustomerName}
+            contactPerson={contactPerson}
+            setContactPerson={setContactPerson}
+            nameDisplayMode={nameDisplayMode}
+            setNameDisplayMode={setNameDisplayMode}
+            selectedCustomer={selectedCustomer}
+            setSelectedCustomer={setSelectedCustomer}
+            address={address}
+            setAddress={setAddress}
             city={city}
             setCity={setCity}
             items={items}
@@ -252,13 +667,18 @@ function App() {
             setBankDetails={setBankDetails}
             accountNo={accountNo}
             setAccountNo={setAccountNo}
+            showIFSC={showIFSC}
+            setShowIFSC={setShowIFSC}
+            showBankDetails={showBankDetails}
+            setShowBankDetails={setShowBankDetails}
             onPreview={() => setViewMode('coolie-preview')}
             onHome={() => setViewMode('home')}
             onLoadTestData={loadTestData}
             onResetData={resetData}
             companyId={companyId}
             setCompanyId={setCompanyId}
-            companyOptions={companyOptions}
+            companyOptions={companyOptions.filter(opt => opt.type === 'coolie')}
+            onSave={() => saveCoolieBill(false)}
           />
         )}
 
@@ -267,9 +687,12 @@ function App() {
           <BillPreview
             config={companyConfig}
             t={t}
+            language={language}
             billNo={billNo}
             date={date}
             customerName={customerName}
+            contactPerson={contactPerson}
+            address={address}
             city={city}
             items={items}
             setharamGrams={setharamGrams}
@@ -279,6 +702,9 @@ function App() {
             customChargeRs={customChargeRs}
             bankDetails={bankDetails}
             accountNo={accountNo}
+            showIFSC={showIFSC}
+            showBankDetails={showBankDetails}
+
             onEdit={() => setViewMode('coolie-new')}
           />
         )}
@@ -294,8 +720,10 @@ function App() {
             }}
             onSelectInvoice={(invoice) => {
               setSilksData(invoice);
-              setViewMode('silks-viewer');
+              setViewMode('silks-new');
             }}
+            t={t}
+            language={language}
           />
         )}
 
@@ -306,6 +734,8 @@ function App() {
             onPreview={() => setViewMode('silks-preview')}
             setData={setSilksData}
             initialData={silksData}
+            t={t}
+            language={language}
           />
         )}
 
@@ -315,6 +745,20 @@ function App() {
             data={silksData}
             onEdit={() => setViewMode('silks-new')}
             onBack={() => setViewMode('silks-dashboard')}
+            t={t}
+            language={language}
+          />
+        )}
+
+        {/* VIEW: SETTINGS */}
+        {viewMode === 'settings' && (
+          <Settings
+            language={language}
+            setLanguage={setLanguage}
+            theme={theme}
+            setTheme={setTheme}
+            onLogout={handleLogout}
+            t={t}
           />
         )}
 

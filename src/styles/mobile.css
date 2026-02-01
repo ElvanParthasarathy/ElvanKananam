@@ -1,8 +1,13 @@
-/**
- * Mobile Styles - Mobile-First Editor UI
- * 
- * Touch-friendly, card-based layout optimized for phones
- */
+/* ========== GLOBAL MOBILE RESET ========== */
+* {
+    -webkit-scrollbar: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
 
 /* ========== APP BRANDING ========== */
 .app-branding {
@@ -142,7 +147,7 @@
 
 /* ========== FORM INPUTS ========== */
 .input-group {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .input-label {
@@ -155,7 +160,7 @@
 
 .input-field {
     width: 100%;
-    min-height: 48px;
+    min-height: 56px;
     /* Touch-friendly */
     padding: var(--space-3) var(--space-4);
     border-radius: 50px;
@@ -496,4 +501,23 @@
     color: white;
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ========== DUAL PLACEHOLDER MOBILE OVERRIDES ========== */
+/* Ensure the dual placeholder is perfectly centered in the 56px field */
+.dual-placeholder-overlay {
+    top: 50%;
+    transform: translateY(-50%);
+    left: 16px;
+    /* Slightly more padding */
+}
+
+.dual-placeholder-primary {
+    font-size: 13px;
+    /* Slightly smaller to fit better */
+}
+
+.dual-placeholder-sub {
+    font-size: 10px;
+    margin-top: 1px;
 }

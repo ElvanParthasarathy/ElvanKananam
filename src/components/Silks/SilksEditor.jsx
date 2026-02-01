@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { IconTrash, IconPlus, IconPrinter, IconHome, IconMenu, IconSave } from '../common/Icons';
 import Autocomplete from '../common/Autocomplete';
 import { supabase } from '../../config/supabaseClient';
+import { useToast } from '../../context/ToastContext';
 import './SilksEditor.css';
+
+import { showSubtitles } from '../../config/translations';
 
 /**
  * SilksEditor Component
@@ -10,7 +13,9 @@ import './SilksEditor.css';
  * Re-designed to match the premium Zoho-style layout of BillEditor.
  * Supports HSN codes, custom tax rates, and notes.
  */
-function SilksEditor({ onHome, onPreview, setData, initialData }) {
+function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
+    const showSubs = showSubtitles(language);
+    const { showToast } = useToast();
     const [invoiceId, setInvoiceId] = useState(null);
     const [billNo, setBillNo] = useState('');
     const [date, setDate] = useState('');
@@ -28,8 +33,8 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
     // Fetch Initial Data
     useEffect(() => {
         async function fetchData() {
-            const { data: customers } = await supabase.from('customers').select('*');
-            const { data: itemsData } = await supabase.from('items').select('*');
+            const { data: customers } = await supabase.from('customers').select('*').eq('type', 'silks'); // STICT FILTER
+            const { data: itemsData } = await supabase.from('items').select('*').eq('type', 'silks'); // STRICT FILTER
             setCustomerOptions(customers || []);
             setItemOptions(itemsData || []);
 
@@ -47,7 +52,7 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
             }
 
             // Fetch Tax Rates
-            const { data: org } = await supabase.from('organization_profile').select('cgst_rate, sgst_rate').limit(1).single();
+            const { data: org } = await supabase.from('organization_profile').select('cgst_rate, sgst_rate').eq('type', 'silks').limit(1).maybeSingle();
             if (org) {
                 setTaxRates({
                     cgst: parseFloat(org.cgst_rate) || 2.5,
@@ -64,6 +69,25 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
             loadFromInitialData(initialData);
         }
     }, [initialData]);
+
+    // Auto-Save Effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (invoiceId && customerDetails && billNo) {
+                // Auto-save only if we have an ID (edit mode) or enough data to create one?
+                // User wants "start typing -> auto save".
+                // If we don't have ID, we need to handle "Create" carefully to avoid duplicates.
+                // Best approach: Only auto-save if we have at least Customer and BillNo.
+                // handleSave checks this.
+                handleSave(true); // Pass true to silent mode
+            } else if (customerDetails && billNo && items.length > 0) {
+                // Try to save new draft
+                handleSave(true);
+            }
+        }, 2000); // 2 second debounce
+
+        return () => clearTimeout(timer);
+    }, [items, customerDetails, billNo, notes, terms, date, taxRates]);
 
     async function loadFromInitialData(data) {
         // Handle both simple objects (state) and DB rows
@@ -164,9 +188,9 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
         onPreview();
     };
 
-    const handleSave = async () => {
+    const handleSave = async (silent = false) => {
         if (!customerDetails || !customerDetails.id) {
-            alert('Please select a valid customer.');
+            if (!silent) showToast(t.error_customer || 'Please select a valid customer.', 'warning');
             return;
         }
 
@@ -194,9 +218,12 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
                 const { data, error } = await supabase.from('invoices').insert([dbInvoiceData]).select().single();
                 if (error) throw error;
                 savedId = data.id;
+                setInvoiceId(savedId); // Update state to prevent duplicate inserts
             }
 
             if (savedId) {
+                // Optimization: Maybe don't delete/insert items on every keystroke if unchanged?
+                // For now, simple approach is safe but heavy.
                 await supabase.from('invoice_items').delete().eq('invoice_id', savedId);
                 const itemsToInsert = items.map(item => ({
                     invoice_id: savedId,
@@ -207,12 +234,15 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
                     hsn_code: item.hsn
                 }));
                 await supabase.from('invoice_items').insert(itemsToInsert);
-                alert('Invoice Saved Successfully!');
-                onHome();
+
+                if (!silent) {
+                    showToast(t.success_invoice_saved || 'Invoice Saved Successfully!', 'success');
+                    onHome();
+                }
             }
         } catch (error) {
             console.error('Error saving invoice:', error);
-            alert('Failed to save invoice: ' + error.message);
+            if (!silent) showToast((t.error_save_failed || 'Failed to save invoice: ') + error.message, 'error');
         }
     };
 
@@ -220,25 +250,26 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
         <div className="bill-editor-container">
             <div className="page-header">
                 <div className="page-title">
-                    {invoiceId ? 'Edit Invoice' : 'New Silks Invoice'}
+                    <div style={{ lineHeight: '1.2' }}>{invoiceId ? (t.editInvoice || 'விலைப்பட்டியலை திருத்து') : (t.newSilksInvoice || 'புதிய பட்டு விலைப்பட்டியல்')}</div>
+                    {showSubs && <div style={{ fontSize: '0.8rem', fontWeight: '400', color: 'var(--color-text-muted)' }}>{invoiceId ? 'Edit Invoice' : 'New Silks Invoice'}</div>}
                 </div>
             </div>
 
             <div className="customer-row">
                 <div className="customer-field-col">
-                    <label className="zoho-label">Customer Name*</label>
+                    <label className="zoho-label">{t.customerName}{showSubs ? ' / Merchant Name' : ''}*</label>
                     <Autocomplete
                         value={customerName}
                         onChange={setCustomerName}
                         options={customerOptions}
-                        placeholder="Search customer..."
+                        placeholder={showSubs ? (t.searchCustomer || 'Search merchant...') : (t.searchCustomer || 'தேடுக...')}
                         displayKey="name"
                         onSelect={handleCustomerSelect}
                     />
                 </div>
                 {customerDetails && (
                     <div style={{ width: '250px' }}>
-                        <label className="zoho-label-normal">Place of Supply</label>
+                        <label className="zoho-label-normal">{t.placeOfSupply || 'Place of Supply'}</label>
                         <div className="zoho-input" style={{ background: 'var(--color-bg)', opacity: 0.8 }}>
                             {customerDetails.city || 'Tamil Nadu'}
                         </div>
@@ -248,11 +279,11 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
 
             <div className="invoice-details-row">
                 <div className="detail-field-group">
-                    <label className="zoho-label">Invoice#*</label>
+                    <label className="zoho-label">{t.invoiceNo}{showSubs ? ' / Invoice#' : ''}*</label>
                     <input type="text" className="zoho-input" value={billNo} onChange={(e) => setBillNo(e.target.value)} inputMode="numeric" />
                 </div>
                 <div className="detail-field-group">
-                    <label className="zoho-label">Invoice Date*</label>
+                    <label className="zoho-label">{t.invoiceDate}{showSubs ? ' / Invoice Date' : ''}*</label>
                     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                         <input
                             type="text"
@@ -289,11 +320,11 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
                     <table className="bill-table">
                         <thead>
                             <tr>
-                                <th style={{ width: '35%' }}>ITEM DETAILS</th>
+                                <th style={{ width: '35%' }}>{t.itemDetails}{showSubs ? ' / ITEM DETAILS' : ''}</th>
                                 <th style={{ width: '15%' }}>HSN/SAC</th>
-                                <th style={{ textAlign: 'right', width: '10%' }}>QTY</th>
-                                <th style={{ textAlign: 'right', width: '15%' }}>RATE</th>
-                                <th style={{ textAlign: 'right', width: '20%' }}>AMOUNT</th>
+                                <th style={{ textAlign: 'right', width: '10%' }}>{t.qty}{showSubs ? ' / QTY' : ''}</th>
+                                <th style={{ textAlign: 'right', width: '15%' }}>{t.rate}{showSubs ? ' / RATE' : ''}</th>
+                                <th style={{ textAlign: 'right', width: '20%' }}>{t.amount}{showSubs ? ' / AMOUNT' : ''}</th>
                                 <th style={{ width: '5%' }}></th>
                             </tr>
                         </thead>
@@ -307,7 +338,7 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
                                             options={itemOptions}
                                             displayKey="name"
                                             onSelect={(val) => handleItemSelect(index, val)}
-                                            placeholder="Select item..."
+                                            placeholder={showSubs ? (t.selectItem || 'Select item...') : (t.selectItem || 'தேர்ந்தெடுக்கவும்...')}
                                         />
                                     </td>
                                     <td>
@@ -335,47 +366,47 @@ function SilksEditor({ onHome, onPreview, setData, initialData }) {
                             <div key={index} className="mobile-item-card">
                                 <div className="card-header">
                                     <span className="item-number">Item #{index + 1}</span>
-                                    <button className="btn-remove-card" onClick={() => handleRemoveItem(index)}>Delete</button>
+                                    <button className="btn-remove-card" onClick={() => handleRemoveItem(index)}>{showSubs ? `${t.delete || 'நீக்க'} / Delete` : (t.delete || 'நீக்க')}</button>
                                 </div>
                                 <div className="card-body">
                                     <div className="card-field">
-                                        <label>Description</label>
+                                        <label>{t.description}{showSubs ? ' / Description' : ''}</label>
                                         <Autocomplete value={item.name} onChange={(val) => handleItemChange(index, 'name', val)} options={itemOptions} displayKey="name" onSelect={(val) => handleItemSelect(index, val)} />
                                     </div>
                                     <div className="card-row">
                                         <div className="card-field flex-1"><label>HSN</label><input type="text" className="zoho-input" value={item.hsn} onChange={(e) => handleItemChange(index, 'hsn', e.target.value)} /></div>
-                                        <div className="card-field flex-1"><label>Qty</label><input type="number" className="zoho-input" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} inputMode="numeric" /></div>
-                                        <div className="card-field flex-1"><label>Rate</label><input type="number" className="zoho-input" value={item.rate} onChange={(e) => handleItemChange(index, 'rate', e.target.value)} inputMode="decimal" /></div>
+                                        <div className="card-field flex-1"><label>{t.qty}{showSubs ? ' / Qty' : ''}</label><input type="number" className="zoho-input" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} inputMode="numeric" /></div>
+                                        <div className="card-field flex-1"><label>{t.rate}{showSubs ? ' / Rate' : ''}</label><input type="number" className="zoho-input" value={item.rate} onChange={(e) => handleItemChange(index, 'rate', e.target.value)} inputMode="decimal" /></div>
                                     </div>
-                                    <div className="card-amount"><span>Amount:</span><span className="amount-val">₹ {item.amount}</span></div>
+                                    <div className="card-amount"><span>{t.amount}{showSubs ? ' / Amount' : ''}:</span><span className="amount-val">₹ {item.amount}</span></div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <button className="btn-add-new-row" onClick={handleAddItem}><span>+</span> Add Item</button>
+                <button className="btn-add-new-row" onClick={handleAddItem}><span>+</span> {t.addItem}{showSubs ? ' / Add Item' : ''}</button>
             </div>
 
             <div className="bill-footer">
                 <div className="footer-left">
-                    <div className="notes-label">Notes</div>
-                    <textarea className="notes-area" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes..." />
-                    <div className="notes-label" style={{ marginTop: '10px' }}>Terms & Conditions</div>
-                    <textarea className="notes-area" value={terms} onChange={(e) => setTerms(e.target.value)} placeholder="Terms..." style={{ height: '60px' }} />
+                    <div className="notes-label">{t.notes}{showSubs ? ' / Notes' : ''}</div>
+                    <textarea className="notes-area" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={showSubs ? `${t.notes || 'Notes'}...` : `${t.notes || 'குறிப்புகள்'}...`} />
+                    <div className="notes-label" style={{ marginTop: '10px' }}>{t.terms}{showSubs ? ' / Terms & Conditions' : ''}</div>
+                    <textarea className="notes-area" value={terms} onChange={(e) => setTerms(e.target.value)} placeholder={showSubs ? `${t.terms || 'Terms'}...` : `${t.terms || 'நிபந்தனைகள்'}...`} style={{ height: '60px' }} />
                 </div>
                 <div className="footer-right">
-                    <div className="summary-row"><span>Sub Total</span><span>{calculateSubtotal().toFixed(2)}</span></div>
+                    <div className="summary-row"><span>{t.subTotal}{showSubs ? ' / Sub Total' : ''}</span><span>{calculateSubtotal().toFixed(2)}</span></div>
                     <div className="summary-row"><span>CGST ({taxRates.cgst}%)</span><span>{calculateGST(calculateSubtotal(), taxRates.cgst)}</span></div>
                     <div className="summary-row"><span>SGST ({taxRates.sgst}%)</span><span>{calculateGST(calculateSubtotal(), taxRates.sgst)}</span></div>
-                    <div className="summary-total"><span>Total (₹)</span><span>{calculateGrandTotal()}</span></div>
+                    <div className="summary-total"><span>{t.total}{showSubs ? ' / Total' : ''} (₹)</span><span>{calculateGrandTotal()}</span></div>
                 </div>
             </div>
 
             <div className="sticky-footer-bar">
-                <button className="btn-save" onClick={handlePreview}>Preview Invoice</button>
-                <button className="btn-cancel" onClick={onHome}>Cancel</button>
-                <button className="btn-helper" style={{ marginLeft: 'auto' }} onClick={handleSave}><IconSave size={16} /> Save</button>
+                <button className="btn-save" onClick={handlePreview}>{t.previewInvoice}{showSubs ? ' / Preview' : ''}</button>
+                <button className="btn-cancel" onClick={onHome}>{t.cancel}{showSubs ? ' / Cancel' : ''}</button>
+                <button className="btn-save" style={{ marginLeft: 'auto' }} onClick={() => handleSave(false)}><IconSave size={16} /> {t.save}{showSubs ? ' / Save' : ''}</button>
             </div>
         </div>
     );

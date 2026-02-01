@@ -222,7 +222,7 @@ function ElvanInvoice({ data, onEdit, onBack }) {
                     {/* Bill To */}
                     <div className="elvan-bill-to-section">
                         <div className="elvan-bill-to-label">Bill To</div>
-                        <div className="elvan-customer-name">{customerDetails?.company_name || customerDetails?.name || 'Unknown Customer'}</div>
+                        <div className="elvan-customer-name">{customerDetails?.company_name || customerDetails?.name || 'Unknown Merchant'}</div>
                         <div className="elvan-customer-address">
                             {customerDetails?.address_line1}, {customerDetails?.city ? customerDetails.city : ''}, {customerDetails?.pincode ? `PIN CODE ${customerDetails.pincode}` : ''}
                         </div>

@@ -34,9 +34,9 @@ function Login({ onLogin, t }) {
             <div className="login-card">
                 {/* Logo/Branding */}
                 <div className="login-header">
-                    <div className="login-logo">எ</div>
-                    <h1 className="login-title">எல்வன் கணனம்</h1>
-                    <p className="login-subtitle">Elvan Kananam</p>
+                    <div className="login-logo">{t.appName ? t.appName[0] : 'க'}</div>
+                    <h1 className="login-title" style={{ fontSize: '1.8rem', marginBottom: '4px' }}>{t.appNameFull}</h1>
+                    <p className="login-subtitle" style={{ fontSize: '1rem', color: 'var(--color-text-muted)' }}>Elvan Kananam</p>
                 </div>
 
                 {/* Login Form */}
@@ -122,7 +122,7 @@ function Login({ onLogin, t }) {
                                     <polyline points="10 17 15 12 10 7" />
                                     <line x1="15" y1="12" x2="3" y2="12" />
                                 </svg>
-                                Login
+                                {t?.login || 'Login'}
                             </>
                         )}
                     </button>
@@ -130,7 +130,7 @@ function Login({ onLogin, t }) {
 
                 {/* Footer */}
                 <div className="login-footer">
-                    <p>© 2026 Elvan Kananam</p>
+                    <p>© 2026 {t.appNameFull}</p>
                 </div>
             </div>
         </div>

@@ -277,7 +277,7 @@
 .bill-footer-new {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: flex-start;
     margin-top: 40px;
     margin-bottom: 30px;
 }

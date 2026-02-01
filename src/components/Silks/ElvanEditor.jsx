@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../config/supabaseClient';
 import { IconArrowLeft, IconTrash, IconPlus } from '../common/Icons';
 import Autocomplete from '../common/Autocomplete';
+import { useToast } from '../../context/ToastContext';
 import './elvan-editor.css';
 
 function ElvanEditor({ onHome, onPreview, setData, initialData }) {
+    const { showToast } = useToast();
     // --- State ---
     const [invoiceId, setInvoiceId] = useState(null); // Track ID for editing
     const [billNo, setBillNo] = useState('');
@@ -152,7 +154,7 @@ function ElvanEditor({ onHome, onPreview, setData, initialData }) {
 
     const handleSaveAndPreview = async () => {
         if (!customerDetails || !customerDetails.id) {
-            alert('Please select a valid customer.');
+            showToast('Please select a valid customer.', 'warning');
             return;
         }
 
@@ -241,7 +243,7 @@ function ElvanEditor({ onHome, onPreview, setData, initialData }) {
 
         } catch (error) {
             console.error('Error saving invoice:', error);
-            alert('Failed to save invoice: ' + error.message);
+            showToast('Failed to save invoice: ' + error.message, 'error');
         }
     };
 

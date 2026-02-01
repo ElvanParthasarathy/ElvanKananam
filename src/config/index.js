@@ -11,34 +11,33 @@
 import pvsConfig from './companies/pvs-silk-twisting.js';
 import vrmConfig from './companies/vrm-silk-twisting.js';
 
+// DEPRECATED: Hardcoded data moved to Supabase DB.
+// Kept temporarily for reference or extreme fallback.
+
 // All available companies
 export const companies = {
-    'pvs-silk-twisting': pvsConfig,
-    'vrm-silk-twisting': vrmConfig
+    // 'pvs-silk-twisting': pvsConfig,
+    // 'vrm-silk-twisting': vrmConfig
 };
 
 // Default company (used when no company is selected)
-export const DEFAULT_COMPANY_ID = 'pvs-silk-twisting';
+export const DEFAULT_COMPANY_ID = 'pvs-silk-twisting'; // Keep ID for reference
 
 /**
  * PDF Server Configuration
- * For local development: http://localhost:3001
- * For production (Vercel): Set VITE_PDF_SERVER_URL in environment variables
+ * For local development: Vite proxies /api/pdf to http://localhost:3001
+ * For production (Vercel): Uses the native /api/pdf serverless function
  */
-export const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || 'http://localhost:3001';
+export const PDF_SERVER_URL = import.meta.env.VITE_PDF_SERVER_URL || '';
 
-// Get company config by ID
+// DEPRECATED: Use DB fetch instead
 export const getCompanyConfig = (companyId) => {
-    return companies[companyId] || companies[DEFAULT_COMPANY_ID];
+    return null; // companies[companyId] || companies[DEFAULT_COMPANY_ID];
 };
 
-// Get all company options (for future company selector)
+// DEPRECATED: Use DB fetch instead
 export const getCompanyOptions = () => {
-    return Object.entries(companies).map(([id, config]) => ({
-        id,
-        name: config.name.english,
-        nameTamil: config.name.tamil
-    }));
+    return [];
 };
 
 export default pvsConfig; // Default export for convenience

@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
+      '/api/pdf': 'http://localhost:3001',
       '/generate-pdf': 'http://localhost:3001'
     }
   }

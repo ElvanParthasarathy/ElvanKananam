@@ -11,20 +11,25 @@ function Autocomplete({
     onChange,
     options,
     placeholder,
+    placeholderSub,
     displayKey = 'name',
     className = '',
-    onSelect
+    onSelect,
+    showSubs = false
 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
     const [filteredOptions, setFilteredOptions] = useState(options);
     const wrapperRef = useRef(null);
 
     // Filter options based on input
     useEffect(() => {
         if (value) {
-            const filtered = options.filter(opt =>
-                opt[displayKey].toLowerCase().includes(value.toLowerCase())
-            );
+            const filtered = options.filter(opt => {
+                const searchVal = opt[displayKey];
+                if (!searchVal) return false;
+                return String(searchVal).toLowerCase().includes(value.toLowerCase());
+            });
             setFilteredOptions(filtered);
         } else {
             setFilteredOptions(options);
@@ -57,6 +62,12 @@ function Autocomplete({
 
     const handleFocus = () => {
         setIsOpen(true);
+        setIsFocused(true);
+    };
+
+    const handleBlur = () => {
+        // Delay to allow clicking options
+        setTimeout(() => setIsFocused(false), 200);
     };
 
     const toggleDropdown = (e) => {
@@ -73,9 +84,17 @@ function Autocomplete({
                 value={value}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
-                placeholder={placeholder}
+                onBlur={handleBlur}
+                placeholder={(!showSubs || !placeholderSub) ? placeholder : ''}
                 autoComplete="off"
             />
+
+            {showSubs && placeholderSub && !value && !isFocused && (
+                <div className="dual-placeholder-overlay">
+                    <span className="dual-placeholder-primary">{placeholder}</span>
+                    <span className="dual-placeholder-sub">{placeholderSub}</span>
+                </div>
+            )}
 
             <button
                 type="button"

@@ -1,6 +1,6 @@
 {
-    "name": "எல்வன் கணனம்",
-    "short_name": "எல்வன் கணனம்",
+    "name": "கணனம்",
+    "short_name": "கணனம்",
     "description": "Professional billing application for silk twisting business",
     "start_url": "/",
     "display": "standalone",

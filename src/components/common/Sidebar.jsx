@@ -1,46 +1,39 @@
 import {
     IconHome,
     IconBox,
-    IconFileText,
     IconSettings,
-    IconUsers,
-    IconFiles,
     IconLogout,
     IconChevronDown,
+    IconChevronLeft,
+    IconChevronRight,
     IconX,
     IconSun,
     IconMoon,
-    IconAuto
+    IconAuto,
+    IconLock
 } from './Icons';
+import { showSubtitles } from '../../config/translations';
 
-const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, language, setLanguage, theme, setTheme }) => {
+const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, language, setLanguage, theme, setTheme, isCollapsed, onToggleCollapse }) => {
+    const showSubs = showSubtitles(language);
 
     // Helper to check if a section is active
     const isActive = (mode) => viewMode.startsWith(mode);
 
     // Nav Item Component
-    const NavItem = ({ icon: Icon, label, value, onClick, hasSubItems = false }) => (
+    const NavItem = ({ icon: Icon, label, value, onClick, hasSubItems = false, title, mobileHidden = false }) => (
         <button
-            className={`nav-item ${isActive(value) ? 'active' : ''}`}
+            className={`nav-item ${isActive(value) ? 'active' : ''} ${isCollapsed ? 'collapsed' : ''} ${mobileHidden ? 'mobile-hidden' : ''}`}
             onClick={() => onClick(value)}
+            title={isCollapsed ? title : undefined}
         >
             <Icon size={20} className="nav-item-icon" />
-            <span style={{ flex: 1 }}>{label}</span>
-            {hasSubItems && <IconChevronDown size={16} />}
+            {!isCollapsed && <span style={{ flex: 1 }}>{label}</span>}
+            {!isCollapsed && hasSubItems && <IconChevronDown size={16} />}
         </button>
     );
 
-    const SubItem = ({ label, value, onClick }) => (
-        <button
-            className={`nav-item nav-sub-item ${viewMode === value ? 'active-sub' : ''}`} // Add active-sub style if needed
-            onClick={(e) => {
-                e.stopPropagation();
-                onClick(value);
-            }}
-        >
-            {label}
-        </button>
-    );
+
 
     return (
         <>
@@ -50,12 +43,30 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, languag
                 onClick={onClose}
             />
 
-            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-                <div className="sidebar-header">
-                    <div className="sidebar-title">Kananam</div>
-                    <button className="sidebar-close-btn" onClick={onClose}>
-                        <IconX size={20} />
-                    </button>
+            <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+                <div className="sidebar-header" style={{ justifyContent: isCollapsed ? 'center' : 'space-between' }}>
+                    {!isCollapsed && (
+                        <div className="sidebar-title" style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
+                            <span>{t.appName}</span>
+                            {showSubs && <span style={{ fontSize: '12px', opacity: 0.7, fontWeight: 'normal' }}>{t.appNameEnglish}</span>}
+                        </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                        {/* Desktop Collapse Toggle */}
+                        <button
+                            className="sidebar-toggle-btn desktop-only"
+                            onClick={onToggleCollapse}
+                            title={isCollapsed ? "Expand" : "Collapse"}
+                        >
+                            {isCollapsed ? <IconChevronRight size={18} /> : <IconChevronLeft size={18} />}
+                        </button>
+
+                        {/* Mobile Close Button */}
+                        <button className="sidebar-close-btn mobile-only" onClick={onClose}>
+                            <IconX size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 <nav className="sidebar-nav">
@@ -63,108 +74,139 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, languag
                     {/* Home */}
                     <NavItem
                         icon={IconHome}
-                        label={t.home}
+                        label={
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                                <span style={{ fontSize: '15px', fontWeight: '600' }}>{t.home}</span>
+                                {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Home</span>}
+                            </div>
+                        }
+                        title="Home"
                         value="home"
                         onClick={onViewChange}
+                        mobileHidden={true}
                     />
 
-                    <div className="nav-section-title">{t.mainModules}</div>
+                    {!isCollapsed && (
+                        <div className="nav-section-title desktop-only">
+                            <div>{t.mainModules}</div>
+                            {showSubs && <div style={{ fontSize: '10px', fontWeight: 'normal' }}>Main Modules</div>}
+                        </div>
+                    )}
 
                     {/* Coolie Bill */}
                     <NavItem
                         icon={IconBox}
-                        label={t.coolieBill}
+                        label={
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                                <span style={{ fontSize: '15px', fontWeight: '600' }}>{t.coolieBill}</span>
+                                {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Coolie Bill</span>}
+                            </div>
+                        }
+                        title="Coolie Bill"
                         value="coolie"
                         onClick={() => onViewChange('coolie-dashboard')} // Default to dashboard
+                        mobileHidden={true}
                     />
-                    {isActive('coolie') && (
-                        <>
-                            <SubItem label={"+ " + t.newBill} value="coolie-new" onClick={onViewChange} />
-                            <SubItem label={t.allBills} value="coolie-dashboard" onClick={onViewChange} />
-                            <SubItem label={t.customers} value="coolie-customers" onClick={onViewChange} />
-                        </>
-                    )}
+
 
                     {/* Silks Bill */}
                     <NavItem
-                        icon={IconFileText}
-                        label={t.silksBill}
-                        value="silks"
-                        onClick={() => onViewChange('silks-dashboard')}
+                        icon={IconLock}
+                        label={
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2', opacity: 0.5 }}>
+                                <span style={{ fontSize: '15px', fontWeight: '600' }}>{t.silksBill}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Maligai Bill</span>}
+                                    <span style={{ fontSize: '9px', background: 'var(--color-border)', padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>LOCK</span>
+                                </div>
+                            </div>
+                        }
+                        title="Maligai Bill"
+                        value="silks-locked"
+                        onClick={() => { }}
+                        mobileHidden={true}
                     />
-                    {isActive('silks') && (
-                        <>
-                            <SubItem label={"+ " + t.newBill} value="silks-new" onClick={onViewChange} />
-                            <SubItem label={t.allBills} value="silks-dashboard" onClick={onViewChange} />
-                            <SubItem label={t.customers} value="silks-customers" onClick={onViewChange} />
-                            <SubItem label={t.inventory} value="silks-items" onClick={onViewChange} />
-                            <SubItem label={t.businessSettings} value="silks-business" onClick={onViewChange} />
-                        </>
-                    )}
 
-                    <div className="nav-section-title">{t.extrasMenu}</div>
+
+                    {!isCollapsed && (
+                        <div className="nav-section-title desktop-only">
+                            <div>{t.extrasMenu}</div>
+                            {showSubs && <div style={{ fontSize: '10px', fontWeight: 'normal' }}>Extras Menu</div>}
+                        </div>
+                    )}
 
                     <NavItem
                         icon={IconSettings}
-                        label={t.settings}
+                        label={
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                                <span style={{ fontSize: '15px', fontWeight: '600' }}>{t.settings}</span>
+                                {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Settings</span>}
+                            </div>
+                        }
+                        title="Settings"
                         value="settings"
                         onClick={onViewChange}
+                        mobileHidden={true}
                     />
 
                 </nav>
 
                 <div className="sidebar-footer">
-                    {/* Language Toggles */}
-                    <div className="pref-section">
-                        <div className="pref-label">{t.language}</div>
-                        <div className="pref-toggle-group">
+                    {!isCollapsed && (
+                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
                             <button
-                                className={`pref-btn ${language === 'en' ? 'active' : ''}`}
-                                onClick={() => setLanguage('en')}
+                                onClick={() => setLanguage('ta_mixed')}
+                                style={{
+                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
+                                    background: language === 'ta_mixed' ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: language === 'ta_mixed' ? '#fff' : 'var(--color-text)',
+                                    fontWeight: language === 'ta_mixed' ? 'bold' : 'normal'
+                                }}
+                                title="Tamil + English"
                             >
-                                English
+                                TA+
                             </button>
                             <button
-                                className={`pref-btn ${language === 'ta' ? 'active' : ''}`}
-                                onClick={() => setLanguage('ta')}
+                                onClick={() => setLanguage('ta_only')}
+                                style={{
+                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
+                                    background: language === 'ta_only' ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: language === 'ta_only' ? '#fff' : 'var(--color-text)',
+                                    fontWeight: language === 'ta_only' ? 'bold' : 'normal'
+                                }}
+                                title="Tamil Only"
                             >
-                                தமிழ்
+                                TA
+                            </button>
+                            <button
+                                onClick={() => setLanguage('en_only')}
+                                style={{
+                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
+                                    background: language === 'en_only' ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: language === 'en_only' ? '#fff' : 'var(--color-text)',
+                                    fontWeight: language === 'en_only' ? 'bold' : 'normal'
+                                }}
+                                title="English Only"
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => setLanguage('tg_mixed')}
+                                style={{
+                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
+                                    background: language === 'tg_mixed' ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: language === 'tg_mixed' ? '#fff' : 'var(--color-text)',
+                                    fontWeight: language === 'tg_mixed' ? 'bold' : 'normal'
+                                }}
+                                title="Tanglish + English"
+                            >
+                                TG
                             </button>
                         </div>
+                    )}
+                    <div style={{ padding: '0 12px', fontSize: '11px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                        ver 1.0.0
                     </div>
-
-                    {/* Theme Toggles */}
-                    <div className="pref-section" style={{ marginTop: '12px', marginBottom: '12px' }}>
-                        <div className="pref-label">{t.display}</div>
-                        <div className="pref-toggle-group">
-                            <button
-                                className={`pref-btn ${theme === 'light' ? 'active' : ''}`}
-                                onClick={() => setTheme('light')}
-                                title="Light Mode"
-                            >
-                                <IconSun size={16} />
-                            </button>
-                            <button
-                                className={`pref-btn ${theme === 'dark' ? 'active' : ''}`}
-                                onClick={() => setTheme('dark')}
-                                title="Dark Mode"
-                            >
-                                <IconMoon size={16} />
-                            </button>
-                            <button
-                                className={`pref-btn ${theme === 'auto' ? 'active' : ''}`}
-                                onClick={() => setTheme('auto')}
-                                title="Auto"
-                            >
-                                <IconAuto size={16} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <button className="nav-item" onClick={onLogout} style={{ color: 'var(--color-danger)', marginTop: '8px' }}>
-                        <IconLogout size={20} />
-                        <span>{t.logout}</span>
-                    </button>
                 </div>
             </aside>
         </>

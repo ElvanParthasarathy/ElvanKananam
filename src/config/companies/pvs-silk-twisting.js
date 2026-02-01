@@ -42,7 +42,7 @@ const pvsConfig = {
     total: 'மொத்தம்',
     inWords: 'எழுத்தில் மொத்தத் தொகை',
     setharam: 'சேதாரம்',
-    courier: 'கொரியர் கட்டணம்',
+    courier: 'கொரியர்',
     ahimsaSilk: 'அகிம்சா பட்டு',
     signature: 'கையொப்பம்',
     forCompany: 'P.V.S. Silk Twisting'

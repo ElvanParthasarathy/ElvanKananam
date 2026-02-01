@@ -1,0 +1,20 @@
+﻿
+        .btn-secondary-desktop:hover {
+            background: var(--color-bg);
+            border-color: var(--color-text-muted);
+            color: var(--color-text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+
+
+
+
+
+
+    .old-btn-helper-hover {
+        background: var(--color-surface-elevated);
+        color: var(--color-primary);
+    }

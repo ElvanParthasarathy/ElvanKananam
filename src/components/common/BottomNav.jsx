@@ -1,76 +1,66 @@
 import {
     IconHome,
     IconBox,
-    IconFileText,
-    IconFiles,
-    IconMenu
+    IconLock,
+    IconSettings
 } from './Icons';
+import { showSubtitles } from '../../config/translations';
 
-const BottomNav = ({ viewMode, onViewChange, onMenu }) => {
+const BottomNav = ({ viewMode, onViewChange, language, t }) => {
+    const showSubs = showSubtitles(language);
 
-    // Check if default or active in sub-routes
-    const isHome = viewMode === 'home';
-    const isCoolie = viewMode.startsWith('coolie');
-    const isSilks = viewMode.startsWith('silks');
-    // const isFiles = viewMode === 'files'; // Future use
+    const isActive = (mode) => viewMode.startsWith(mode);
 
     return (
         <nav className="bottom-nav">
 
             {/* Home */}
             <button
-                className={`bottom-nav-item ${isHome ? 'active' : ''}`}
+                className={`bottom-nav-item ${viewMode === 'home' ? 'active' : ''}`}
                 onClick={() => onViewChange('home')}
             >
-                <IconHome size={20} />
-                <span className="bottom-nav-label">Home</span>
-            </button>
-
-            {/* + Coolie (Action) */}
-            <button
-                className={`bottom-nav-item ${isCoolie ? 'active' : ''}`}
-                onClick={() => onViewChange('coolie-new')}
-            >
-                <div style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                }}>
-                    <span style={{ fontSize: '18px', lineHeight: 1 }}>+</span>
-                    <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Coolie</span>
+                <IconHome size={22} />
+                <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+                    <span>{t.home}</span>
+                    {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Home</span>}
                 </div>
             </button>
 
-            {/* + Silks (Action) */}
+            {/* Coolie Bill */}
             <button
-                className={`bottom-nav-item ${isSilks ? 'active' : ''}`}
-                onClick={() => onViewChange('silks-new')}
+                className={`bottom-nav-item ${isActive('coolie') ? 'active' : ''}`}
+                onClick={() => onViewChange('coolie-dashboard')}
             >
-                <div style={{
-                    backgroundColor: 'var(--color-brand-silks, #24AE61)',
-                    color: '#fff',
-                    padding: '8px 12px',
-                    borderRadius: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                }}>
-                    <span style={{ fontSize: '18px', lineHeight: 1 }}>+</span>
-                    <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Silks</span>
+                <IconBox size={22} />
+                <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+                    <span>{t.coolieBill}</span>
+                    {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Coolie</span>}
                 </div>
             </button>
 
-            {/* Menu / More */}
+            {/* Pattu Bill (Silks) */}
             <button
-                className="bottom-nav-item"
-                onClick={onMenu}
+                className={`bottom-nav-item ${isActive('silks') ? 'active' : ''}`}
+                onClick={() => onViewChange('silks-locked')}
+                style={{ opacity: 0.6 }}
             >
-                <IconMenu size={20} />
-                <span className="bottom-nav-label">Menu</span>
+                <IconLock size={20} />
+                <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+                    <span>{t.silksBill}</span>
+                    {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Maligai</span>}
+                </div>
+            </button>
+
+            {/* Settings */}
+            <button
+                className={`bottom-nav-item ${viewMode === 'settings' ? 'active' : ''}`}
+                onClick={() => onViewChange('settings')}
+            >
+                <IconSettings size={22} />
+                <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+                    <span>{t.settings}</span>
+                    {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Settings</span>}
+                </div>
             </button>
 
         </nav>

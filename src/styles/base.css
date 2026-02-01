@@ -331,6 +331,10 @@ button:focus {
   background: rgba(0, 0, 0, 0.1);
 }
 
+.autocomplete-wrapper.open {
+  z-index: 10000;
+}
+
 /* Editor Header Layout */
 .editor-title {
   margin-bottom: 0;
@@ -372,15 +376,127 @@ button:focus {
 .company-select:focus {
   border-color: var(--color-primary);
 }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.animate-spin { animation: spin 1s linear infinite; }
 
-.download-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justifyContent: center; color: white; }
-.download-card { background: white; padding: 30px; border-radius: 12px; text-align: center; color: #333; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-.progress-container { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin: 20px 0; overflow: hidden; }
-.progress-fill { height: 100%; background: #e65100; transition: width 0.3s ease; }
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
 
-.download-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; color: white; backdrop-filter: blur(4px); }
-.download-card { background: white; padding: 30px; border-radius: 16px; text-align: center; color: #333; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-.progress-container { width: 100%; height: 12px; background: #f0f0f0; border-radius: 6px; margin: 20px 0; overflow: hidden; border: 1px solid #ddd; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #e65100, #ff9800); transition: width 0.2s ease; }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.download-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.download-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  color: #333;
+  width: 300px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: #eee;
+  border-radius: 5px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #e65100;
+  transition: width 0.3s ease;
+}
+
+.download-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.download-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  color: #333;
+  width: 320px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  margin: 20px 0;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e65100, #ff9800);
+  transition: width 0.2s ease;
+}
+
+/* ========== DUAL PLACEHOLDER OVERLAY ========== */
+.dual-placeholder-overlay {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  line-height: 1.2;
+}
+
+.dual-placeholder-primary {
+  font-size: 14px;
+  color: var(--color-placeholder);
+  font-weight: 500;
+}
+
+.dual-placeholder-sub {
+  font-size: 10px;
+  color: var(--color-placeholder);
+  opacity: 0.8;
+}
+
+/* For Textareas where center alignment is not ideal */
+.dual-placeholder-overlay.textarea-placeholder {
+  top: 10px;
+  transform: none;
+}

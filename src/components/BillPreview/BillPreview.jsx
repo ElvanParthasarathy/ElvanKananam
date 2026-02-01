@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IconPhone, IconPrinter, IconEdit, IconMail, IconZoomIn, IconZoomOut, IconSave, IconLoader } from '../common/Icons';
+import { showSubtitles } from '../../config/translations';
 import { numberToWordsTamil } from '../../utils/tamilNumbers';
 import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight, formatCurrency } from '../../utils/calculations';
 import { PDF_SERVER_URL } from '../../config/index';
@@ -14,6 +15,8 @@ function BillPreview({
     billNo,
     date,
     customerName,
+    contactPerson,
+    address,
     city,
     items,
     setharamGrams,
@@ -23,9 +26,14 @@ function BillPreview({
     customChargeRs,
     bankDetails,
     accountNo,
-    onEdit
+    onEdit,
+    t,
+    language,
+    showIFSC = true,
+    showBankDetails = true
 }) {
-    const { name, greeting, billType, address, phone, email, labels } = config;
+    const showSubs = false; // Never show bilingual subtitles in Preview/Print
+    const { name, greeting, billType, address: merchantAddress, phone, email } = config;
 
     // Calculations
     const setharamKg = gramsToKg(setharamGrams);
@@ -97,84 +105,9 @@ function BillPreview({
         }, 100);
     };
 
-    // SERVER-SIDE PDF DOWNLOAD
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [downloadProgress, setDownloadProgress] = useState(0);
 
-    const handleDownloadPDF = async () => {
-        setIsGenerating(true);
-        setDownloadProgress(2);
 
-        let activeInterval = setInterval(() => {
-            setDownloadProgress(prev => {
-                if (prev < 90) return prev + Math.floor(Math.random() * 5) + 1;
-                if (prev < 98) return prev + 0.5;
-                return prev;
-            });
-        }, 400);
 
-        try {
-            const fullHtml = document.documentElement.outerHTML;
-            const endpoint = `${PDF_SERVER_URL}/generate-pdf`;
-
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ html: fullHtml })
-            });
-
-            if (!response.ok) throw new Error('Server Failed');
-
-            clearInterval(activeInterval);
-            activeInterval = null;
-            setDownloadProgress(95);
-
-            const contentLength = response.headers.get('content-length');
-            const total = parseInt(contentLength, 10);
-            let loaded = 0;
-
-            const reader = response.body.getReader();
-            const chunks = [];
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                chunks.push(value);
-                loaded += value.length;
-
-                if (total) {
-                    const percent = Math.round((loaded / total) * 100);
-                    setDownloadProgress(percent);
-                } else {
-                    // Gradual fallback if no content length
-                    setDownloadProgress(prev => Math.min(prev + 2, 98));
-                }
-            }
-
-            const blob = new Blob(chunks, { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const cleanDate = date.replace(/[/._]/g, ' ');
-            const cleanName = name.english.replace(/[/._]/g, ' ');
-            a.download = `Bill-${billNo} ${cleanDate} ${cleanName}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-
-        } catch (error) {
-            console.error('PDF Download Error:', error);
-            alert('Failed to generate PDF. Is the PDF Server running?');
-        } finally {
-            if (activeInterval) clearInterval(activeInterval);
-            setTimeout(() => {
-                setIsGenerating(false);
-                setDownloadProgress(0);
-            }, 800);
-        }
-    };
 
     return (
         <div className="preview-overlay" style={{
@@ -184,36 +117,17 @@ function BillPreview({
             zIndex: 2000
         }}>
 
-            {/* Download Progress Overlay */}
-            {isGenerating && (
-                <div className="download-overlay">
-                    <div className="download-card">
-                        <div style={{ marginBottom: '15px' }}>
-                            <IconLoader size={40} className="animate-spin" style={{ color: '#e65100' }} />
-                        </div>
-                        <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>
-                            {downloadProgress < 95 ? 'Generating PDF...' : 'Downloading File...'}
-                        </h3>
-                        <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>Please wait, this will take a few seconds</p>
 
-                        <div className="progress-container">
-                            <div className="progress-fill" style={{ width: `${downloadProgress}%` }}></div>
-                        </div>
-
-                        <div style={{ fontSize: '24px', fontWeight: '800', color: '#e65100' }}>
-                            {Math.round(downloadProgress)}%
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Wrapper to handle scaling and scrolling */}
             <div className="zoom-wrapper" style={{
                 width: '210mm',
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left', // Pivot from top-left for predictable scrolling
-                margin: scale < 1 ? '0 auto' : '0', // Center if smaller than screen
-                marginBottom: '200px' // Extra space for FABs
+                marginTop: scale < 1 ? '0' : '0',
+                marginRight: scale < 1 ? 'auto' : '0',
+                marginBottom: '200px', // Extra space for FABs
+                marginLeft: scale < 1 ? 'auto' : '0'
             }}>
                 {/* A4 Paper */}
                 <div
@@ -222,10 +136,11 @@ function BillPreview({
                 >
 
                     {/* Top Greeting Row */}
+                    {/* Top Greeting Row */}
                     <div className="top-greeting-row">
                         <span className="greeting-left">வாழ்க வையகம்</span>
                         <span className="greeting-center">உ</span>
-                        <span className="greeting-right">{greeting}</span>
+                        <span className="greeting-right">வாழ்க வளமுடன்</span>
                     </div>
 
                     {/* Header */}
@@ -243,7 +158,7 @@ function BillPreview({
 
                         {/* Right - Bill Type */}
                         <div className="header-right">
-                            <div className="bill-type-badge font-tamil">{billType}</div>
+                            <div className="bill-type-badge font-tamil">கூலி பில்</div>
                         </div>
                     </div>
 
@@ -255,15 +170,23 @@ function BillPreview({
                     {/* Bill Info Section */}
                     <div className="bill-info-section">
                         <div className="bill-meta-row">
-                            <span className="bill-meta">{labels.billNo} : <strong>{billNo}</strong></span>
-                            <span className="bill-meta">{labels.date} : <strong>{date}</strong></span>
+                            <span className="bill-meta">பில் எண் : <strong>{billNo}</strong></span>
+                            {showSubs && <span className="bill-meta" style={{ fontSize: '10px', marginLeft: '-15px', color: 'var(--bill-text-dark)', opacity: 0.7 }}>Bill No</span>}
+                            <span className="bill-meta">நாள் : <strong>{date}</strong></span>
+                            {showSubs && <span className="bill-meta" style={{ fontSize: '10px', marginLeft: '-15px', color: 'var(--bill-text-dark)', opacity: 0.7 }}>Date</span>}
                         </div>
                         <div className="customer-info">
                             <div className="customer-name-simple">
-                                <span className="customer-label">{labels.customerPrefix}</span> {customerName}
+                                <span className="customer-label">திரு:</span>
+                                <span style={{ fontWeight: '600' }}>
+                                    {contactPerson ? `${contactPerson}, ${customerName}` : customerName}
+                                </span>
+                                {showSubs && <span style={{ fontSize: '10px', color: 'var(--bill-text-dark)', opacity: 0.7, marginLeft: '8px' }}>/ Mr.</span>}
                             </div>
                             <div className="customer-city-simple">
-                                <span className="customer-label">{labels.cityPrefix}</span> {city}
+                                <span className="customer-label">ஊர்:</span>
+                                {address && city ? `${address}, ${city}` : (address || city || '')}
+                                {showSubs && <span style={{ fontSize: '10px', color: 'var(--bill-text-dark)', opacity: 0.7, marginLeft: '8px' }}>/ City</span>}
                             </div>
                         </div>
                     </div>
@@ -272,10 +195,22 @@ function BillPreview({
                     <table className="bill-table-new">
                         <thead>
                             <tr>
-                                <th style={{ width: '15%' }}>{labels.rate}</th>
-                                <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>{labels.itemName}</th>
-                                <th style={{ width: '15%' }}>{labels.weight}</th>
-                                <th style={{ width: '25%' }}>{labels.amount}</th>
+                                <th style={{ width: '15%' }}>
+                                    <div>கூலி</div>
+                                    {showSubs && <div style={{ fontSize: '9px', fontWeight: 'normal' }}>Coolie</div>}
+                                </th>
+                                <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>
+                                    <div>பொருள் பெயர்</div>
+                                    {showSubs && <div style={{ fontSize: '9px', fontWeight: 'normal' }}>Item Description</div>}
+                                </th>
+                                <th style={{ width: '15%' }}>
+                                    <div>எடை (Kg)</div>
+                                    {showSubs && <div style={{ fontSize: '9px', fontWeight: 'normal' }}>Weight (Kg)</div>}
+                                </th>
+                                <th style={{ width: '25%' }}>
+                                    <div>தொகை</div>
+                                    {showSubs && <div style={{ fontSize: '9px', fontWeight: 'normal' }}>Amount</div>}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -288,28 +223,13 @@ function BillPreview({
                                 </tr>
                             ))}
 
-                            {setharamGrams && (
-                                <tr className={items.length % 2 === 1 ? 'row-alt' : ''}>
-                                    <td className="text-center">-</td>
-                                    <td className="text-left">{labels.setharam}</td>
-                                    <td className="text-center">{formatWeight(setharamKg)}</td>
-                                    <td className="text-center">-</td>
-                                </tr>
-                            )}
-
-                            {courierRs && (
-                                <tr>
-                                    <td className="text-center">-</td>
-                                    <td className="text-left">{labels.courier}</td>
-                                    <td className="text-center">-</td>
-                                    <td className="text-center">{formatCurrency(courierRs)}</td>
-                                </tr>
-                            )}
-
                             {ahimsaSilkRs && (
                                 <tr>
                                     <td className="text-center">-</td>
-                                    <td className="text-left">{labels.ahimsaSilk}</td>
+                                    <td className="text-left">
+                                        <div>அகிம்சா பட்டு</div>
+                                        {showSubs && <div style={{ fontSize: '9px', color: '#666' }}>Ahimsa Silk</div>}
+                                    </td>
                                     <td className="text-center">-</td>
                                     <td className="text-center">{formatCurrency(ahimsaSilkRs)}</td>
                                 </tr>
@@ -318,16 +238,46 @@ function BillPreview({
                             {customChargeRs && (
                                 <tr>
                                     <td className="text-center">-</td>
-                                    <td className="text-left">{customChargeName || (labels.otherName || 'More')}</td>
+                                    <td className="text-left">
+                                        <div>{customChargeName || 'பிற விவரம்'}</div>
+                                        {showSubs && !customChargeName && <div style={{ fontSize: '9px', color: '#666' }}>Other Details</div>}
+                                    </td>
                                     <td className="text-center">-</td>
                                     <td className="text-center">{formatCurrency(customChargeRs)}</td>
+                                </tr>
+                            )}
+
+                            {setharamGrams && (
+                                <tr className={items.length % 2 === 1 ? 'row-alt' : ''}>
+                                    <td className="text-center">-</td>
+                                    <td className="text-left">
+                                        <div>சேதாரம்</div>
+                                        {showSubs && <div style={{ fontSize: '9px', color: '#666' }}>Wastage</div>}
+                                    </td>
+                                    <td className="text-center">{formatWeight(setharamKg)}</td>
+                                    <td className="text-center">-</td>
+                                </tr>
+                            )}
+
+                            {courierRs && (
+                                <tr>
+                                    <td className="text-center">-</td>
+                                    <td className="text-left">
+                                        <div>கொரியர் கட்டணம்</div>
+                                        {showSubs && <div style={{ fontSize: '9px', color: '#666' }}>Courier</div>}
+                                    </td>
+                                    <td className="text-center">-</td>
+                                    <td className="text-center">{formatCurrency(courierRs)}</td>
                                 </tr>
                             )}
                         </tbody>
                         {/* Total Row in Footer for Alignment */}
                         <tfoot>
                             <tr className="total-footer-row">
-                                <td colSpan="2" className="text-right total-label-cell">{labels.total}</td>
+                                <td colSpan="2" className="text-right total-label-cell">
+                                    மொத்தம்
+                                    {showSubs && <span style={{ fontSize: '10px', marginLeft: '10px', fontWeight: 'normal', textTransform: 'uppercase' }}>/ Total</span>}
+                                </td>
                                 <td className="text-center total-weight-cell">
                                     {formatWeight(totalKg)} Kg
                                 </td>
@@ -340,36 +290,70 @@ function BillPreview({
 
                     {/* Amount in Words */}
                     <div className="words-section">
-                        {labels.inWords}: <span className="words-line">{numberToWordsTamil(totalRs)}</span>
+                        எழுத்தில் மொத்தத் தொகை: <span className="words-line">{numberToWordsTamil(totalRs)}</span>
+                        {showSubs && <div style={{ fontSize: '9px', color: '#666', marginTop: '4px' }}>Amount in Words: (Tamil Words Above)</div>}
                     </div>
 
                     {/* Footer */}
                     <div className="bill-footer-new">
                         <div className="footer-left">
-                            {(bankDetails || accountNo) && (
-                                <div style={{ marginBottom: '15px', color: 'var(--bill-text-dark)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                                    {bankDetails && <div><strong>வங்கி விவரம் :</strong> {bankDetails}</div>}
-                                    {accountNo && <div><strong>கணக்கு எண் :</strong> {accountNo}</div>}
+                            {showBankDetails && (bankDetails || accountNo) && (
+                                <div style={{
+                                    marginBottom: '10px',
+                                    color: 'var(--bill-text-dark)',
+                                    fontSize: '0.9rem',
+                                    lineHeight: '1.4',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '6px'
+                                }}>
+                                    {bankDetails && (
+                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                            <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>வங்கி விவரம் :</div>
+                                            <div style={{ color: '#000' }}>{bankDetails}</div>
+                                        </div>
+                                    )}
+                                    {accountNo && (
+                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                            <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>கணக்கு எண் :</div>
+                                            <div style={{ color: '#000' }}>{accountNo}</div>
+                                        </div>
+                                    )}
+                                    {showIFSC && config.ifscCode && (
+                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                            <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>IFSC :</div>
+                                            <div style={{ textTransform: 'uppercase', color: '#000' }}>{config.ifscCode}</div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                            <div className="thank-you font-tamil">நன்றி</div>
+                            <div className="thank-you font-tamil">
+                                நன்றி
+                                {showSubs && <span style={{ fontSize: '12px', marginLeft: '10px', fontWeight: 'normal' }}>/ Thank You</span>}
+                            </div>
                         </div>
                         <div className="preview-footer-right">
                             <div className="sign-company font-display">{name.english}</div>
                             <div className="sign-space"></div>
-                            <div className="sign-label">{labels.signature}</div>
+                            <div className="sign-label">
+                                (கையொப்பம்)
+                                {showSubs && <span style={{ fontSize: '9px', display: 'block', fontWeight: 'normal' }}>Authorized Signature</span>}
+                            </div>
                         </div>
                     </div>
 
                     {/* Contact Section */}
                     <div className="contact-section">
-                        <div className="contact-title">தொடர்பு கொள்ள</div>
+                        <div className="contact-title">
+                            தொடர்பு கொள்ள
+                            {showSubs && <span style={{ fontSize: '10px', marginLeft: '10px', fontWeight: 'normal' }}>/ Contact Us</span>}
+                        </div>
                         <div className="contact-row">
                             <div className="contact-left">
                                 <div className="contact-address">
-                                    {address.line1}, {address.line2}
+                                    {merchantAddress.line2}
                                     <br />
-                                    {address.line3}
+                                    {merchantAddress.line3}
                                 </div>
                                 <div className="contact-email">
                                     <IconMail size={14} /> {email}
@@ -402,39 +386,8 @@ function BillPreview({
                     <IconEdit size={22} />
                 </button>
 
-                {/* Server-Side PDF Download */}
-                <button
-                    className="fab fab-primary"
-                    onClick={handleDownloadPDF}
-                    disabled={isGenerating}
-                    aria-label="Save PDF (Server)"
-                    title={isGenerating ? `Generating... ${downloadProgress}%` : "Download PDF (High Quality)"}
-                    style={{
-                        marginRight: '8px',
-                        backgroundColor: '#e65100',
-                        opacity: isGenerating ? 0.7 : 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        minWidth: '50px' // Ensure enough space for text
-                    }}
-                >
-                    {isGenerating ? (
-                        <>
-                            <IconLoader size={26} className="animate-spin" />
-                            <span style={{
-                                position: 'absolute',
-                                fontSize: '8px',
-                                fontWeight: '800',
-                                color: 'white',
-                                pointerEvents: 'none'
-                            }}>
-                                {downloadProgress > 0 ? `${downloadProgress}%` : ''}
-                            </span>
-                        </>
-                    ) : <IconSave size={22} />}
-                </button>
+
+
 
                 {/* Print Button (Fallback) */}
                 <button className="fab fab-primary" onClick={handlePrint} aria-label="Print" title="Print to Paper">
