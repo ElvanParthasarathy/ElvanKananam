@@ -1,0 +1,9 @@
+pdf-server/
+migrations/
+scripts/
+backup_full.json
+tail_css.txt
+tail_css_utf8.txt
+supabase_schema.sql
+temp_migrate_color.js
+.env
