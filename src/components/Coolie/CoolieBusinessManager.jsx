@@ -61,6 +61,8 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
 
         if (error) {
             console.log('Error fetching profiles:', error.message);
+            setProfiles([]);
+            setSelectedId(null);
         } else {
             setProfiles(data || []);
             if (data && data.length > 0 && !selectedId) {

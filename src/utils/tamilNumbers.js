@@ -123,7 +123,7 @@ function convertUnder100000(n) {
 }
 
 function convert(n) {
-    if (n === 0) return 'பூஜ்ஜியம்';
+    if (n === 0) return 'சுழியம்';
     if (n < 100000) return convertUnder100000(n);
 
     const lakhs = Math.floor(n / 100000);

@@ -1,7 +1,7 @@
 import {
     IconHome,
     IconBox,
-    IconLock,
+    IconFiles,
     IconSettings
 } from './Icons';
 import { showSubtitles } from '../../config/translations';
@@ -41,10 +41,9 @@ const BottomNav = ({ viewMode, onViewChange, language, t }) => {
             {/* Pattu Bill (Silks) */}
             <button
                 className={`bottom-nav-item ${isActive('silks') ? 'active' : ''}`}
-                onClick={() => onViewChange('silks-locked')}
-                style={{ opacity: 0.6 }}
+                onClick={() => onViewChange('silks-dashboard')}
             >
-                <IconLock size={20} />
+                <IconFiles size={20} />
                 <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
                     <span>{t.silksBill}</span>
                     {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Maligai</span>}

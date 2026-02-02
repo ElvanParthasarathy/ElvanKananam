@@ -46,6 +46,8 @@ export const tanglish = {
     quantity: 'Edai (Kg)',
     weight: 'Edai (KG)',
     rate: 'Koolie',
+    price: 'Vilai',
+    hsnCode: 'HSN Kuriyeedu',
     amount: 'Thogai',
     addAnotherItem: 'Pudhiya Varisai',
     newItem: 'Pudhiya Porul',
@@ -171,6 +173,7 @@ export const tanglish = {
 
     // Language
     language: 'Mozhi',
+    billLanguage: 'Bill Mozhi',
     tamil: 'Tamizh',
     english: 'Aangilam',
     tamilMixed: 'Tamizh + Aangilam',

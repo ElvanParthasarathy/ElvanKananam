@@ -13,8 +13,10 @@ export const numberToWords = (n) => {
     const convertChunk = (num) => {
         let str = "";
         if (num > 99) {
-            str += units[Math.floor(num / 100)] + " Hundred ";
+            str += units[Math.floor(num / 100)] + " Hundred";
             num %= 100;
+            if (num > 0) str += " and ";
+            else str += " ";
         }
         if (num > 19) {
             str += tens[Math.floor(num / 10)] + " ";

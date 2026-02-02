@@ -10,7 +10,7 @@ import {
     IconSun,
     IconMoon,
     IconAuto,
-    IconLock
+    IconFiles
 } from './Icons';
 import { showSubtitles } from '../../config/translations';
 
@@ -111,19 +111,16 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, languag
 
                     {/* Silks Bill */}
                     <NavItem
-                        icon={IconLock}
+                        icon={IconFiles}
                         label={
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2', opacity: 0.5 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
                                 <span style={{ fontSize: '15px', fontWeight: '600' }}>{t.silksBill}</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Maligai Bill</span>}
-                                    <span style={{ fontSize: '9px', background: 'var(--color-border)', padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>LOCK</span>
-                                </div>
+                                {showSubs && <span style={{ fontSize: '11px', opacity: 0.7 }}>Maligai Bill</span>}
                             </div>
                         }
                         title="Maligai Bill"
-                        value="silks-locked"
-                        onClick={() => { }}
+                        value="silks"
+                        onClick={() => onViewChange('silks-dashboard')}
                         mobileHidden={true}
                     />
 

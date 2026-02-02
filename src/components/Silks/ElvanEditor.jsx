@@ -94,8 +94,75 @@ function ElvanEditor({ onHome, onPreview, setData, initialData }) {
     async function fetchInitialData() {
         const { data: customers } = await supabase.from('customers').select('*');
         const { data: itemsData } = await supabase.from('items').select('*');
-        setCustomerOptions(customers || []);
-        setItemOptions(itemsData || []);
+
+        const processedCustomers = (customers || []).map(c => {
+            const primaryName = c.name_tamil || c.name || '';
+            const secondaryName = c.name_tamil && c.name ? c.name : c.name_tamil || '';
+            const companyPrimary = c.company_name_tamil || c.company_name || '';
+            const companySecondary = c.company_name_tamil && c.company_name ? c.company_name : '';
+            const placePrimary = c.city_tamil || c.city || c.place_of_supply || '';
+            const placeSecondary = c.city_tamil && c.city ? c.city : '';
+
+            return {
+                ...c,
+                searchText: [
+                    c.name_tamil,
+                    c.name,
+                    c.company_name_tamil,
+                    c.company_name,
+                    c.city_tamil,
+                    c.city,
+                    c.place_of_supply,
+                    c.gstin
+                ].filter(Boolean).join(' '),
+                displayName: (
+                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '4px 0', gap: '2px' }}>
+                        {companyPrimary && (
+                            <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--color-primary)' }}>
+                                {companyPrimary}
+                                {companySecondary && <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>{companySecondary}</span>}
+                            </div>
+                        )}
+                        <div style={{ fontWeight: '600', fontSize: '12px', color: 'var(--color-text)' }}>
+                            {primaryName}
+                            {secondaryName && secondaryName !== primaryName && (
+                                <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>{secondaryName}</span>
+                            )}
+                        </div>
+                        {placePrimary && (
+                            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                {placePrimary}
+                                {placeSecondary && placeSecondary !== placePrimary && <span style={{ opacity: 0.7, marginLeft: '4px' }}>({placeSecondary})</span>}
+                            </div>
+                        )}
+                    </div>
+                )
+            };
+        });
+
+        const processedItems = (itemsData || []).map(item => ({
+            ...item,
+            searchText: [
+                item.name_tamil,
+                item.name,
+                item.hsn_or_sac
+            ].filter(Boolean).join(' '),
+            displayName: (
+                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '2px 0' }}>
+                    <span style={{ fontWeight: '600', fontSize: '13px', color: 'var(--color-text)' }}>
+                        {item.name_tamil || item.name}
+                    </span>
+                    {item.name_tamil && item.name && (
+                        <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                            {item.name}
+                        </span>
+                    )}
+                </div>
+            )
+        }));
+
+        setCustomerOptions(processedCustomers);
+        setItemOptions(processedItems);
 
         // Only generate New Bill# if NOT editing (no initialData)
         if (!initialData) {
@@ -323,7 +390,7 @@ function ElvanEditor({ onHome, onPreview, setData, initialData }) {
                     <thead>
                         <tr>
                             <th style={{ width: '40%' }}>Item Details</th>
-                            <th style={{ width: '10%' }}>HSN/SAC</th>
+                            <th style={{ width: '10%' }}>HSN Code</th>
                             <th style={{ width: '10%', textAlign: 'right' }}>Quantity</th>
                             <th style={{ width: '15%', textAlign: 'right' }}>Rate</th>
                             <th style={{ width: '15%', textAlign: 'right' }}>Amount</th>

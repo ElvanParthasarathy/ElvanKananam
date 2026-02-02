@@ -46,6 +46,8 @@ export const tamil = {
     quantity: 'எடை (Kg)',
     weight: 'எடை (கிலோ)',
     rate: 'கூலி',
+    price: 'விலை',
+    hsnCode: 'HSN குறியீடு',
     amount: 'தொகை',
     addAnotherItem: 'புதிய வரிசை',
     coolieItems: 'பொருட்கள்',
@@ -167,8 +169,10 @@ export const tamil = {
     signature: '(கையொப்பம்)',
 
     // Language
+    language: 'மொழி',
+    billLanguage: 'பில் மொழி',
     tamil: 'தமிழ்',
-    english: 'English',
+    english: 'ஆங்கிலம்',
     tamilMixed: 'Tamil + English',
     tanglishMixed: 'Tanglish + English',
 

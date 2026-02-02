@@ -16,6 +16,8 @@ function BillEditor({
     t = {},
     language = 'en',
     setLanguage,
+    previewLanguage = 'ta_mixed',
+    setPreviewLanguage,
     theme,
     setTheme,
     billNo = '',
@@ -77,17 +79,24 @@ function BillEditor({
     useEffect(() => {
         async function fetchData() {
             // Fetch Customers (Type = Coolie)
-            // Fetch Customer Options (Type = Coolie)
-            const { data: customers } = await supabase
+            const { data: customers, error: customersError } = await supabase
                 .from('coolie_customers')
                 .select('*')
                 .eq('type', 'coolie'); // Strict Filter
 
+            if (customersError) {
+                console.warn('Failed to fetch coolie customers', customersError);
+            }
+
             // Fetch Items (Type = Coolie)
-            const { data: itemsData } = await supabase
+            const { data: itemsData, error: itemsError } = await supabase
                 .from('coolie_items')
                 .select('*')
                 .eq('type', 'coolie'); // Strict Filter
+
+            if (itemsError) {
+                console.warn('Failed to fetch coolie items', itemsError);
+            }
 
             // Process Customers for Bilingual Display
             const processedCustomers = (customers || []).map(c => {
@@ -96,6 +105,14 @@ function BillEditor({
 
                 return {
                     ...c,
+                    searchText: [
+                        c.company_name_tamil,
+                        c.company_name,
+                        c.name_tamil,
+                        c.name,
+                        c.city_tamil,
+                        c.city
+                    ].filter(Boolean).join(' '),
                     primaryName: tamilName || c.name, // Preferred Name for Input
                     displayName: (
                         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '4px 0', gap: '2px' }}>
@@ -144,6 +161,7 @@ function BillEditor({
             const processedItems = (itemsData || []).map(item => {
                 return {
                     ...item,
+                    searchText: `${item.name_tamil || ''} ${item.name_english || ''}`.trim(),
                     displayName: (
                         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '2px 0' }}>
                             <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--color-text)' }}>
@@ -167,10 +185,10 @@ function BillEditor({
 
     // Calculation Helpers
     const calculateRowTotal = (item) => {
-        if (!item) return '0.00';
+        if (!item) return '0';
         const qty = parseFloat(item.kg) || 0;
         const rate = parseFloat(item.coolie) || 0;
-        return (qty * rate).toFixed(2);
+        return Math.floor(qty * rate);
     };
 
     const calculateSubtotal = () => {
@@ -179,10 +197,10 @@ function BillEditor({
 
     const calculateGrandTotal = () => {
         const subtotal = calculateSubtotal();
-        const courier = parseFloat(courierRs) || 0;
-        const ahimsa = parseFloat(ahimsaSilkRs) || 0;
-        const other = parseFloat(customChargeRs) || 0;
-        return (subtotal + courier + ahimsa + other).toFixed(2);
+        const courier = Math.floor(parseFloat(courierRs) || 0);
+        const ahimsa = Math.floor(parseFloat(ahimsaSilkRs) || 0);
+        const other = Math.floor(parseFloat(customChargeRs) || 0);
+        return Math.floor(subtotal + courier + ahimsa + other);
     };
 
     // Handlers
@@ -214,6 +232,10 @@ function BillEditor({
                 const displayName = itemData.name_tamil || itemData.name_english || '';
 
                 newItems[index].porul = displayName;
+                // Store English and Tamil names for multilingual preview
+                newItems[index].name_english = itemData.name_english || '';
+                newItems[index].name_tamil = itemData.name_tamil || '';
+
                 if (itemData.rate) newItems[index].coolie = itemData.rate;
                 setItems(newItems);
             }
@@ -302,6 +324,32 @@ function BillEditor({
                     <div className="page-title">
                         <div style={{ lineHeight: '1.2' }}>{t.newBill}</div>
                         {showSubs && <div style={{ fontSize: '0.8rem', fontWeight: '400', color: 'var(--color-text-muted)' }}>New Bill</div>}
+                    </div>
+                </div>
+            </div>
+
+            {/* Bill Language Selector */}
+            <div className="form-row" style={{ marginBottom: '16px' }}>
+                <div className="form-group" style={{ flex: '0 0 auto' }}>
+                    <label className="zoho-label">
+                        <div>{t.billLanguage}</div>
+                        {showSubs && <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 'normal' }}>Bill Language</div>}
+                    </label>
+                    <div className="merchant-type-toggles" style={{ marginTop: '8px' }}>
+                        <button
+                            onClick={() => setPreviewLanguage && setPreviewLanguage('ta_only')}
+                            className={`type-toggle-btn ${previewLanguage === 'ta_only' ? 'active' : ''}`}
+                        >
+                            <span className="type-main-label">{t.tamil}</span>
+                            {showSubs && <span className="type-sub-label">Tamil</span>}
+                        </button>
+                        <button
+                            onClick={() => setPreviewLanguage && setPreviewLanguage('en_only')}
+                            className={`type-toggle-btn ${previewLanguage === 'en_only' ? 'active' : ''}`}
+                        >
+                            <span className="type-main-label">{t.english}</span>
+                            {showSubs && <span className="type-sub-label">English</span>}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -642,7 +690,7 @@ function BillEditor({
                                             options={itemOptions}
                                             placeholder={t.searchPlaceholder || 'தேடுக...'}
                                             placeholderSub="Search Item"
-                                            displayKey="name"
+                                            displayKey="name_tamil"
                                             onSelect={(val) => handleItemSelect(index, val)}
                                             showSubs={showSubs}
                                         />
@@ -683,7 +731,7 @@ function BillEditor({
                                             <span style={{ fontSize: '12px', fontWeight: 'bold' }}>{t.amount}</span>
                                             {showSubs && <span style={{ fontSize: '10px', opacity: 0.7 }}>Amount</span>}
                                         </div>
-                                        <span className="amount-val">₹ {calculateRowTotal(item)}</span>
+                                            <span className="amount-val">₹ {calculateRowTotal(item)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -778,7 +826,7 @@ function BillEditor({
                             </div>
                             <div className="calc-input-wrapper">
                                 <div style={{ textAlign: 'right', fontWeight: 'bold', padding: '6px 8px' }}>
-                                    {calculateSubtotal().toFixed(2)}
+                                    {calculateSubtotal()}
                                 </div>
                             </div>
                         </div>

@@ -68,7 +68,7 @@ export function formatWeight(kg) {
  */
 export function formatCurrency(amount) {
     if (!amount && amount !== 0) return '';
-    return Number(amount).toLocaleString('en-IN');
+    return Math.floor(Number(amount)).toLocaleString('en-IN');
 }
 
 /**

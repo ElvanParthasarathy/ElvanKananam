@@ -66,6 +66,9 @@ function App() {
     return saved || DEFAULT_LANGUAGE;
   });
 
+  // Separate Language State for Bill Preview (defaults to Tamil Only per user request)
+  const [previewLanguage, setPreviewLanguage] = useState('ta_only');
+
   const t = getTranslation(language);
 
   // Persist language change
@@ -181,6 +184,14 @@ function App() {
     if (displayBranch) bankParts.push(displayBranch);
     const bankDetailsString = bankParts.join(', ');
 
+    // English Bank Details
+    const bankPartsEn = [];
+    const displayBankNameEn = bankInfo.bankName || bankInfo.bankNameTamil;
+    const displayBranchEn = bankInfo.place || bankInfo.placeTamil;
+    if (displayBankNameEn) bankPartsEn.push(displayBankNameEn);
+    if (displayBranchEn) bankPartsEn.push(displayBranchEn);
+    const bankDetailsStringEn = bankPartsEn.join(', ');
+
     const themeColor = selected.theme_color || '#388e3c';
 
     // Theme mapping for professional look
@@ -206,13 +217,19 @@ function App() {
       greeting: 'வாழ்க வளமுடன்',
       billType: 'கூலி பில்',
       address: {
-        line1: selected.address_line1 || '',
+        line1: '', // Not used directly in new layout
         line2: selected.address_line2 ? `${selected.address_line2}, ${selected.city_tamil || bankInfo.cityTamil} - ${selected.pincode}` : '',
-        line3: selected.district_tamil || ''
+        line3: selected.district_tamil || '',
+        english: {
+          // CoolieBusinessManager saves English Address in address_line1
+          line2: selected.address_line1 ? `${selected.address_line1}, ${selected.city} - ${selected.pincode}` : '',
+          line3: selected.district || selected.district_tamil || ''
+        }
       },
       phone: selected.phone ? selected.phone.split(',') : [],
       email: selected.email,
       bankDetails: bankDetailsString,
+      bankDetailsEnglish: bankDetailsStringEn,
       accountNo: bankInfo.accountNo || '',
       ifscCode: bankInfo.ifsc || '',
       labels: {
@@ -336,38 +353,6 @@ function App() {
 
   // ... (rest of code)
 
-  {/* VIEW: COOLIE BILL (New/Edit) */ }
-  {
-    (viewMode === 'coolie-new' || viewMode === 'edit') && (
-      <BillEditor
-        config={companyConfig}
-        t={t}
-        language={language}
-        // ... (other props)
-        accountNo={accountNo}
-        setAccountNo={setAccountNo}
-        showIFSC={showIFSC}
-        setShowIFSC={setShowIFSC}
-        onPreview={() => setViewMode('coolie-preview')}
-      // ...
-      />
-    )
-  }
-
-  {/* VIEW: COOLIE BILL (Preview) */ }
-  {
-    (viewMode === 'coolie-preview' || viewMode === 'preview') && (
-      <BillPreview
-        config={companyConfig}
-        // ...
-        accountNo={accountNo}
-        showIFSC={showIFSC}
-
-        onEdit={() => setViewMode('coolie-new')}
-      />
-    )
-  }
-
 
   // Update URL Hash for back button support
   useEffect(() => {
@@ -418,9 +403,23 @@ function App() {
     setCustomerName('சுந்தரி சில்க்ஸ் இந்தியா');
     setCity('திருச்சேறை, கும்பகோணம்');
     setItems([
-      { porul: 'ஒண்டி தடை செய்ய கூலி', kg: '13.850', coolie: '660' },
-      { porul: 'மூன்று இழை சப்புரி செய்ய கூலி', kg: '21.720', coolie: '430' }
+      { porul: 'ஒண்டி தடை செய்ய கூலி', kg: '13.850', coolie: '660', name_english: 'Ondi Dhadai Coolie', name_tamil: 'ஒண்டி தடை செய்ய கூலி' },
+      { porul: 'மூன்று இழை சப்புரி செய்ய கூலி', kg: '21.720', coolie: '430', name_english: 'Three Izhai Sappuri Coolie', name_tamil: 'மூன்று இழை சப்புரி செய்ய கூலி' }
     ]);
+
+    // Set Mock Customer with English Data for Preview Verification
+    setSelectedCustomer({
+      id: 'test-customer-1',
+      name: 'Sundari Silks India',
+      name_tamil: 'சுந்தரி சில்க்ஸ் இந்தியா',
+      company_name: 'Sundari Silks India',
+      company_name_tamil: 'சுந்தரி சில்க்ஸ் இந்தியா',
+      city: 'Thiruchenurai, Kumbakonam',
+      city_tamil: 'திருச்சேறை, கும்பகோணம்',
+      address_line1: '123, Main Road', // English Address
+      address_tamil: '123, மெயின் ரோடு'
+    });
+
     setSetharamGrams('1680');
     setCourierRs('760');
     setAhimsaSilkRs(''); // Default empty for test
@@ -473,6 +472,50 @@ function App() {
     setCustomChargeRs(bill.custom_charge_rs || '');
     setAccountNo(bill.account_no || '');
     setBankDetails(bill.bank_details || '');
+
+    // Best-effort: resolve full customer record for English preview
+    // (Older bills may only store Tamil names)
+    (async () => {
+      try {
+        const { supabase } = await import('./config/supabaseClient');
+        const name = bill.customer_name || '';
+        const city = bill.city || '';
+
+        if (!name) {
+          setSelectedCustomer(null);
+          return;
+        }
+
+        const escapeLike = (value) => String(value || '').replace(/[%_]/g, '\\$&');
+        const nameLike = escapeLike(name);
+        const cityLike = escapeLike(city);
+
+        // First try: fuzzy match by name only (more reliable)
+        let { data } = await supabase
+          .from('coolie_customers')
+          .select('*')
+          .or(`name.ilike.%${nameLike}%,name_tamil.ilike.%${nameLike}%,company_name.ilike.%${nameLike}%,company_name_tamil.ilike.%${nameLike}%`)
+          .limit(1);
+
+        // Second try: if not found, attempt city-only match (best effort)
+        if ((!data || data.length === 0) && city) {
+          ({ data } = await supabase
+            .from('coolie_customers')
+            .select('*')
+            .or(`city.ilike.%${cityLike}%,city_tamil.ilike.%${cityLike}%`)
+            .limit(1));
+        }
+
+        if (data && data.length > 0) {
+          setSelectedCustomer(data[0]);
+        } else {
+          setSelectedCustomer(null);
+        }
+      } catch (err) {
+        console.warn('Failed to resolve customer for bill preview', err);
+        setSelectedCustomer(null);
+      }
+    })();
   };
 
   // Local Storage Auto-Save (Crash Safety)
@@ -480,11 +523,11 @@ function App() {
     if (viewMode === 'coolie-new' || viewMode === 'edit') {
       const draft = {
         billNo, customerName, contactPerson, nameDisplayMode, address, city, items, setharamGrams, courierRs,
-        ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo
+        ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo, selectedCustomer
       };
       localStorage.setItem('coolie-draft', JSON.stringify(draft));
     }
-  }, [billNo, customerName, contactPerson, nameDisplayMode, address, city, items, setharamGrams, courierRs, ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo, viewMode]);
+  }, [billNo, customerName, contactPerson, nameDisplayMode, address, city, items, setharamGrams, courierRs, ahimsaSilkRs, customChargeName, customChargeRs, bankDetails, accountNo, selectedCustomer, viewMode]);
 
   // Draft restoration disabled per user request
   // useEffect(() => {
@@ -713,6 +756,8 @@ function App() {
             t={t}
             language={language}
             setLanguage={setLanguage}
+            previewLanguage={previewLanguage}
+            setPreviewLanguage={setPreviewLanguage}
             theme={theme}
             setTheme={setTheme}
             billNo={billNo}
@@ -766,8 +811,8 @@ function App() {
         {(viewMode === 'coolie-preview' || viewMode === 'preview') && (
           <BillPreview
             config={companyConfig}
-            t={t}
-            language={language}
+            t={getTranslation(previewLanguage)}
+            language={previewLanguage}
             billNo={billNo}
             date={date}
             customerName={customerName}
@@ -784,13 +829,13 @@ function App() {
             accountNo={accountNo}
             showIFSC={showIFSC}
             showBankDetails={showBankDetails}
-
+            selectedCustomer={selectedCustomer}
             onEdit={() => setViewMode('coolie-new')}
           />
         )}
 
         {/* VIEW: SILKS (Dashboard/List) */}
-        {(viewMode === 'silks-dashboard' || viewMode === 'silks-items' || viewMode === 'silks-customers' || viewMode === 'silks-business') && (
+        {(viewMode === 'silks-dashboard' || viewMode === 'silks-bills' || viewMode === 'silks-items' || viewMode === 'silks-customers' || viewMode === 'silks-business') && (
           <SilksDashboard
             activeTab={viewMode.split('-')[1] || 'home'}
             onHome={() => setViewMode('home')}

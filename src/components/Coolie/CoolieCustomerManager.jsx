@@ -51,8 +51,10 @@ function CoolieCustomerManager({ t, language }) {
             .eq('type', 'coolie')
             .order('name', { ascending: true });
 
-        if (error) console.error('Error fetching customers:', error);
-        else {
+        if (error) {
+            console.error('Error fetching customers:', error);
+            setCustomers([]);
+        } else {
             setCustomers(data || []);
         }
         setLoading(false);
@@ -162,12 +164,27 @@ function CoolieCustomerManager({ t, language }) {
         }
     };
 
-    const filteredCustomers = customers.filter(c =>
-        c.name?.toLowerCase().includes(filter.toLowerCase()) ||
-        c.company_name?.toLowerCase().includes(filter.toLowerCase()) ||
-        c.city?.toLowerCase().includes(filter.toLowerCase()) ||
-        c.phone?.includes(filter)
-    );
+    const filteredCustomers = customers.filter(c => {
+        const needle = filter.toLowerCase().trim();
+        if (!needle) return true;
+
+        const haystack = [
+            c.name,
+            c.name_tamil,
+            c.company_name,
+            c.company_name_tamil,
+            c.city,
+            c.city_tamil,
+            c.address_line1,
+            c.address_tamil,
+            c.phone
+        ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+        return haystack.includes(needle);
+    });
 
     return (
         <div style={{ padding: isMobile ? '15px' : '30px' }}>
@@ -191,7 +208,7 @@ function CoolieCustomerManager({ t, language }) {
                     flexDirection: isMobile ? 'column' : 'row'
                 }}>
                     <div className="autocomplete-wrapper" style={{ flex: 1 }}>
-                        <IconSearch size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', zSubIndex: 10 }} />
+                        <IconSearch size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', zIndex: 10 }} />
                         <input
                             type="text"
                             placeholder={!showSubs ? t.searchCustomers : ''}

@@ -42,8 +42,12 @@ function CoolieItemManager({ t, language }) {
             .eq('type', 'coolie')
             .order('name_english', { ascending: true });
 
-        if (error) console.error('Error fetching items:', error);
-        else setItems(data || []);
+        if (error) {
+            console.error('Error fetching items:', error);
+            setItems([]);
+        } else {
+            setItems(data || []);
+        }
         setLoading(false);
     }
 

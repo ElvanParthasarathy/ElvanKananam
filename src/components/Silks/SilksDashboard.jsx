@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IconSearch, IconPlus, IconFiles, IconBox, IconUsers, IconSettings, IconArrowLeft, IconTrash } from '../common/Icons';
-import { supabase } from '../../config/supabaseClient';
+import { supabase, SILKS_DB_ENABLED } from '../../config/supabaseClient';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
 import ItemManager from './ItemManager';
@@ -20,6 +20,13 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (activeTab === 'dashboard' || activeTab === 'invoices') {
@@ -29,6 +36,15 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
 
     async function fetchInvoices() {
         setLoading(true);
+
+        // If DB disabled, show empty state
+        if (!SILKS_DB_ENABLED) {
+            console.log('⚠️ Silks DB is DISABLED - showing empty dashboard');
+            setInvoices([]);
+            setLoading(false);
+            return;
+        }
+
         const { data, error } = await supabase
             .from('invoices')
             .select(`
@@ -47,6 +63,13 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
 
     async function handleDelete(id, e) {
         e.stopPropagation();
+
+        // Database disabled check
+        if (!SILKS_DB_ENABLED) {
+            showToast('⚠️ Database disabled for Silks - Delete not available', 'warning');
+            return;
+        }
+
         const shouldDelete = await confirm({
             title: showSubs ? `${t.deleteBill || 'பில்லை நீக்க'} / Delete Invoice` : (t.deleteBill || 'பில்லை நீக்க'),
             message: showSubs
@@ -81,108 +104,260 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
     // Helpers to switch tabs using window location hash (since App.jsx listens to it)
     const switchTab = (tab) => {
         if (tab === 'dashboard') window.location.hash = '#silks-dashboard';
+        if (tab === 'bills') window.location.hash = '#silks-bills';
         if (tab === 'items') window.location.hash = '#silks-items';
         if (tab === 'customers') window.location.hash = '#silks-customers';
         if (tab === 'business') window.location.hash = '#silks-business';
     };
 
-    const renderNav = () => (
-        <div style={{ display: 'flex', gap: '10px', padding: '20px 20px 0 20px', maxWidth: '1200px', margin: '0 auto' }}>
+    const renderNav = () => {
+        if (!isMobile) {
+            return (
+                <div style={{ display: 'flex', gap: '10px', padding: '20px 20px 0 20px', maxWidth: '1200px', margin: '0 auto' }}>
+                    <button
+                        onClick={() => switchTab('dashboard')}
+                        style={{
+                            padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+                            background: activeTab === 'dashboard' ? 'var(--color-brand-silks)' : 'var(--color-surface)',
+                            color: activeTab === 'dashboard' ? 'white' : 'var(--color-text-muted)',
+                            fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
+                            whiteSpace: 'nowrap',
+                            border: activeTab === 'dashboard' ? 'none' : '1px solid var(--color-border)'
+                        }}
+                    >
+                        <IconFiles size={20} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                            <span style={{ fontSize: '14px' }}>{t.bills || 'பில்கள்'}</span>
+                            {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Bills</span>}
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => switchTab('items')}
+                        style={{
+                            padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+                            background: activeTab === 'items' ? 'var(--color-brand-silks)' : 'var(--color-surface)',
+                            color: activeTab === 'items' ? 'white' : 'var(--color-text-muted)',
+                            fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
+                            whiteSpace: 'nowrap',
+                            border: activeTab === 'items' ? 'none' : '1px solid var(--color-border)'
+                        }}
+                    >
+                        <IconBox size={20} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                            <span style={{ fontSize: '14px' }}>{t.itemsList || 'பொருட்கள்'}</span>
+                            {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Items</span>}
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => switchTab('customers')}
+                        style={{
+                            padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+                            background: activeTab === 'customers' ? 'var(--color-brand-silks)' : 'var(--color-surface)',
+                            color: activeTab === 'customers' ? 'white' : 'var(--color-text-muted)',
+                            fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
+                            whiteSpace: 'nowrap',
+                            border: activeTab === 'customers' ? 'none' : '1px solid var(--color-border)'
+                        }}
+                    >
+                        <IconUsers size={20} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                            <span style={{ fontSize: '14px' }}>{t.customers || 'வணிகர்கள்'}</span>
+                            {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Merchants</span>}
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => switchTab('business')}
+                        style={{
+                            padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+                            background: activeTab === 'business' ? 'var(--color-brand-silks)' : 'var(--color-surface)',
+                            color: activeTab === 'business' ? 'white' : 'var(--color-text-muted)',
+                            fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
+                            whiteSpace: 'nowrap',
+                            border: activeTab === 'business' ? 'none' : '1px solid var(--color-border)'
+                        }}
+                    >
+                        <IconSettings size={20} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                            <span style={{ fontSize: '14px' }}>{t.settings || 'அமைப்புகள்'}</span>
+                            {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Settings</span>}
+                        </div>
+                    </button>
+                </div>
+            );
+        }
+
+        // Mobile Nav: Only show hub on dashboard, otherwise show sub-header
+        if (activeTab === 'dashboard') {
+            return renderMobileHub();
+        }
+        return renderSubHeader();
+    };
+
+    const renderSubHeader = () => (
+        <div style={{
+            padding: '12px 15px',
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '10px'
+        }}>
             <button
                 onClick={() => switchTab('dashboard')}
                 style={{
-                    padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
-                    background: activeTab === 'dashboard' ? 'var(--color-brand-silks)' : 'transparent',
-                    color: activeTab === 'dashboard' ? 'white' : 'var(--color-text-muted)',
-                    fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', textAlign: 'left'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 12px',
+                    background: 'rgba(123, 31, 162, 0.05)',
+                    border: '1px solid rgba(123, 31, 162, 0.2)',
+                    borderRadius: '10px',
+                    color: 'var(--color-brand-silks)',
+                    fontWeight: '700',
+                    fontSize: '13px',
+                    cursor: 'pointer'
                 }}
             >
-                <IconFiles size={16} />
-                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                    <span style={{ fontSize: '14px' }}>{t.bills || 'பில்கள்'}</span>
-                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Bills</span>}
-                </div>
+                <IconArrowLeft size={16} />
+                {t.backToHub || 'முகப்பு / Back'}
             </button>
-            <button
-                onClick={() => switchTab('items')}
-                style={{
-                    padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
-                    background: activeTab === 'items' ? 'var(--color-brand-silks)' : 'transparent',
-                    color: activeTab === 'items' ? 'white' : 'var(--color-text-muted)',
-                    fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', textAlign: 'left'
-                }}
-            >
-                <IconBox size={16} />
-                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                    <span style={{ fontSize: '14px' }}>{t.itemsList || 'பொருட்கள்'}</span>
-                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Items</span>}
-                </div>
-            </button>
-            <button
-                onClick={() => switchTab('customers')}
-                style={{
-                    padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
-                    background: activeTab === 'customers' ? 'var(--color-brand-silks)' : 'transparent',
-                    color: activeTab === 'customers' ? 'white' : 'var(--color-text-muted)',
-                    fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', textAlign: 'left'
-                }}
-            >
-                <IconUsers size={16} />
-                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                    <span style={{ fontSize: '14px' }}>{t.customers || 'வணிகர்கள்'}</span>
-                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Merchants</span>}
-                </div>
-            </button>
-            <button
-                onClick={() => switchTab('business')}
-                style={{
-                    padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
-                    background: activeTab === 'business' ? 'var(--color-brand-silks)' : 'transparent',
-                    color: activeTab === 'business' ? 'white' : 'var(--color-text-muted)',
-                    fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', textAlign: 'left'
-                }}
-            >
-                <IconSettings size={16} />
-                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                    <span style={{ fontSize: '14px' }}>{t.settings || 'அமைப்புகள்'}</span>
-                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Settings</span>}
-                </div>
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-text)' }}>
+                    {activeTab === 'bills' ? t.bills : activeTab === 'items' ? t.itemsList : activeTab === 'customers' ? t.customers : t.settings}
+                </span>
+                {showSubs && <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>
+                    {activeTab === 'bills' ? 'All Bills' : activeTab}
+                </span>}
+            </div>
+        </div>
+    );
+
+    const renderMobileHub = () => (
+        <div style={{ padding: '20px 15px', background: 'var(--color-bg)' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: '15px'
+            }}>
+                <button
+                    onClick={() => switchTab('bills')}
+                    style={{
+                        background: activeTab === 'bills' ? 'rgba(123, 31, 162, 0.1)' : 'var(--color-surface)',
+                        border: activeTab === 'bills' ? '2px solid var(--color-brand-silks)' : '1px solid var(--color-border)',
+                        borderRadius: '16px',
+                        padding: '15px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        boxShadow: activeTab === 'bills' ? '0 4px 12px rgba(123, 31, 162, 0.05)' : 'none',
+                        transition: 'all 0.2s ease'
+                    }}
+                >
+                    <IconFiles size={28} color={activeTab === 'bills' ? 'var(--color-brand-silks)' : 'var(--color-text-muted)'} />
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--color-text)' }}>{t.bills || 'பில்கள்'}</div>
+                        {showSubs && <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>Bills List</div>}
+                    </div>
+                </button>
+
+                <button
+                    onClick={() => switchTab('items')}
+                    style={{
+                        background: activeTab === 'items' ? 'rgba(123, 31, 162, 0.1)' : 'var(--color-surface)',
+                        border: activeTab === 'items' ? '2px solid var(--color-brand-silks)' : '1px solid var(--color-border)',
+                        borderRadius: '16px',
+                        padding: '15px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        boxShadow: activeTab === 'items' ? '0 4px 12px rgba(123, 31, 162, 0.05)' : 'none',
+                        transition: 'all 0.2s ease'
+                    }}
+                >
+                    <IconBox size={28} color={activeTab === 'items' ? 'var(--color-brand-silks)' : 'var(--color-text-muted)'} />
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--color-text)' }}>{t.itemsList || 'பொருட்கள்'}</div>
+                        {showSubs && <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>Items</div>}
+                    </div>
+                </button>
+
+                <button
+                    onClick={() => switchTab('customers')}
+                    style={{
+                        background: activeTab === 'customers' ? 'rgba(123, 31, 162, 0.1)' : 'var(--color-surface)',
+                        border: activeTab === 'customers' ? '2px solid var(--color-brand-silks)' : '1px solid var(--color-border)',
+                        borderRadius: '16px',
+                        padding: '15px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        boxShadow: activeTab === 'customers' ? '0 4px 12px rgba(123, 31, 162, 0.05)' : 'none',
+                        transition: 'all 0.2s ease'
+                    }}
+                >
+                    <IconUsers size={28} color={activeTab === 'customers' ? 'var(--color-brand-silks)' : 'var(--color-text-muted)'} />
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--color-text)' }}>{t.customers || 'வணிகர்கள்'}</div>
+                        {showSubs && <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>Merchants</div>}
+                    </div>
+                </button>
+
+                <button
+                    onClick={() => switchTab('business')}
+                    style={{
+                        background: activeTab === 'business' ? 'rgba(123, 31, 162, 0.1)' : 'var(--color-surface)',
+                        border: activeTab === 'business' ? '2px solid var(--color-brand-silks)' : '1px solid var(--color-border)',
+                        borderRadius: '16px',
+                        padding: '15px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        boxShadow: activeTab === 'business' ? '0 4px 12px rgba(123, 31, 162, 0.05)' : 'none',
+                        transition: 'all 0.2s ease'
+                    }}
+                >
+                    <IconSettings size={28} color={activeTab === 'business' ? 'var(--color-brand-silks)' : 'var(--color-text-muted)'} />
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--color-text)' }}>{t.settings || 'அமைப்புகள்'}</div>
+                        {showSubs && <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>Settings</div>}
+                    </div>
+                </button>
+            </div>
         </div>
     );
 
     const renderDashboard = () => (
-        <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', width: '100%', animation: 'fadeIn 0.3s ease' }}>
+        <div style={{ padding: isMobile ? '15px' : '20px', maxWidth: '1200px', margin: '0 auto', width: '100%', animation: 'fadeIn 0.3s ease' }}>
 
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <button
-                        onClick={onHome}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            color: 'var(--color-text-muted)'
-                        }}
-                    >
-                        <IconArrowLeft size={20} />
-                    </button>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <h1 style={{ fontSize: '22px', margin: 0, fontWeight: '700', color: 'var(--color-text)' }}>{t.silksBills || 'பட்டு பில்கள்'}</h1>
-                        {showSubs && <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Silks Bills</span>}
-                    </div>
+            <div style={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                justifyContent: 'space-between',
+                gap: isMobile ? '15px' : '20px',
+                marginBottom: isMobile ? '20px' : '30px'
+            }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <h1 style={{ fontSize: isMobile ? '1.2rem' : '22px', fontWeight: '600', margin: 0, color: 'var(--color-text)' }}>{t.silksBills || 'பட்டு பில்கள்'}</h1>
+                    {showSubs && <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Silks Bills</span>}
                 </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '0 12px', display: 'flex', alignItems: 'center', gap: '8px', height: '40px' }}>
+                <div style={{ display: 'flex', gap: '10px', width: isMobile ? '100%' : 'auto', flexDirection: isMobile ? 'column' : 'row' }}>
+                    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '0 12px', display: 'flex', alignItems: 'center', gap: '8px', height: '44px', flex: isMobile ? 1 : 'none' }}>
                         <IconSearch size={16} color="var(--color-text-muted)" />
                         <input
                             type="text"
                             placeholder={showSubs ? `${t.searchPlaceholder || 'தேடுக…'} Search...` : (t.searchPlaceholder || 'தேடுக…')}
-                            style={{ background: 'transparent', border: 'none', color: 'var(--color-text)', outline: 'none', fontSize: '14px', width: '150px' }}
+                            style={{ background: 'transparent', border: 'none', color: 'var(--color-text)', outline: 'none', fontSize: '14px', width: isMobile ? '100%' : '150px' }}
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                         />
@@ -194,13 +369,15 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
                             color: 'white',
                             border: 'none',
                             borderRadius: '8px',
-                            padding: '0 20px',
+                            padding: isMobile ? '12px 20px' : '0 20px',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'center',
                             gap: '8px',
                             fontWeight: '600',
-                            height: '42px',
+                            height: '44px',
+                            width: isMobile ? '100%' : 'auto',
                             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
                         }}
                     >
@@ -213,92 +390,152 @@ function SilksDashboard({ activeTab = 'dashboard', onNewInvoice, onSelectInvoice
                 </div>
             </div>
 
-
-
-            {/* Invoices List */}
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                    <thead style={{ background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
-                        <tr>
-                            <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.date || 'தேதி'}</div>
-                                {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>DATE</div>}
-                            </th>
-                            <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.billNo || 'பில் எண்'}</div>
-                                {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>INVOICE#</div>}
-                            </th>
-                            <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.customer || 'வணிகர்'}</div>
-                                {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>MERCHANT</div>}
-                            </th>
-                            <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.status || 'நிலை'}</div>
-                                {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>STATUS</div>}
-                            </th>
-                            <th style={{ padding: '15px 20px', textAlign: 'right', color: 'var(--color-text-muted)' }}>
-                                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.amount || 'தொகை'}</div>
-                                {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>AMOUNT</div>}
-                            </th>
-                            <th style={{ padding: '15px 20px', width: '50px' }}></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>{showSubs ? `${t.loading || 'ஏற்றுகிறது...'} / Loading records...` : (t.loading || 'ஏற்றுகிறது...')}</td></tr>
-                        ) : filteredInvoices.length === 0 ? (
+            {/* Desktop Table View */}
+            {!isMobile && (
+                <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                        <thead style={{ background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
                             <tr>
-                                <td colSpan="6" style={{ padding: '60px 40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noBills || 'பில்கள் இல்லை'}</div>
-                                        {showSubs && <div style={{ fontSize: '13px' }}>No invoices found. Create a new one!</div>}
-                                    </div>
-                                </td>
+                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.date || 'தேதி'}</div>
+                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>DATE</div>}
+                                </th>
+                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.billNo || 'பில் எண்'}</div>
+                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>INVOICE#</div>}
+                                </th>
+                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.customer || 'வணிகர்'}</div>
+                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>MERCHANT</div>}
+                                </th>
+                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.status || 'நிலை'}</div>
+                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>STATUS</div>}
+                                </th>
+                                <th style={{ padding: '15px 20px', textAlign: 'right', color: 'var(--color-text-muted)' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.amount || 'தொகை'}</div>
+                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>AMOUNT</div>}
+                                </th>
+                                <th style={{ padding: '15px 20px', width: '50px' }}></th>
                             </tr>
-                        ) : (
-                            filteredInvoices.map((inv) => (
-                                <tr
-                                    key={inv.id}
-                                    onClick={() => onSelectInvoice(inv)}
-                                    style={{ borderBottom: '1px solid var(--color-border)', cursor: 'pointer', transition: 'background 0.2s' }}
-                                    className="table-row-hover"
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    <td style={{ padding: '15px 20px', color: 'var(--color-text)' }}>{inv.date}</td>
-                                    <td style={{ padding: '15px 20px', color: 'var(--color-info)', fontWeight: '600' }}>{inv.invoice_number}</td>
-                                    <td style={{ padding: '15px 20px', color: 'var(--color-text)' }}>{inv.customers?.company_name || inv.customers?.name}</td>
-                                    <td style={{ padding: '15px 20px' }}>
-                                        <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '700', background: inv.status === 'Draft' ? 'var(--color-bg)' : 'var(--color-success-bg)', color: inv.status === 'Draft' ? 'var(--color-text-muted)' : 'var(--color-success)', border: '1px solid var(--color-border)' }}>
-                                            {inv.status || 'SAVED'}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '15px 20px', textAlign: 'right', fontWeight: '700', color: 'var(--color-text)' }}>₹ {inv.total_amount?.toLocaleString('en-IN')}</td>
-                                    <td style={{ padding: '15px 20px', textAlign: 'center' }}>
-                                        <button
-                                            onClick={(e) => handleDelete(inv.id, e)}
-                                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', opacity: 0.7 }}
-                                            title="Delete"
-                                        >
-                                            <IconTrash size={16} />
-                                        </button>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>{showSubs ? `${t.loading || 'ஏற்றுகிறது...'} / Loading records...` : (t.loading || 'ஏற்றுகிறது...')}</td></tr>
+                            ) : filteredInvoices.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '60px 40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                                            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noBills || 'பில்கள் இல்லை'}</div>
+                                            {showSubs && <div style={{ fontSize: '13px' }}>No invoices found. Create a new one!</div>}
+                                        </div>
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            ) : (
+                                filteredInvoices.map((inv) => (
+                                    <tr
+                                        key={inv.id}
+                                        onClick={() => onSelectInvoice(inv)}
+                                        style={{ borderBottom: '1px solid var(--color-border)', cursor: 'pointer', transition: 'background 0.2s' }}
+                                        className="table-row-hover"
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <td style={{ padding: '15px 20px', color: 'var(--color-text)' }}>{inv.date}</td>
+                                        <td style={{ padding: '15px 20px', color: 'var(--color-info)', fontWeight: '600' }}>{inv.invoice_number}</td>
+                                        <td style={{ padding: '15px 20px', color: 'var(--color-text)' }}>{inv.customers?.company_name || inv.customers?.name}</td>
+                                        <td style={{ padding: '15px 20px' }}>
+                                            <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '700', background: inv.status === 'Draft' ? 'var(--color-bg)' : 'var(--color-success-bg)', color: inv.status === 'Draft' ? 'var(--color-text-muted)' : 'var(--color-success)', border: '1px solid var(--color-border)' }}>
+                                                {inv.status || 'SAVED'}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '15px 20px', textAlign: 'right', fontWeight: '700', color: 'var(--color-text)' }}>₹ {inv.total_amount?.toLocaleString('en-IN')}</td>
+                                        <td style={{ padding: '15px 20px', textAlign: 'center' }}>
+                                            <button
+                                                onClick={(e) => handleDelete(inv.id, e)}
+                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', opacity: 0.7 }}
+                                                title="Delete"
+                                            >
+                                                <IconTrash size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {/* Mobile Card View */}
+            {isMobile && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                            <span style={{ fontSize: '16px', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
+                            {showSubs && <span style={{ fontSize: '13px', opacity: 0.8 }}>Loading...</span>}
+                        </div>
+                    ) : filteredInvoices.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noBills || 'பில்கள் இல்லை'}</div>
+                            {showSubs && <div style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>No invoices found.</div>}
+                        </div>
+                    ) : (
+                        filteredInvoices.map((inv) => (
+                            <div
+                                key={inv.id}
+                                onClick={() => onSelectInvoice(inv)}
+                                style={{
+                                    background: 'var(--color-surface)',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--color-border)',
+                                    padding: '16px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                                    <div>
+                                        <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-brand-silks)' }}>{inv.invoice_number}</span>
+                                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{inv.date}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '10px', fontWeight: '700', background: inv.status === 'Draft' ? 'var(--color-bg)' : 'var(--color-success-bg)', color: inv.status === 'Draft' ? 'var(--color-text-muted)' : 'var(--color-success)', border: '1px solid var(--color-border)' }}>
+                                            {inv.status || 'SAVED'}
+                                        </span>
+                                        <button
+                                            onClick={(e) => handleDelete(inv.id, e)}
+                                            style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '6px', color: 'var(--color-danger)' }}
+                                        >
+                                            <IconTrash size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '14px', color: 'var(--color-text)', fontWeight: '500' }}>{inv.customers?.company_name || inv.customers?.name || '-'}</span>
+                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-success)' }}>₹{inv.total_amount?.toLocaleString('en-IN')}</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
         </div>
     );
 
     return (
         <div className="layout-content-area" style={{ flex: 1, overflow: 'auto', background: 'transparent' }}>
+            {/* Nav / Hub / Sub-Header */}
             {renderNav()}
-            {activeTab === 'dashboard' && renderDashboard()}
-            {activeTab === 'items' && <ItemManager t={t} language={language} />}
-            {activeTab === 'customers' && <CustomerManager t={t} language={language} />}
-            {activeTab === 'business' && <BusinessManager t={t} language={language} />}
+
+            <div style={{ paddingBottom: '40px' }}>
+                {/* Content Rendering */}
+                {/* On desktop: show dashboard. On mobile: only show dashboard if activeTab is bills/dashboard (the hub handles navigation) */}
+                {(activeTab === 'dashboard' || activeTab === 'bills') && (!isMobile || activeTab === 'bills' ? renderDashboard() : null)}
+
+                {activeTab === 'items' && <ItemManager t={t} language={language} />}
+                {activeTab === 'customers' && <CustomerManager t={t} language={language} />}
+                {activeTab === 'business' && <BusinessManager t={t} language={language} />}
+            </div>
         </div>
     );
 }

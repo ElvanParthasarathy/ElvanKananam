@@ -33,7 +33,12 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
     }, []);
 
     const fetchOrgMap = async () => {
-        const { data } = await supabase.from('coolie_settings').select('id, organization_name, marketing_title');
+        const { data, error } = await supabase.from('coolie_settings').select('id, organization_name, marketing_title');
+        if (error) {
+            console.warn('Error fetching organization map:', error);
+            setOrgMap({});
+            return;
+        }
         if (data) {
             const map = {};
             data.forEach(org => {
@@ -51,7 +56,12 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
     }, []);
 
     const fetchCustomerMap = async () => {
-        const { data } = await supabase.from('coolie_customers').select('name, name_tamil, company_name, company_name_tamil, city, city_tamil');
+        const { data, error } = await supabase.from('coolie_customers').select('name, name_tamil, company_name, company_name_tamil, city, city_tamil');
+        if (error) {
+            console.warn('Error fetching customer map:', error);
+            setCustomerMap({});
+            return;
+        }
         if (data) {
             const map = {};
             data.forEach(c => {
@@ -104,6 +114,7 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
 
         if (error) {
             console.error('Error fetching coolie bills:', error);
+            setBills([]);
         } else {
             setBills(data || []);
         }
@@ -132,11 +143,83 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
         }
     }
 
-    const filteredBills = bills.filter(b =>
-        b.customer_name?.toLowerCase().includes(filter.toLowerCase()) ||
-        b.bill_no?.toLowerCase().includes(filter.toLowerCase()) ||
-        b.city?.toLowerCase().includes(filter.toLowerCase())
-    );
+    const normalizeBasic = (text) => String(text || '').toLowerCase().replace(/[\s\-_/.,]+/g, '');
+    const normalizeTanglish = (text) => {
+        let s = normalizeBasic(text);
+        if (!s) return s;
+        s = s
+            .replace(/aa/g, 'a')
+            .replace(/ee/g, 'e')
+            .replace(/ii/g, 'i')
+            .replace(/oo/g, 'o')
+            .replace(/uu/g, 'u')
+            .replace(/ph/g, 'f')
+            .replace(/bh/g, 'b')
+            .replace(/dh/g, 'd')
+            .replace(/th/g, 't')
+            .replace(/kh/g, 'k')
+            .replace(/gh/g, 'g')
+            .replace(/ch/g, 's')
+            .replace(/sh/g, 's')
+            .replace(/zh/g, 'l')
+            .replace(/j/g, 's')
+            .replace(/c/g, 's')
+            .replace(/z/g, 's')
+            .replace(/ng/g, 'n')
+            .replace(/nj/g, 'n')
+            .replace(/rr/g, 'r')
+            .replace(/ll/g, 'l')
+            .replace(/nn/g, 'n')
+            .replace(/bb/g, 'b')
+            .replace(/pp/g, 'p')
+            .replace(/ff/g, 'f');
+        s = s
+            .replace(/b/g, 'p')
+            .replace(/f/g, 'p')
+            .replace(/d/g, 't')
+            .replace(/g/g, 'k')
+            .replace(/v/g, 'w');
+        s = s.replace(/(.)\1+/g, '$1');
+        return s;
+    };
+    const consonantSkeleton = (text) => normalizeTanglish(text).replace(/[aeiou]/g, '');
+
+    const buildHaystack = (b) => {
+        const raw = [
+            b.customer_name,
+            b.bill_no,
+            b.city,
+            customerMap[b.customer_name],
+            customerMap[b.city]
+        ].filter(Boolean).join(' ');
+
+        return [
+            raw.toLowerCase(),
+            normalizeBasic(raw),
+            normalizeTanglish(raw),
+            consonantSkeleton(raw)
+        ].filter(Boolean);
+    };
+
+    const buildNeedles = (input) => {
+        const raw = String(input || '').toLowerCase().trim();
+        if (!raw) return [];
+        return [
+            raw,
+            normalizeBasic(raw),
+            normalizeTanglish(raw),
+            consonantSkeleton(raw)
+        ].filter(Boolean);
+    };
+
+    const isBillMatch = (b) => {
+        const needles = buildNeedles(filter);
+        if (needles.length === 0) return true;
+        const haystack = buildHaystack(b);
+        return needles.some(n => haystack.some(h => h.includes(n)));
+    };
+
+    const filteredBills = bills.filter(isBillMatch);
 
     const switchTab = (tab) => {
         if (tab === 'dashboard') window.location.hash = '#coolie-dashboard';
@@ -148,7 +231,7 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
 
     const renderDashboard = () => {
         // Group bills by company
-        const grouped = bills.reduce((acc, bill) => {
+        const grouped = filteredBills.reduce((acc, bill) => {
             const key = bill.company_id || 'legacy';
             if (!acc[key]) acc[key] = [];
             acc[key].push(bill);
@@ -249,11 +332,7 @@ function CoolieDashboard({ activeTab = 'dashboard', onNewBill, onHome, onSelectB
                     </div>
                 ) : (
                     companyIds.map(compId => {
-                        const compBills = grouped[compId].filter(b =>
-                            b.customer_name?.toLowerCase().includes(filter.toLowerCase()) ||
-                            b.bill_no?.toLowerCase().includes(filter.toLowerCase()) ||
-                            b.city?.toLowerCase().includes(filter.toLowerCase())
-                        );
+                        const compBills = grouped[compId].filter(isBillMatch);
 
                         if (compBills.length === 0) return null;
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconTrash, IconPlus, IconPrinter, IconHome, IconMenu, IconSave } from '../common/Icons';
 import Autocomplete from '../common/Autocomplete';
-import { supabase } from '../../config/supabaseClient';
+import { supabase, SILKS_DB_ENABLED } from '../../config/supabaseClient';
 import { useToast } from '../../context/ToastContext';
 import './SilksEditor.css';
 
@@ -25,6 +25,8 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
     const [notes, setNotes] = useState('Thanks for your business.');
     const [terms, setTerms] = useState('');
     const [taxRates, setTaxRates] = useState({ cgst: 2.5, sgst: 2.5 });
+    // Preview Language State (Default Tamil Only)
+    const [previewLanguage, setPreviewLanguage] = useState('ta_only');
 
     // Autocomplete Data
     const [customerOptions, setCustomerOptions] = useState([]);
@@ -33,10 +35,82 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
     // Fetch Initial Data
     useEffect(() => {
         async function fetchData() {
+            // Database disabled warning
+            if (!SILKS_DB_ENABLED) {
+                console.log('⚠️ Silks DB is DISABLED - working in offline mode');
+            }
+
             const { data: customers } = await supabase.from('customers').select('*').eq('type', 'silks'); // STICT FILTER
             const { data: itemsData } = await supabase.from('items').select('*').eq('type', 'silks'); // STRICT FILTER
-            setCustomerOptions(customers || []);
-            setItemOptions(itemsData || []);
+
+            const processedCustomers = (customers || []).map(c => {
+                const primaryName = c.name_tamil || c.name || '';
+                const secondaryName = c.name_tamil && c.name ? c.name : c.name_tamil || '';
+                const companyPrimary = c.company_name_tamil || c.company_name || '';
+                const companySecondary = c.company_name_tamil && c.company_name ? c.company_name : '';
+                const placePrimary = c.city_tamil || c.city || c.place_of_supply || '';
+                const placeSecondary = c.city_tamil && c.city ? c.city : '';
+
+                return {
+                    ...c,
+                    searchText: [
+                        c.name_tamil,
+                        c.name,
+                        c.company_name_tamil,
+                        c.company_name,
+                        c.city_tamil,
+                        c.city,
+                        c.place_of_supply,
+                        c.gstin
+                    ].filter(Boolean).join(' '),
+                    displayName: (
+                        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '4px 0', gap: '2px' }}>
+                            {companyPrimary && (
+                                <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--color-primary)' }}>
+                                    {companyPrimary}
+                                    {companySecondary && <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>{companySecondary}</span>}
+                                </div>
+                            )}
+                            <div style={{ fontWeight: '600', fontSize: '12px', color: 'var(--color-text)' }}>
+                                {primaryName}
+                                {secondaryName && secondaryName !== primaryName && (
+                                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>{secondaryName}</span>
+                                )}
+                            </div>
+                            {placePrimary && (
+                                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                    {placePrimary}
+                                    {placeSecondary && placeSecondary !== placePrimary && <span style={{ opacity: 0.7, marginLeft: '4px' }}>({placeSecondary})</span>}
+                                </div>
+                            )}
+                        </div>
+                    )
+                };
+            });
+
+            const processedItems = (itemsData || []).map(item => ({
+                ...item,
+                searchText: [
+                    item.name_tamil,
+                    item.name,
+                    item.hsn_or_sac
+                ].filter(Boolean).join(' '),
+                displayName: (
+                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2', padding: '2px 0' }}>
+                        <span style={{ fontWeight: '600', fontSize: '13px', color: 'var(--color-text)' }}>
+                            {item.name_tamil || item.name}
+                        </span>
+                        {item.name_tamil && item.name && (
+                            <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                                {item.name}
+                            </span>
+                        )}
+                    </div>
+                )
+            }));
+
+            setCustomerOptions(processedCustomers);
+            setItemOptions(processedItems);
 
             // Set initial date if not editing
             if (!initialData) {
@@ -46,9 +120,13 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
                 const year = today.getFullYear();
                 setDate(`${day}/${month}/${year}`);
 
-                // Generate Bill No
-                const { count } = await supabase.from('invoices').select('*', { count: 'exact', head: true });
-                setBillNo(`INV-${(count || 0) + 1}`);
+                // Generate Bill No (use timestamp if DB disabled)
+                if (SILKS_DB_ENABLED) {
+                    const { count } = await supabase.from('invoices').select('*', { count: 'exact', head: true });
+                    setBillNo(`INV-${(count || 0) + 1}`);
+                } else {
+                    setBillNo(`INV-${Date.now().toString().slice(-6)}`);
+                }
             }
 
             // Fetch Tax Rates
@@ -70,8 +148,10 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
         }
     }, [initialData]);
 
-    // Auto-Save Effect
+    // Auto-Save Effect - DISABLED when DB is off
     useEffect(() => {
+        if (!SILKS_DB_ENABLED) return; // Skip auto-save when DB disabled
+
         const timer = setTimeout(() => {
             if (invoiceId && customerDetails && billNo) {
                 // Auto-save only if we have an ID (edit mode) or enough data to create one?
@@ -106,7 +186,7 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
             setDate(data.date);
             setNotes(data.notes || '');
 
-            if (data.customer_id) {
+            if (data.customer_id && SILKS_DB_ENABLED) {
                 const { data: cust } = await supabase.from('customers').select('*').eq('id', data.customer_id).single();
                 if (cust) {
                     setCustomerDetails(cust);
@@ -122,15 +202,17 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
             }
             setDate(displayDate);
 
-            const { data: invItems } = await supabase.from('invoice_items').select('*').eq('invoice_id', data.id);
-            if (invItems) {
-                setItems(invItems.map(item => ({
-                    name: item.description,
-                    quantity: item.quantity,
-                    rate: item.rate,
-                    amount: item.amount,
-                    hsn: item.hsn_code || '5007'
-                })));
+            if (SILKS_DB_ENABLED) {
+                const { data: invItems } = await supabase.from('invoice_items').select('*').eq('invoice_id', data.id);
+                if (invItems) {
+                    setItems(invItems.map(item => ({
+                        name: item.description,
+                        quantity: item.quantity,
+                        rate: item.rate,
+                        amount: item.amount,
+                        hsn: item.hsn_code || '5007'
+                    })));
+                }
             }
         }
     }
@@ -183,12 +265,23 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
             subTotal: calculateSubtotal(),
             notes,
             terms,
-            taxRates
+            taxRates,
+            previewLanguage // Pass language to preview
         });
         onPreview();
     };
 
     const handleSave = async (silent = false) => {
+        // ========== DATABASE DISABLED CHECK ==========
+        if (!SILKS_DB_ENABLED) {
+            if (!silent) {
+                showToast('⚠️ Database disabled for Silks - Preview only mode', 'warning');
+            }
+            console.log('Silks DB disabled - save skipped');
+            return;
+        }
+        // =============================================
+
         if (!customerDetails || !customerDetails.id) {
             if (!silent) showToast(t.error_customer || 'Please select a valid customer.', 'warning');
             return;
@@ -254,6 +347,33 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
                     {showSubs && <div style={{ fontSize: '0.8rem', fontWeight: '400', color: 'var(--color-text-muted)' }}>{invoiceId ? 'Edit Invoice' : 'New Silks Invoice'}</div>}
                 </div>
             </div>
+
+            {/* Bill Language Selector */}
+            <div className="form-row" style={{ marginBottom: '16px' }}>
+                <div className="form-group" style={{ flex: '0 0 auto' }}>
+                    <label className="zoho-label">
+                        <div>{t.billLanguage || 'பில் மொழி'}</div>
+                        {showSubs && <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 'normal' }}>Bill Language</div>}
+                    </label>
+                    <div className="merchant-type-toggles" style={{ marginTop: '8px' }}>
+                        <button
+                            onClick={() => setPreviewLanguage('ta_only')}
+                            className={`type-toggle-btn ${previewLanguage === 'ta_only' ? 'active' : ''}`}
+                        >
+                            <span className="type-main-label">{t.tamil || 'தமிழ்'}</span>
+                            {showSubs && <span className="type-sub-label">Tamil</span>}
+                        </button>
+                        <button
+                            onClick={() => setPreviewLanguage('en_only')}
+                            className={`type-toggle-btn ${previewLanguage === 'en_only' ? 'active' : ''}`}
+                        >
+                            <span className="type-main-label">{t.english || 'English'}</span>
+                            {showSubs && <span className="type-sub-label">English</span>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
 
             <div className="customer-row">
                 <div className="customer-field-col">
@@ -321,7 +441,7 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
                         <thead>
                             <tr>
                                 <th style={{ width: '35%' }}>{t.itemDetails}{showSubs ? ' / ITEM DETAILS' : ''}</th>
-                                <th style={{ width: '15%' }}>HSN/SAC</th>
+                                <th style={{ width: '15%' }}>HSN Code</th>
                                 <th style={{ textAlign: 'right', width: '10%' }}>{t.qty}{showSubs ? ' / QTY' : ''}</th>
                                 <th style={{ textAlign: 'right', width: '15%' }}>{t.rate}{showSubs ? ' / RATE' : ''}</th>
                                 <th style={{ textAlign: 'right', width: '20%' }}>{t.amount}{showSubs ? ' / AMOUNT' : ''}</th>
@@ -408,7 +528,7 @@ function SilksEditor({ onHome, onPreview, setData, initialData, t, language }) {
                 <button className="btn-cancel" onClick={onHome}>{t.cancel}{showSubs ? ' / Cancel' : ''}</button>
                 <button className="btn-save" style={{ marginLeft: 'auto' }} onClick={() => handleSave(false)}><IconSave size={16} /> {t.save}{showSubs ? ' / Save' : ''}</button>
             </div>
-        </div>
+        </div >
     );
 }
 

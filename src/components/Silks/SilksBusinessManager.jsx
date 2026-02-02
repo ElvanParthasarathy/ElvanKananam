@@ -10,6 +10,14 @@ function SilksBusinessManager({ t, language }) {
     const [loading, setLoading] = useState(true);
     const [profiles, setProfiles] = useState([]);
     const [selectedId, setSelectedId] = useState(null); // 'new' or ID
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     const [formData, setFormData] = useState({
         organization_name: '',
         address_line1: '',
@@ -148,74 +156,156 @@ function SilksBusinessManager({ t, language }) {
         }
     };
 
-    if (loading && profiles.length === 0) return <div style={{ padding: '30px' }}>{showSubs ? `${t.loading || 'ஏற்றுகிறது...'} / Loading Profiles...` : (t.loading || 'ஏற்றுகிறது...')}</div>;
+    if (loading && profiles.length === 0) return <div style={{ padding: isMobile ? '15px' : '30px' }}>{showSubs ? `${t.loading || 'ஏற்றுகிறது...'} / Loading Profiles...` : (t.loading || 'ஏற்றுகிறது...')}</div>;
+
+    const currentProfileName = selectedId === 'new'
+        ? (t.newBusiness || 'புதிய நிறுவனம்')
+        : (profiles.find(p => p.id === selectedId)?.organization_name || (t.selectBusiness || 'நிறுவனத்தைத் தேர்ந்தெடுக்கவும்'));
 
     return (
-        <div style={{ padding: '30px', maxWidth: '1200px', display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
+        <div style={{ padding: isMobile ? '15px' : '30px', maxWidth: '1200px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '20px' : '30px', alignItems: 'flex-start' }}>
 
-            {/* Sidebar List */}
-            <div style={{ width: '250px', flexShrink: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <h2 style={{ fontSize: '20px', margin: 0, color: 'var(--color-text)' }}>{t.businesses || 'நிறுவனங்கள்'}</h2>
-                        {showSubs && <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Silks Businesses</span>}
-                    </div>
-                    <button
-                        onClick={handleAddNew}
-                        style={{ background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        title="Add New Business"
-                    >
-                        +
-                    </button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {profiles.map(profile => (
+            {/* Mobile Dropdown Selector */}
+            {isMobile && (
+                <div style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <h2 style={{ fontSize: '1.2rem', fontWeight: '600', margin: 0, color: 'var(--color-text)' }}>{t.businesses || 'நிறுவனங்கள்'}</h2>
+                            {showSubs && <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Silks Businesses</span>}
+                        </div>
                         <button
-                            key={profile.id}
-                            onClick={() => selectProfile(profile)}
+                            onClick={handleAddNew}
+                            style={{ background: 'var(--color-brand-silks)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '600' }}
+                        >
+                            + {t.newBusiness || 'புதியது'}
+                        </button>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowDropdown(!showDropdown)}
                             style={{
-                                textAlign: 'left',
-                                padding: '10px 15px',
-                                background: selectedId === profile.id ? 'var(--color-primary)' : 'var(--color-surface)',
-                                color: selectedId === profile.id ? 'white' : 'var(--color-text)',
+                                width: '100%',
+                                padding: '12px 16px',
+                                background: 'var(--color-surface)',
                                 border: '1px solid var(--color-border)',
-                                borderRadius: '6px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
                                 cursor: 'pointer',
+                                color: 'var(--color-text)',
+                                fontSize: '14px',
                                 fontWeight: '500'
                             }}
                         >
-                            {profile.organization_name}
+                            <span>{currentProfileName}</span>
+                            <span style={{ transform: showDropdown ? 'rotate(180deg)' : 'rotate(0)', transition: '0.2s' }}>▼</span>
                         </button>
-                    ))}
-                    {selectedId === 'new' && (
-                        <button
-                            style={{
-                                textAlign: 'left',
-                                padding: '10px 15px',
+                        {showDropdown && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                marginTop: '4px',
                                 background: 'var(--color-surface)',
-                                color: 'var(--color-text)',
-                                border: '1px dashed var(--color-primary)',
-                                borderRadius: '6px',
-                                cursor: 'default',
-                                fontStyle: 'italic',
-                                fontSize: '13px'
-                            }}
-                        >
-                            {t.newBusiness || 'புதிய நிறுவனம்'}... {showSubs && <span style={{ fontSize: '11px', opacity: 0.8 }}>/ New Business...</span>}
-                        </button>
-                    )}
+                                border: '1px solid var(--color-border)',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                zIndex: 100,
+                                maxHeight: '200px',
+                                overflow: 'auto'
+                            }}>
+                                {profiles.map(profile => (
+                                    <button
+                                        key={profile.id}
+                                        onClick={() => { selectProfile(profile); setShowDropdown(false); }}
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px 16px',
+                                            background: selectedId === profile.id ? 'rgba(123, 31, 162, 0.1)' : 'transparent',
+                                            border: 'none',
+                                            textAlign: 'left',
+                                            cursor: 'pointer',
+                                            color: selectedId === profile.id ? 'var(--color-brand-silks)' : 'var(--color-text)',
+                                            fontWeight: selectedId === profile.id ? '600' : '400',
+                                            borderBottom: '1px solid var(--color-border)'
+                                        }}
+                                    >
+                                        {profile.organization_name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
+
+            {/* Desktop Sidebar List */}
+            {!isMobile && (
+                <div style={{ width: '250px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <h2 style={{ fontSize: '20px', margin: 0, color: 'var(--color-text)' }}>{t.businesses || 'நிறுவனங்கள்'}</h2>
+                            {showSubs && <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Silks Businesses</span>}
+                        </div>
+                        <button
+                            onClick={handleAddNew}
+                            style={{ background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            title="Add New Business"
+                        >
+                            +
+                        </button>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {profiles.map(profile => (
+                            <button
+                                key={profile.id}
+                                onClick={() => selectProfile(profile)}
+                                style={{
+                                    textAlign: 'left',
+                                    padding: '10px 15px',
+                                    background: selectedId === profile.id ? 'var(--color-primary)' : 'var(--color-surface)',
+                                    color: selectedId === profile.id ? 'white' : 'var(--color-text)',
+                                    border: '1px solid var(--color-border)',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                {profile.organization_name}
+                            </button>
+                        ))}
+                        {selectedId === 'new' && (
+                            <button
+                                style={{
+                                    textAlign: 'left',
+                                    padding: '10px 15px',
+                                    background: 'var(--color-surface)',
+                                    color: 'var(--color-text)',
+                                    border: '1px dashed var(--color-primary)',
+                                    borderRadius: '6px',
+                                    cursor: 'default',
+                                    fontStyle: 'italic',
+                                    fontSize: '13px'
+                                }}
+                            >
+                                {t.newBusiness || 'புதிய நிறுவனம்'}... {showSubs && <span style={{ fontSize: '11px', opacity: 0.8 }}>/ New Business...</span>}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Main Form */}
-            <div style={{ flex: 1, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', padding: '30px' }}>
+            <div style={{ flex: 1, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: isMobile ? '12px' : '4px', padding: isMobile ? '20px' : '30px', width: '100%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
                     <h2 style={{ fontSize: '24px', margin: 0, color: 'var(--color-text)' }}>
                         {selectedId === 'new' ? (showSubs ? `${t.newBusiness || 'புதிய நிறுவனம்'} / Create New Profile` : (t.newBusiness || 'புதிய நிறுவனம்')) : (showSubs ? `${t.editBusinessProfile || 'நிறுவனத்தை திருத்த'} / Edit Profile` : (t.editBusinessProfile || 'நிறுவனத்தை திருத்த'))}
                     </h2>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
 
                     {/* Logo Upload Section */}
                     <div style={{ gridColumn: 'span 2', marginBottom: '20px' }}>

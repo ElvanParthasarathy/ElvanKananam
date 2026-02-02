@@ -46,6 +46,8 @@ export const english = {
     quantity: 'Weight (Kg)',
     weight: 'Weight (KG)',
     rate: 'Coolie',
+    price: 'Price',
+    hsnCode: 'HSN Code',
     amount: 'Amount',
     addAnotherItem: 'Add Row',
     newItem: 'New Item',
@@ -176,6 +178,7 @@ export const english = {
 
     // Language
     language: 'Language',
+    billLanguage: 'Bill Language',
     tamil: 'Tamil',
     english: 'English',
     tamilMixed: 'Tamil + English',

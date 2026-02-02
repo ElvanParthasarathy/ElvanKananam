@@ -1,4 +1,16 @@
-/* BillEditor.css - Zoho Style Clone */
+﻿/* Button Text Alignment Utilities */
+.btn-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.btn-sub {
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.8;
+}
 
 /* ========== CONTAINER ========== */
 .bill-editor-container {
@@ -8,7 +20,7 @@
     display: flex;
     flex-direction: column;
     padding: 0;
-    padding-bottom: 120px;
+    padding-bottom: 40px;
 }
 
 /* ========== HEADER SECTION ========== */
@@ -53,6 +65,56 @@
     color: var(--color-text-muted);
     margin-bottom: 8px;
     font-weight: 500;
+}
+
+/* Merchant Type Selection Layout */
+.merchant-type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.merchant-type-toggles {
+    display: flex;
+    gap: 8px;
+}
+
+.type-toggle-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    min-width: 70px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.type-toggle-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.type-main-label {
+    font-weight: 700;
+    line-height: 1.2;
+    font-size: 11px;
+}
+
+.type-sub-label {
+    font-size: 9px;
+    opacity: 0.8;
+    font-weight: 400;
+    margin-top: 2px;
 }
 
 .zoho-input,
@@ -101,8 +163,13 @@
 
 /* ========== TABLE SECTION ========== */
 .bill-table-wrapper {
-    margin-bottom: 40px;
-    overflow: visible;
+    margin-bottom: 60px;
+    overflow: visible !important;
+    position: relative;
+    min-height: 400px;
+    /* More space for dropdowns */
+    contain: none !important;
+    /* Prevent browser clipping */
 }
 
 .bill-table {
@@ -135,7 +202,8 @@
     border-bottom: 1px solid var(--color-border);
     border-right: 1px solid var(--color-border);
     vertical-align: top;
-    position: static;
+    position: relative;
+    /* Positioned to allow z-index for dropdowns */
 }
 
 .bill-table td:focus-within {
@@ -145,11 +213,22 @@
 
 .bill-table tr:focus-within {
     position: relative;
-    z-index: 9999;
+    z-index: 9999 !important;
 }
 
-.bill-table td:last-child {
-    border-right: none;
+.bill-table td:focus-within {
+    position: relative;
+    z-index: 10000 !important;
+    overflow: visible !important;
+}
+
+.bill-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.85rem;
+    border: 1px solid var(--color-border);
+    overflow: visible !important;
 }
 
 .bill-table tr:last-child td {
@@ -198,112 +277,206 @@
 }
 
 /* ========== FOOTER SECTION ========== */
+/* ========== FOOTER SECTION ========== */
 .bill-footer {
     display: flex;
-    gap: 40px;
+    flex-direction: row !important;
+    /* Force row on desktop */
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
+    gap: 24px;
+    align-items: stretch;
+    /* Force equal height */
+    margin-top: 20px;
 }
 
 .footer-left {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    min-width: 0;
+    /* Prevent flex overflow */
 }
 
-.notes-label {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
+/* Footer Card for Read-only Info */
+.footer-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    box-shadow: var(--shadow-sm);
+}
+
+.footer-card-header {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--color-bg);
+    padding-bottom: 12px;
     margin-bottom: 8px;
 }
 
-.notes-area {
-    width: 100%;
-    max-width: 500px;
-    height: 80px;
-    padding: 12px;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    font-size: 0.9rem;
-    background: var(--color-input-bg);
+.read-only-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.read-only-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.read-only-value {
+    font-size: 0.95rem;
     color: var(--color-text);
+    font-weight: 600;
+    white-space: pre-wrap;
+    line-height: 1.4;
+    text-align: right;
 }
 
+/* Calculation Grid */
+/* Calculation Grid */
 .footer-right {
-    width: 400px;
-    background: var(--color-header-bg);
-    border-radius: 8px;
-    padding: 24px;
+    flex: 1;
+    min-width: 0;
+    /* Prevent flex overflow */
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
 }
 
-.summary-row {
+.calc-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calc-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+}
+
+.calc-label {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.calc-label-main {
     font-size: 0.9rem;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.calc-label-sub {
+    font-size: 0.75rem;
     color: var(--color-text-muted);
 }
 
-.summary-value {
-    min-width: 100px;
-    text-align: right;
-    font-weight: 600;
-    color: var(--color-text);
+.calc-input-wrapper {
+    width: 120px;
+    position: relative;
 }
 
-.summary-total {
-    margin-top: 16px;
+.calc-input {
+    width: 100%;
+    text-align: right;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: var(--color-input-bg);
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+.calc-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+    box-shadow: 0 0 0 2px rgba(56, 142, 60, 0.1);
+}
+
+.calc-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+}
+
+/* Specific inputs */
+.input-adjustment-name {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    border-bottom: 1px dashed var(--color-border);
+    padding: 0 0 2px 0;
+}
+
+.input-adjustment-name:focus {
+    outline: none;
+    border-bottom-color: var(--color-primary);
+}
+
+
+.total-row {
+    margin-top: 24px;
     padding-top: 16px;
-    border-top: 1px solid var(--color-border);
-    font-size: 1.1rem;
-    color: var(--color-text-primary);
+    border-top: 2px solid var(--color-border);
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
 }
 
-/* ========== STICKY ACTION BAR ========== */
-.sticky-footer-bar {
-    position: fixed;
-    bottom: 0px;
-    left: 0;
-    right: 0;
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-border);
-    padding: 12px 40px;
+.total-label {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1.2;
+}
+
+.total-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+}
+
+/* ========== ACTION BUTTONS STRIP (AT THE BOTTOM) ========== */
+.editor-actions-strip {
+    margin-top: 24px;
+    padding: 0;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     gap: 12px;
-    z-index: 900;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+    border-top: none;
 }
 
-@media (min-width: 1024px) {
-    .sticky-footer-bar {
-        left: 260px;
-    }
-}
 
-.btn-save {
-    background: var(--color-success);
-    color: white;
-    border: none;
-    padding: 8px 24px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-save:hover {
-    opacity: 0.9;
-}
 
 .btn-cancel {
     background: var(--color-surface);
@@ -313,6 +486,11 @@
     border-radius: 4px;
     font-weight: 500;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: var(--color-bg);
 }
 
 /* ========== AUTOCOMPLETE OVERRIDES ========== */
@@ -397,17 +575,17 @@
 
 .desktop-only-view {
     display: block;
+    overflow: visible !important;
 }
 
 @media (max-width: 1023px) {
     .bill-editor-container {
         padding: 12px;
-        padding-bottom: 180px;
+        padding-bottom: 40px;
     }
 
     .customer-row,
-    .invoice-details-row,
-    .bill-footer {
+    .invoice-details-row {
         flex-direction: column;
         gap: 16px;
     }
@@ -425,19 +603,21 @@
         width: 100%;
     }
 
-    .sticky-footer-bar {
-        left: 0;
-        bottom: 64px;
-        /* Move UP to sit above the global BottomNav */
+    .editor-actions-strip {
         padding: 10px 16px;
-        gap: 8px;
+        gap: 12px;
         z-index: 1005;
-        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        border-top: 1px dashed var(--color-border);
         background: var(--color-surface);
+        margin-top: 32px;
     }
 }
 
 @media (max-width: 768px) {
+    .bill-footer {
+        flex-direction: column !important;
+    }
+
     .desktop-only-view {
         display: none !important;
     }
@@ -490,6 +670,27 @@
         margin-bottom: 4px;
     }
 
+    /* Merchant Toggle Stacking on Mobile */
+    .merchant-type-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .merchant-type-toggles {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .type-toggle-btn {
+        min-width: 0;
+        padding: 8px 4px;
+        height: 48px;
+    }
+
     .card-row {
         display: flex;
         gap: 10px;
@@ -525,36 +726,236 @@
         padding: 12px;
         font-size: 14px;
     }
-}
 
-/* Footer Helper Buttons */
-.footer-helper-btns {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.btn-helper {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-muted);
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-helper:hover {
-    background: var(--color-surface-elevated);
-    color: var(--color-primary);
-}
-
-@media (max-width: 480px) {
-    .footer-helper-btns {
-        display: none;
+    /* Action Strip Refinements for Mobile */
+    .editor-actions-strip {
+        margin-top: 30px;
+        padding: 20px 0;
+        flex-direction: column;
+        gap: 20px;
+        border-top: 1px solid var(--color-border);
+        box-shadow: none;
+        background: transparent;
+        backdrop-filter: none;
     }
 
-    /* Hide on very small screens to save space for primary actions */
+    /* Tier 1: Secondary Small Buttons */
+    .footer-secondary-row {
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .btn-mini-secondary {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-muted);
+        padding: 8px 4px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-mini-secondary:active {
+        background: var(--color-bg);
+        transform: scale(0.95);
+    }
+
+    /* Tier 2: Primary Large Buttons */
+    .footer-primary-row {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .btn-preview-new,
+    .btn-save-new {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 16px;
+        border: none;
+        font-weight: 700;
+        font-size: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+
+    .btn-preview-new {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .btn-save-new {
+        background: var(--color-success);
+        color: white;
+    }
+
+    .btn-preview-new:active,
+    .btn-save-new:active {
+        transform: scale(0.98);
+        filter: brightness(0.9);
+    }
+
+
+
+    /* Mobie Item Card Refinements */
+    .mobile-item-card {
+        border-radius: 20px;
+        padding: 20px;
+        background: var(--color-surface-elevated);
+        border: 1px solid var(--color-card-border);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-remove-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, 0.15);
+        color: var(--color-danger);
+        border: none;
+        transition: all 0.2s;
+    }
+
+    .btn-remove-circle:active {
+        transform: scale(0.85);
+        background: var(--color-danger);
+        color: white;
+    }
+
+    .mobile-only-flex {
+        display: flex !important;
+    }
+
+    .desktop-only-flex {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-only-flex {
+        display: none !important;
+    }
+
+    .desktop-only-flex {
+        display: flex !important;
+    }
+
+    .footer-primary-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .btn-preview-new,
+    .btn-save-new {
+        background: var(--color-success);
+        color: white;
+        border: none;
+        padding: 0 24px;
+        height: 48px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-preview-new {
+        background: var(--color-primary);
+    }
+
+    .btn-preview-new:hover,
+    .btn-save-new:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .footer-helper-btns.desktop-only-flex {
+        margin-left: auto;
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-secondary-desktop {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        color: var(--color-text-muted);
+        padding: 0 20px;
+        height: 48px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary-desktop:hover {
+        background: var(--color-bg);
+        border-color: var(--color-text-muted);
+        color: var(--color-text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+}
+
+/* Intermediate / Compact Desktop (Tablet Landscape / Small Laptop) */
+@media (min-width: 769px) and (max-width: 1200px) {
+    .footer-primary-row {
+        gap: 8px;
+        /* Tighter gap */
+    }
+
+    .footer-helper-btns.desktop-only-flex {
+        gap: 8px;
+    }
+
+    /* Compact Primary Buttons */
+    .btn-preview-new,
+    .btn-save-new {
+        padding: 0 16px;
+        /* Reduced padding */
+        height: 44px;
+        /* Slightly shorter */
+        font-size: 0.95rem;
+        gap: 8px;
+    }
+
+    /* Compact Secondary Buttons */
+    .btn-secondary-desktop {
+        padding: 0 12px;
+        height: 44px;
+    }
+
+    .btn-text-group span:first-child {
+        font-size: 0.9rem;
+    }
+
+    .btn-sub {
+        font-size: 9px;
+    }
 }
