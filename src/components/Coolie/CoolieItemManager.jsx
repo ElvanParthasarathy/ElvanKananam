@@ -7,6 +7,8 @@ import { showSubtitles } from '../../config/translations';
 
 function CoolieItemManager({ t, language }) {
     const showSubs = showSubtitles(language);
+    // Language-aware display: Tamil mode shows Tamil first, English/Tanglish shows English first
+    const useTamilFirst = language === 'ta_mixed' || language === 'ta_only';
     const { showToast } = useToast();
     const { confirm } = useConfirm();
     const [items, setItems] = useState([]);
@@ -166,10 +168,6 @@ function CoolieItemManager({ t, language }) {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                         <thead style={{ background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
                             <tr>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', color: 'var(--color-text-muted)', width: '100px' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.language || 'மொழி'}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Language</div>}
-                                </th>
                                 <th style={{ padding: '12px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                                     <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.name || 'பெயர்'}</div>
                                     {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Name</div>}
@@ -183,7 +181,7 @@ function CoolieItemManager({ t, language }) {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="3" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                    <td colSpan="2" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                                             <span style={{ fontSize: '16px', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
                                             {showSubs && <span style={{ fontSize: '13px', opacity: 0.8 }}>Loading...</span>}
@@ -192,32 +190,36 @@ function CoolieItemManager({ t, language }) {
                                 </tr>
                             ) : items.length === 0 ? (
                                 <tr>
-                                    <td colSpan="3" style={{ padding: '60px 40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                    <td colSpan="2" style={{ padding: '60px 40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-                                            <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noItems || 'பொருள்கள் இல்லை'}</div>
+                                            <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noItems || 'பொருள்கள் இல்லை'}</div>
                                             {showSubs && <div style={{ fontSize: '14px', color: '#6b7280' }}>No items found.</div>}
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
-                                items.map(item => (
-                                    <React.Fragment key={item.id}>
-                                        <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-surface)' }}>
-                                            <td style={{ padding: '12px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 'bold' }}>{t.tamil}</td>
-                                            <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{item.name_tamil || '-'}</td>
-                                            <td style={{ padding: '12px 20px', textAlign: 'center', verticalAlign: 'middle' }} rowSpan="2">
+                                items.map(item => {
+                                    // Language-aware display
+                                    const primaryName = useTamilFirst ? (item.name_tamil || item.name_english) : (item.name_english || item.name_tamil);
+                                    const subtitleName = useTamilFirst ? item.name_english : item.name_tamil;
+
+                                    return (
+                                        <tr key={item.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                            <td style={{ padding: '12px 20px' }}>
+                                                <div style={{ fontWeight: '500', color: 'var(--color-text)' }}>{primaryName}</div>
+                                                {showSubs && subtitleName && primaryName !== subtitleName && (
+                                                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{subtitleName}</div>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '12px 20px', textAlign: 'center' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                                                     <button onClick={() => openModal(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}><IconEdit size={16} /></button>
                                                     <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)' }}><IconTrash size={16} /></button>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr style={{ borderBottom: '2px solid var(--color-border)', background: 'var(--color-bg-subtle)' }}>
-                                            <td style={{ padding: '12px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 'bold' }}>{t.english}</td>
-                                            <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{item.name_english}</td>
-                                        </tr>
-                                    </React.Fragment>
-                                ))
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>
@@ -249,8 +251,14 @@ function CoolieItemManager({ t, language }) {
                                 alignItems: 'center'
                             }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>{item.name_tamil || item.name_english}</span>
-                                    {showSubs && item.name_tamil && <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{item.name_english}</span>}
+                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>
+                                        {useTamilFirst ? (item.name_tamil || item.name_english) : (item.name_english || item.name_tamil)}
+                                    </span>
+                                    {showSubs && (
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                            {useTamilFirst ? item.name_english : item.name_tamil}
+                                        </span>
+                                    )}
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <button onClick={() => openModal(item)} style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '8px', color: 'var(--color-text-muted)' }}><IconEdit size={18} /></button>

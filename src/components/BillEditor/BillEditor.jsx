@@ -92,6 +92,7 @@ function BillEditor({
             // Process Customers for Bilingual Display
             const processedCustomers = (customers || []).map(c => {
                 const tamilName = c.name_tamil || '';
+                const cityDisplay = c.city_tamil || c.city;
 
                 return {
                     ...c,
@@ -105,9 +106,9 @@ function BillEditor({
                                         {c.company_name_tamil || c.company_name}
                                     </span>
                                     {c.company_name_tamil && c.company_name && (
-                                        <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                                        <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>
                                             {c.company_name}
-                                        </div>
+                                        </span>
                                     )}
                                 </div>
                             )}
@@ -118,11 +119,21 @@ function BillEditor({
                                     {tamilName || c.name}
                                 </span>
                                 {tamilName && c.name && (
-                                    <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '6px' }}>
                                         {c.name}
-                                    </div>
+                                    </span>
                                 )}
                             </div>
+
+                            {/* City Section - to differentiate same business, different location */}
+                            {cityDisplay && (
+                                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                                    <span style={{ fontWeight: '500' }}>{cityDisplay}</span>
+                                    {c.city_tamil && c.city && (
+                                        <span style={{ opacity: 0.7, marginLeft: '4px' }}>({c.city})</span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )
                 };

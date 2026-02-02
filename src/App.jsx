@@ -12,7 +12,7 @@ import Layout from './components/common/Layout';
 import { DEFAULT_COMPANY_ID } from './config';
 import { getTranslation, DEFAULT_LANGUAGE, showSubtitles } from './config/translations';
 import { isAuthenticated, login, logout } from './config/auth';
-import { getCurrentDate } from './utils/calculations';
+import { getCurrentDate, calcTotalRs } from './utils/calculations';
 import { useToast } from './context/ToastContext';
 import { useConfirm } from './context/ConfirmContext';
 
@@ -110,14 +110,30 @@ function App() {
       console.warn("Supabase fetch failed", err);
     }
 
-    // Find selected company
+    // Find selected company - PRIORITY ORDER:
+    // 1. Match by current companyId (if it's a valid UUID from editing a bill)
+    // 2. Match by organization_name if companyId is a string name
+    // 3. Default to PVS if nothing else matches
+    // 4. Fallback to first org
     let selected;
     if (orgs && orgs.length > 0) {
-      selected = orgs.find(o => o.organization_name.includes('P.V.S.'));
-      if (companyId && companyId !== DEFAULT_COMPANY_ID && companyId.length > 20) {
+      // First: Try to match by exact ID (UUID from database)
+      if (companyId && companyId.length > 20) {
         selected = orgs.find(o => o.id === companyId);
       }
-      if (!selected) selected = orgs[0]; // Fallback
+
+      // Second: If no match yet, and companyId is a string name, try name match
+      if (!selected && companyId && typeof companyId === 'string') {
+        selected = orgs.find(o => o.organization_name === companyId || o.organization_name.includes(companyId));
+      }
+
+      // Third: Default to PVS if still no match
+      if (!selected) {
+        selected = orgs.find(o => o.organization_name.includes('P.V.S.'));
+      }
+
+      // Fourth: Fallback to first org
+      if (!selected) selected = orgs[0];
     }
 
     // Default mock if DB is empty to prevent crash
@@ -400,7 +416,7 @@ function App() {
     setBillNo('13');
     setDate('15/12/2025');
     setCustomerName('சுந்தரி சில்க்ஸ் இந்தியா');
-    setCity('திருச்சேறை, கும்பகோனம்');
+    setCity('திருச்சேறை, கும்பகோணம்');
     setItems([
       { porul: 'ஒண்டி தடை செய்ய கூலி', kg: '13.850', coolie: '660' },
       { porul: 'மூன்று இழை சப்புரி செய்ய கூலி', kg: '21.720', coolie: '430' }
@@ -437,6 +453,12 @@ function App() {
   // Load Coolie Bill
   const loadCoolieBill = (bill) => {
     setCurrentBillId(bill.id);
+
+    // IMPORTANT: Set company ID FIRST so the correct business profile is loaded
+    if (bill.company_id) {
+      setCompanyId(bill.company_id);
+    }
+
     setBillNo(bill.bill_no);
     setDate(bill.date);
     setCustomerName(bill.customer_name);
@@ -501,6 +523,9 @@ function App() {
       return;
     }
 
+    // Calculate Grand Total before saving
+    const grandTotal = calcTotalRs(items, courierRs, ahimsaSilkRs, customChargeRs);
+
     const billData = {
       bill_no: billNo,
       date,
@@ -516,6 +541,8 @@ function App() {
       custom_charge_rs: customChargeRs,
       bank_details: bankDetails,
       account_no: accountNo,
+      company_id: companyConfig?.id || companyId, // Link bill to specific profile
+      grand_total: grandTotal
     };
 
     // If editing an existing bill, just update it
@@ -523,24 +550,62 @@ function App() {
       const { error } = await supabase.from('coolie_bills').update(billData).eq('id', currentBillId);
       if (error) {
         if (!silent) showToast('Error saving: ' + error.message, 'error');
-      } else if (!silent) {
-        showToast('Bill Updated Successfully!', 'success');
+      } else {
+        // Check for duplicates to cleanup (Self-Healing)
+        let dupQuery = supabase
+          .from('coolie_bills')
+          .select('id')
+          .eq('bill_no', billNo)
+          .neq('id', currentBillId); // exclude self
+
+        if (billData.company_id) {
+          dupQuery = dupQuery.eq('company_id', billData.company_id);
+        } else {
+          dupQuery = dupQuery.is('company_id', null);
+        }
+
+        const { data: duplicates } = await dupQuery;
+
+        if (duplicates && duplicates.length > 0) {
+          const duplicateIds = duplicates.map(d => d.id);
+          await supabase.from('coolie_bills').delete().in('id', duplicateIds);
+          if (!silent) showToast(`Bill Updated & ${duplicates.length} duplicates merged/deleted!`, 'success');
+        } else if (!silent) {
+          showToast('Bill Updated Successfully!', 'success');
+        }
       }
       return;
     }
 
-    // New bill - Check for existing bill with same bill number
-    const { data: existing } = await supabase
+    // New bill - Check for existing bill with same bill number AND same company
+    let query = supabase
       .from('coolie_bills')
       .select('id')
-      .eq('bill_no', billNo)
-      .maybeSingle();
+      .eq('bill_no', billNo);
+
+    // If company_id is present, scope the check
+    if (billData.company_id) {
+      query = query.eq('company_id', billData.company_id);
+    } else {
+      // If no company_id (legacy), only check records with no company_id
+      query = query.is('company_id', null);
+    }
+
+    const { data: existingRows } = await query;
+    const existing = existingRows?.[0];
 
     if (existing) {
       // Bill with same number already exists
       if (silent) {
-        // Auto-save: Silently update the existing bill instead of creating duplicate
+        // Auto-save: Silently update the existing bill
         const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
+
+        // If there are multiple duplicates, delete the extras silently to self-heal
+        if (!error && existingRows.length > 1) {
+          const duplicatesToDelete = existingRows.slice(1).map(r => r.id);
+          await supabase.from('coolie_bills').delete().in('id', duplicatesToDelete);
+        }
+
         if (!error) {
           setCurrentBillId(existing.id); // Track this as the current bill
           localStorage.removeItem('coolie-draft');
@@ -558,10 +623,21 @@ function App() {
       });
 
       if (shouldOverwrite) {
+        // Update the primary one
         const { error } = await supabase.from('coolie_bills').update(billData).eq('id', existing.id);
-        if (error) showToast('Error saving: ' + error.message, 'error');
-        else {
-          showToast('Bill Overwritten Successfully!', 'success');
+
+        if (error) {
+          showToast('Error saving: ' + error.message, 'error');
+        } else {
+          // Delete duplicates if any
+          if (existingRows.length > 1) {
+            const duplicatesToDelete = existingRows.slice(1).map(r => r.id);
+            await supabase.from('coolie_bills').delete().in('id', duplicatesToDelete);
+            showToast(`Bill Overwritten & ${duplicatesToDelete.length} duplicates removed!`, 'success');
+          } else {
+            showToast('Bill Overwritten Successfully!', 'success');
+          }
+
           setCurrentBillId(existing.id);
           localStorage.removeItem('coolie-draft');
         }
@@ -626,6 +702,7 @@ function App() {
               setViewMode('coolie-new'); // Go straight to editor
             }}
             onRefreshConfig={fetchCompany}
+          // companyId={companyId || companyConfig?.id} // Commented out to allow Dashboard to show ALL bills grouped by company
           />
         )}
 
@@ -675,7 +752,7 @@ function App() {
             showBankDetails={showBankDetails}
             setShowBankDetails={setShowBankDetails}
             onPreview={() => setViewMode('coolie-preview')}
-            onHome={() => setViewMode('home')}
+            onHome={() => setViewMode('coolie-dashboard')}
             onLoadTestData={loadTestData}
             onResetData={resetData}
             companyId={companyId}

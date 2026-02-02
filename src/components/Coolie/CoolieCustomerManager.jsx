@@ -7,6 +7,8 @@ import { showSubtitles } from '../../config/translations';
 
 function CoolieCustomerManager({ t, language }) {
     const showSubs = showSubtitles(language);
+    // Language-aware display: Tamil mode shows Tamil first, English/Tanglish shows English first
+    const useTamilFirst = language === 'ta_mixed' || language === 'ta_only';
     const { showToast } = useToast();
     const { confirm } = useConfirm();
     const [customers, setCustomers] = useState([]);
@@ -244,10 +246,6 @@ function CoolieCustomerManager({ t, language }) {
                         <thead style={{ background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
                             <tr>
                                 <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text)' }}>{t.language}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Language</div>}
-                                </th>
-                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                                     <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text)' }}>{t.customerName}</div>
                                     {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Merchant Name</div>}
                                 </th>
@@ -259,10 +257,6 @@ function CoolieCustomerManager({ t, language }) {
                                     <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text)' }}>{t.placeCity}</div>
                                     {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Place</div>}
                                 </th>
-                                <th style={{ padding: '15px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text)' }}>{t.address}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Address</div>}
-                                </th>
                                 <th style={{ padding: '15px 20px', width: '100px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                                     <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-text)' }}>{t.actions}</div>
                                     {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Actions</div>}
@@ -272,7 +266,7 @@ function CoolieCustomerManager({ t, language }) {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                    <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                                             <span style={{ fontSize: '16px', fontWeight: '500' }}>{t.loading}</span>
                                             {showSubs && <span style={{ fontSize: '13px', opacity: 0.8 }}>Loading...</span>}
@@ -281,7 +275,7 @@ function CoolieCustomerManager({ t, language }) {
                                 </tr>
                             ) : filteredCustomers.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                    <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                                             <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noMerchants}</div>
                                             {showSubs && <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>No merchants found in your database.</div>}
@@ -290,30 +284,42 @@ function CoolieCustomerManager({ t, language }) {
                                 </tr>
                             ) : (
                                 filteredCustomers.map(customer => {
+                                    // Language-aware display
+                                    const primaryName = useTamilFirst ? (customer.name_tamil || customer.name) : (customer.name || customer.name_tamil);
+                                    const subtitleName = useTamilFirst ? customer.name : customer.name_tamil;
+                                    const primaryCompany = useTamilFirst ? (customer.company_name_tamil || customer.company_name) : (customer.company_name || customer.company_name_tamil);
+                                    const subtitleCompany = useTamilFirst ? customer.company_name : customer.company_name_tamil;
+                                    const primaryCity = useTamilFirst ? (customer.city_tamil || customer.city) : (customer.city || customer.city_tamil);
+                                    const subtitleCity = useTamilFirst ? customer.city : customer.city_tamil;
+
                                     return (
-                                        <React.Fragment key={customer.id}>
-                                            <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-surface)' }}>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 'bold' }}>{t.tamil}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.name_tamil || '-'}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.company_name_tamil || '-'}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.city_tamil || '-'}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.address_tamil || '-'}</td>
-                                                <td style={{ padding: '12px 20px', textAlign: 'center', verticalAlign: 'middle' }} rowSpan="2">
-                                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                                        <button onClick={() => openModal(customer)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}><IconEdit size={16} /></button>
-                                                        <button onClick={() => handleDelete(customer.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)' }}><IconTrash size={16} /></button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr style={{ borderBottom: '2px solid var(--color-border)', background: 'var(--color-bg-subtle)' }}>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 'bold' }}>{t.english}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.name}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.company_name || '-'}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.city || '-'}</td>
-                                                <td style={{ padding: '12px 20px', color: 'var(--color-text)' }}>{customer.address_line1 || '-'}</td>
-                                            </tr>
-                                        </React.Fragment>
-                                    )
+                                        <tr key={customer.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                            <td style={{ padding: '12px 20px' }}>
+                                                <div style={{ fontWeight: '500', color: 'var(--color-text)' }}>{primaryName || '-'}</div>
+                                                {showSubs && subtitleName && primaryName !== subtitleName && (
+                                                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{subtitleName}</div>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '12px 20px' }}>
+                                                <div style={{ fontWeight: '500', color: 'var(--color-text)' }}>{primaryCompany || '-'}</div>
+                                                {showSubs && subtitleCompany && primaryCompany !== subtitleCompany && (
+                                                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{subtitleCompany}</div>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '12px 20px' }}>
+                                                <div style={{ color: 'var(--color-text-muted)' }}>{primaryCity || '-'}</div>
+                                                {showSubs && subtitleCity && primaryCity !== subtitleCity && (
+                                                    <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '2px' }}>{subtitleCity}</div>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '12px 20px', textAlign: 'center' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                                                    <button onClick={() => openModal(customer)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}><IconEdit size={16} /></button>
+                                                    <button onClick={() => handleDelete(customer.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)' }}><IconTrash size={16} /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
                                 })
                             )}
                         </tbody>
@@ -340,6 +346,14 @@ function CoolieCustomerManager({ t, language }) {
                         </div>
                     ) : (
                         filteredCustomers.map(customer => {
+                            // Language-aware display
+                            const primaryName = useTamilFirst ? (customer.name_tamil || customer.name) : (customer.name || customer.name_tamil);
+                            const subtitleName = useTamilFirst ? customer.name : customer.name_tamil;
+                            const primaryCompany = useTamilFirst ? (customer.company_name_tamil || customer.company_name) : (customer.company_name || customer.company_name_tamil);
+                            const subtitleCompany = useTamilFirst ? customer.company_name : customer.company_name_tamil;
+                            const primaryCity = useTamilFirst ? (customer.city_tamil || customer.city) : (customer.city || customer.city_tamil);
+                            const subtitleCity = useTamilFirst ? customer.city : customer.city_tamil;
+
                             return (
                                 <div key={customer.id} style={{
                                     background: 'var(--color-surface)',
@@ -352,27 +366,21 @@ function CoolieCustomerManager({ t, language }) {
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            {customer.company_name_tamil && (
+                                            {primaryCompany && (
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>{customer.company_name_tamil}</span>
-                                                    {showSubs && <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{customer.company_name}</span>}
-                                                </div>
-                                            )}
-                                            {!customer.company_name_tamil && customer.company_name && (
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>{customer.company_name}</span>
+                                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>{primaryCompany}</span>
+                                                    {showSubs && subtitleCompany && primaryCompany !== subtitleCompany && (
+                                                        <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{subtitleCompany}</span>
+                                                    )}
                                                 </div>
                                             )}
 
-                                            {customer.name_tamil && (
+                                            {primaryName && (
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: '600', fontSize: '15px' }}>{customer.name_tamil}</span>
-                                                    {showSubs && <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{customer.name}</span>}
-                                                </div>
-                                            )}
-                                            {!customer.name_tamil && customer.name && (
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: '600', fontSize: '15px' }}>{customer.name}</span>
+                                                    <span style={{ fontWeight: '600', fontSize: '15px' }}>{primaryName}</span>
+                                                    {showSubs && subtitleName && primaryName !== subtitleName && (
+                                                        <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{subtitleName}</span>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -382,12 +390,14 @@ function CoolieCustomerManager({ t, language }) {
                                         </div>
                                     </div>
 
-                                    {(customer.city_tamil || customer.city) && (
+                                    {primaryCity && (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'var(--color-bg)', borderRadius: '8px' }}>
                                             <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>📍</span>
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontSize: '13px', fontWeight: '600' }}>{customer.city_tamil || customer.city}</span>
-                                                {showSubs && <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>{customer.city}</span>}
+                                                <span style={{ fontSize: '13px', fontWeight: '600' }}>{primaryCity}</span>
+                                                {showSubs && subtitleCity && primaryCity !== subtitleCity && (
+                                                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>{subtitleCity}</span>
+                                                )}
                                             </div>
                                         </div>
                                     )}
