@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IconZoomIn, IconZoomOut, IconPrinter, IconEdit } from '../common/Icons';
+import { IconZoomIn, IconZoomOut, IconPrinter, IconEdit } from '../../common/Icons';
 import BillPreviewTamil from './BillPreviewTamil';
 import BillPreviewEnglish from './BillPreviewEnglish';
 

@@ -1,15 +1,15 @@
 import React from 'react';
-import { numberToWords } from '../../utils/numberToWords';
-import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight, formatCurrency } from '../../utils/calculations';
-import { IconPhone, IconMail } from '../common/Icons';
+import { showSubtitles } from '../../../config/translations';
+import { numberToWordsTamil } from '../../../utils/tamilNumbers';
+import { calcItemAmount, calcTotalKg, calcTotalRs, gramsToKg, formatWeight, formatCurrency } from '../../../utils/calculations';
+import { IconPhone, IconMail } from '../../common/Icons';
 
 /**
- * BillPreviewEnglish Component
+ * BillPreviewTamil Component
  * 
- * English layout for the bill.
- * Preserves the Tamil spiritual greeting and Bilingual Company Name as requested.
+ * Strict Tamil layout for the bill.
  */
-function BillPreviewEnglish({
+function BillPreviewTamil({
     config,
     billNo,
     date,
@@ -27,108 +27,37 @@ function BillPreviewEnglish({
     accountNo,
     showIFSC,
     showBankDetails,
-    customStyles,
-    selectedCustomer // New Prop
+    customStyles
 }) {
-    const { email, phone } = config; // Removed displayAddress from destructuring as it's now derived
+    const showSubs = false; // Strict Tamil, no subtitles
+    const { name, displayAddress, email, phone } = config;
 
-    // Calculations
-    const totalKg = calcTotalKg(items, setharamGrams);
-    const totalRs = calcTotalRs(items, courierRs, ahimsaSilkRs, customChargeRs);
-    const setharamKg = gramsToKg(setharamGrams);
-
-    // English Data Logic
-    // If selectedCustomer is present, we try to use the English fields.
-    // 'customerName' prop usually holds the primary display name (Tamil in Editor).
-    // 'contactPerson' prop usually holds the person name in 'Both' mode (Tamil in Editor).
-
-    const pickEnglishPart = (text) => {
+    const pickTamilPart = (text) => {
         if (!text) return text;
         const str = String(text);
         if (str.includes('/')) {
             const parts = str.split('/').map(p => p.trim()).filter(Boolean);
-            return parts[parts.length - 1] || str;
+            return parts[0] || str;
         }
         return str;
     };
 
-    let displayCustomerName = customerName;
-    let displayCity = city;
-
-    // Resolve Name
-    if (selectedCustomer) {
-        // English Fields from DB
-        const engName = selectedCustomer.name || '';
-        const engCompany = selectedCustomer.company_name || '';
-
-        if (contactPerson) {
-            // Both Mode: Person Name, Company Name
-            // If we have English versions, use them.
-            // Fallback: if English name missing, use the prop (which might be Tamil, but better than nothing)
-            const pName = engName || pickEnglishPart(contactPerson);
-            const cName = engCompany || pickEnglishPart(customerName);
-            displayCustomerName = `${pName}, ${cName}`;
-        } else {
-            // Single Mode (Company OR Individual)
-            // If customerName prop matches company_name_tamil/company_name, use English Company Logic
-            // Otherwise use English Name logic. 
-            // Simple heuristic: if we have an English Company name and it's not empty, prefer it if the user selected a company-like profile.
-            // But safest is: check if `customerName` provided matches the Tamil Company Name? 
-            // Better: Just use whatever non-empty English field exists that matches the 'primary' intent.
-
-            // If the user selected 'Company' mode, BillEditor passed company name as 'customerName'.
-            // If 'Individual', passed name as 'customerName'.
-
-            // We can check which one aligns. 
-            // Or simpler: If existing 'customerName' matches 'company_name_tamil', use 'company_name'.
-
-            if (customerName === (selectedCustomer.company_name_tamil || selectedCustomer.company_name)) {
-                displayCustomerName = engCompany || pickEnglishPart(customerName);
-            } else {
-                displayCustomerName = engName || pickEnglishPart(customerName);
-            }
-        }
-
-        // Resolve City
-        if (selectedCustomer.city) {
-            displayCity = selectedCustomer.city;
-        }
-    } else {
-        // Fallback for Manual Entry or Legacy
-        const pName = contactPerson ? pickEnglishPart(contactPerson) : '';
-        const cName = pickEnglishPart(customerName);
-        displayCustomerName = contactPerson ? `${pName}, ${cName}` : cName;
-    }
-
-    // Address Handling: If selectedCustomer has address_line1 (English), use it?
-    // The 'address' prop currently comes from setAddress in BillEditor, which prefers Tamil.
-    // So we should override if English available.
-    let displayAddress = address;
-    if (selectedCustomer && selectedCustomer.address_line1) {
-        displayAddress = selectedCustomer.address_line1;
-    } else {
-        displayAddress = pickEnglishPart(displayAddress);
-    }
-
-    if (selectedCustomer && selectedCustomer.city) {
-        displayCity = selectedCustomer.city;
-    } else {
-        displayCity = pickEnglishPart(displayCity);
-    }
-
-    const name = config.name || {};
+    // Calculations
+    const setharamKg = gramsToKg(setharamGrams);
+    const totalKg = calcTotalKg(items, setharamGrams);
+    const totalRs = calcTotalRs(items, courierRs, ahimsaSilkRs, customChargeRs);
 
     return (
         <div
-            className="a4-paper"
+            className="a4-paper font-tamil"
             style={customStyles}
         >
 
-            {/* Top Greeting Row - Transliterated to English */}
+            {/* Top Greeting Row */}
             <div className="top-greeting-row">
-                <span className="greeting-left">Vaazhga Vaiyagam</span>
+                <span className="greeting-left">வாழ்க வையகம்</span>
                 <span className="greeting-center">உ</span>
-                <span className="greeting-right">Vaazhga Valamudan</span>
+                <span className="greeting-right">வாழ்க வளமுடன்</span>
             </div>
 
             {/* Header */}
@@ -140,14 +69,13 @@ function BillPreviewEnglish({
                         <div className="company-name font-display">
                             {name.english}
                         </div>
-                        {/* Company Subtitle Preserved in Tamil */}
                         <div className="company-subtitle">{name.tamil}</div>
                     </div>
                 </div>
 
                 {/* Right - Bill Type */}
                 <div className="header-right">
-                    <div className="bill-type-badge">Coolie Bill</div>
+                    <div className="bill-type-badge font-tamil">கூலி பில்</div>
                 </div>
             </div>
 
@@ -157,19 +85,19 @@ function BillPreviewEnglish({
             {/* Bill Info Section */}
             <div className="bill-info-section">
                 <div className="bill-meta-row">
-                    <span className="bill-meta">Bill No : <strong>{billNo}</strong></span>
-                    <span className="bill-meta">Date : <strong>{date}</strong></span>
+                    <span className="bill-meta">பில் எண் : <strong>{billNo}</strong></span>
+                    <span className="bill-meta">நாள் : <strong>{date}</strong></span>
                 </div>
                 <div className="customer-info">
                     <div className="customer-name-simple">
-                        <span className="customer-label">Thiru:</span>
+                        <span className="customer-label">திரு:</span>
                         <span style={{ fontWeight: '600' }}>
-                            {displayCustomerName}
+                            {contactPerson ? `${pickTamilPart(contactPerson)}, ${pickTamilPart(customerName)}` : pickTamilPart(customerName)}
                         </span>
                     </div>
                     <div className="customer-city-simple">
-                        <span className="customer-label">Place:</span>
-                        {displayAddress && displayCity ? `${displayAddress}, ${displayCity}` : (displayAddress || displayCity || '')}
+                        <span className="customer-label">ஊர்:</span>
+                        {address && city ? `${pickTamilPart(address)}, ${pickTamilPart(city)}` : (pickTamilPart(address) || pickTamilPart(city) || '')}
                     </div>
                 </div>
             </div>
@@ -179,16 +107,16 @@ function BillPreviewEnglish({
                 <thead>
                     <tr>
                         <th style={{ width: '15%' }}>
-                            <div>Coolie</div>
+                            <div>கூலி</div>
                         </th>
                         <th style={{ width: '45%', textAlign: 'left', paddingLeft: '15px' }}>
-                            <div>Item description</div>
+                            <div>பொருள் பெயர்</div>
                         </th>
                         <th style={{ width: '15%' }}>
-                            <div>Weight (Kg)</div>
+                            <div>எடை (Kg)</div>
                         </th>
                         <th style={{ width: '25%' }}>
-                            <div>Amount</div>
+                            <div>தொகை</div>
                         </th>
                     </tr>
                 </thead>
@@ -196,7 +124,7 @@ function BillPreviewEnglish({
                     {items.map((item, i) => (
                         <tr key={i} className={i % 2 === 1 ? 'row-alt' : ''}>
                             <td className="text-center">{item.coolie || ''}</td>
-                            <td className="text-left">{item.name_english || item.porul}</td>
+                            <td className="text-left">{pickTamilPart(item.porul)}</td>
                             <td className="text-center">{item.kg ? formatWeight(item.kg) : ''}</td>
                             <td className="text-center">{item.kg ? formatCurrency(calcItemAmount(item.coolie, item.kg)) : ''}</td>
                         </tr>
@@ -206,7 +134,7 @@ function BillPreviewEnglish({
                         <tr>
                             <td className="text-center">-</td>
                             <td className="text-left">
-                                <div>Ahimsa Silk</div>
+                                <div>அகிம்சா பட்டு</div>
                             </td>
                             <td className="text-center">-</td>
                             <td className="text-center">{formatCurrency(ahimsaSilkRs)}</td>
@@ -217,7 +145,7 @@ function BillPreviewEnglish({
                         <tr>
                             <td className="text-center">-</td>
                             <td className="text-left">
-                                <div>{customChargeName || 'Other Charges'}</div>
+                                <div>{customChargeName || 'பிற விவரம்'}</div>
                             </td>
                             <td className="text-center">-</td>
                             <td className="text-center">{formatCurrency(customChargeRs)}</td>
@@ -228,7 +156,7 @@ function BillPreviewEnglish({
                         <tr className={items.length % 2 === 1 ? 'row-alt' : ''}>
                             <td className="text-center">-</td>
                             <td className="text-left">
-                                <div>Wastage</div>
+                                <div>சேதாரம்</div>
                             </td>
                             <td className="text-center">{formatWeight(setharamKg)}</td>
                             <td className="text-center">-</td>
@@ -239,7 +167,7 @@ function BillPreviewEnglish({
                         <tr>
                             <td className="text-center">-</td>
                             <td className="text-left">
-                                <div>Courier Charges</div>
+                                <div>கொரியர் கட்டணம்</div>
                             </td>
                             <td className="text-center">-</td>
                             <td className="text-center">{formatCurrency(courierRs)}</td>
@@ -250,7 +178,7 @@ function BillPreviewEnglish({
                 <tfoot>
                     <tr className="total-footer-row">
                         <td colSpan="2" className="text-right total-label-cell">
-                            Total
+                            மொத்தம்
                         </td>
                         <td className="text-center total-weight-cell">
                             {formatWeight(totalKg)} Kg
@@ -264,13 +192,13 @@ function BillPreviewEnglish({
 
             {/* Amount in Words */}
             <div className="words-section">
-                Amount in Words: <span className="words-line" style={{ textTransform: 'capitalize' }}>{numberToWords(totalRs)} Only</span>
+                எழுத்தில் மொத்தத் தொகை: <span className="words-line">{numberToWordsTamil(totalRs)}</span>
             </div>
 
             {/* Footer */}
             <div className="bill-footer-new">
                 <div className="footer-left">
-                    {showBankDetails && (
+                    {showBankDetails && (bankDetails || accountNo) && (
                         <div style={{
                             marginBottom: '10px',
                             color: 'var(--bill-text-dark)',
@@ -280,14 +208,15 @@ function BillPreviewEnglish({
                             flexDirection: 'column',
                             gap: '6px'
                         }}>
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                                <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Bank Details :</div>
-                                <div style={{ color: '#000' }}>{config.bankDetailsEnglish || bankDetails}</div>
-                            </div>
-
+                            {bankDetails && (
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                    <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>வங்கி விவரம் :</div>
+                                    <div style={{ color: '#000' }}>{bankDetails}</div>
+                                </div>
+                            )}
                             {accountNo && (
                                 <div style={{ display: 'flex', gap: '5px' }}>
-                                    <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Account No :</div>
+                                    <div style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>கணக்கு எண் :</div>
                                     <div style={{ color: '#000' }}>{accountNo}</div>
                                 </div>
                             )}
@@ -299,15 +228,15 @@ function BillPreviewEnglish({
                             )}
                         </div>
                     )}
-                    <div className="thank-you">
-                        Thank You
+                    <div className="thank-you font-tamil">
+                        நன்றி
                     </div>
                 </div>
                 <div className="preview-footer-right">
                     <div className="sign-company font-display">{name.english}</div>
                     <div className="sign-space"></div>
                     <div className="sign-label">
-                        (Authorized Signature)
+                        (கையொப்பம்)
                     </div>
                 </div>
             </div>
@@ -315,14 +244,14 @@ function BillPreviewEnglish({
             {/* Contact Section */}
             <div className="contact-section">
                 <div className="contact-title">
-                    Contact Us
+                    தொடர்பு கொள்ள
                 </div>
                 <div className="contact-row">
                     <div className="contact-left">
                         <div className="contact-address">
-                            {config.address.english?.line2 || config.address.line2}
+                            {config.address.line2}
                             <br />
-                            {config.address.english?.line3 || config.address.line3}
+                            {config.address.line3}
                         </div>
                         <div className="contact-email">
                             <IconMail size={14} /> {email}
@@ -342,4 +271,4 @@ function BillPreviewEnglish({
     );
 }
 
-export default BillPreviewEnglish;
+export default BillPreviewTamil;

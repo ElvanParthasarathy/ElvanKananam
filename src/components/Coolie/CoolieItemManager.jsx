@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../config/supabaseClient';
-import { IconTrash, IconPlus, IconEdit, IconX } from '../common/Icons';
+import { IconTrash, IconPlus, IconEdit, IconX, IconSearch } from '../common/Icons';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import { showSubtitles } from '../../config/translations';
@@ -127,98 +127,121 @@ function CoolieItemManager({ t, language }) {
         }
     };
 
+    // Filter State
+    const [filter, setFilter] = useState('');
+
+    const filteredItems = items.filter(item => {
+        if (!filter) return true;
+        const search = filter.toLowerCase();
+        return (
+            (item.name_english && item.name_english.toLowerCase().includes(search)) ||
+            (item.name_tamil && item.name_tamil.toLowerCase().includes(search))
+        );
+    });
+
     return (
-        <div style={{ padding: isMobile ? '15px' : '30px' }}>
-            <div style={{
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                justifyContent: 'space-between',
-                alignItems: isMobile ? 'flex-start' : 'center',
-                marginBottom: '20px',
-                gap: '15px'
-            }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ fontSize: isMobile ? '1.2rem' : '22px', fontWeight: '600', margin: 0, color: 'var(--color-text)' }}>{t.coolieItems || 'பொருள்கள்'}</h2>
-                    {showSubs && <span style={{ fontSize: '13px', color: '#6b7280' }}>Items List</span>}
+        <div style={{ padding: isMobile ? '16px' : '24px' }}>
+            {/* Header */}
+            <div className="coolie-header-wrapper">
+                <div className="coolie-title-group">
+                    <h2 className="coolie-title">{t.coolieItems || 'பொருள்கள்'}</h2>
+                    {showSubs && <span className="coolie-subtitle">Items List</span>}
                 </div>
-                <button
-                    onClick={() => openModal()}
-                    style={{
-                        background: '#e65100',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 20px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        height: '44px',
-                        width: isMobile ? '100%' : 'auto',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <IconPlus size={20} />
-                    <div style={{ textAlign: 'left', lineHeight: '1.2' }}>
-                        <div style={{ fontWeight: '700', fontSize: '13px' }}>{t.newItem || 'புதிய பொருள்'}</div>
-                        {showSubs && <div style={{ fontSize: '10px', fontWeight: '400', opacity: 0.9 }}>New Item</div>}
+
+                <div className="coolie-actions-group" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+                    {/* Search Bar */}
+                    <div className="coolie-search-bar" style={{ width: isMobile ? '100%' : '240px' }}>
+                        <IconSearch size={16} color="var(--md-sys-color-on-surface-variant)" />
+                        <input
+                            type="text"
+                            placeholder={!showSubs ? (t.search || 'தேடுக...') : ''}
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            className="coolie-search-input"
+                        />
+                        {showSubs && !filter && (
+                            <div className="dual-placeholder-overlay" style={{ left: '36px' }}>
+                                <span className="dual-placeholder-primary">{t.search || 'தேடுக...'}</span>
+                                <span className="dual-placeholder-sub">Search Items</span>
+                            </div>
+                        )}
                     </div>
-                </button>
+
+                    <button
+                        onClick={() => openModal()}
+                        className="coolie-primary-btn"
+                        style={{ width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}
+                    >
+                        <IconPlus size={20} />
+                        <div style={{ textAlign: 'left', lineHeight: '1.2' }}>
+                            <div style={{ fontWeight: '600', fontSize: '0.875rem' }}>{t.newItem || 'புதிய பொருள்'}</div>
+                            {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: '400', opacity: 0.9 }}>New Item</div>}
+                        </div>
+                    </button>
+                </div>
             </div>
 
             {/* Desktop Table View */}
             {!isMobile && (
-                <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                        <thead style={{ background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
+                <div className="coolie-table-container">
+                    <table className="coolie-table">
+                        <thead>
                             <tr>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.name || 'பெயர்'}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Name</div>}
+                                <th>
+                                    <div>{t.name || 'பெயர்'}</div>
+                                    {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: 'normal' }}>Name</div>}
                                 </th>
-                                <th style={{ padding: '12px 20px', textAlign: 'center', color: 'var(--color-text-muted)', width: '100px' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.actions || 'செயல்கள்'}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Actions</div>}
+                                <th style={{ textAlign: 'center', width: '100px' }}>
+                                    <div>{t.actions || 'செயல்கள்'}</div>
+                                    {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: 'normal' }}>Actions</div>}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="2" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                    <td colSpan="2" style={{ padding: '40px', textAlign: 'center', color: 'var(--md-sys-color-on-surface-variant)' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '16px', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
-                                            {showSubs && <span style={{ fontSize: '13px', opacity: 0.8 }}>Loading...</span>}
+                                            <span style={{ fontSize: '1rem', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
+                                            {showSubs && <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Loading...</span>}
                                         </div>
                                     </td>
                                 </tr>
-                            ) : items.length === 0 ? (
+                            ) : filteredItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="2" style={{ padding: '60px 40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-                                            <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noItems || 'பொருள்கள் இல்லை'}</div>
-                                            {showSubs && <div style={{ fontSize: '14px', color: '#6b7280' }}>No items found.</div>}
+                                    <td colSpan="2" className="coolie-empty">
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--md-sys-color-on-surface)' }}>{t.noItems || 'பொருள்கள் இல்லை'}</div>
+                                            {showSubs && <div style={{ fontSize: '0.875rem', color: 'var(--md-sys-color-on-surface-variant)' }}>No items found.</div>}
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
-                                items.map(item => {
+                                filteredItems.map(item => {
                                     // Language-aware display
                                     const primaryName = useTamilFirst ? (item.name_tamil || item.name_english) : (item.name_english || item.name_tamil);
                                     const subtitleName = useTamilFirst ? item.name_english : item.name_tamil;
 
                                     return (
-                                        <tr key={item.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                                            <td style={{ padding: '12px 20px' }}>
-                                                <div style={{ fontWeight: '500', color: 'var(--color-text)' }}>{primaryName}</div>
+                                        <tr key={item.id}>
+                                            <td style={{ padding: '16px 20px' }}>
+                                                <div style={{ fontWeight: '500', color: 'var(--md-sys-color-on-surface)' }}>{primaryName}</div>
                                                 {showSubs && subtitleName && primaryName !== subtitleName && (
-                                                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{subtitleName}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginTop: '2px' }}>{subtitleName}</div>
                                                 )}
                                             </td>
-                                            <td style={{ padding: '12px 20px', textAlign: 'center' }}>
+                                            <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                                                    <button onClick={() => openModal(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}><IconEdit size={16} /></button>
-                                                    <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)' }}><IconTrash size={16} /></button>
+                                                    <button
+                                                        onClick={() => openModal(item)}
+                                                        className="coolie-table-btn-delete"
+                                                        style={{ color: 'var(--md-sys-color-primary)', background: 'transparent' }}
+                                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--md-sys-color-surface-container-highest)' }}
+                                                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                                                    >
+                                                        <IconEdit size={18} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(item.id)} className="coolie-table-btn-delete"><IconTrash size={18} /></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -234,39 +257,31 @@ function CoolieItemManager({ t, language }) {
             {isMobile && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '16px', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
-                            {showSubs && <span style={{ fontSize: '13px', opacity: 0.8 }}>Loading...</span>}
+                        <div className="coolie-loading">
+                            <span style={{ fontSize: '1rem', fontWeight: '500' }}>{t.loading || 'ஏற்றுகிறது...'}</span>
+                            {showSubs && <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Loading...</span>}
                         </div>
-                    ) : items.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--color-text)' }}>{t.noItems}</div>
-                            {showSubs && <div style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>No items found.</div>}
+                    ) : filteredItems.length === 0 ? (
+                        <div className="coolie-empty">
+                            <div style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--md-sys-color-on-surface)' }}>{t.noItems}</div>
+                            {showSubs && <div style={{ fontSize: '0.875rem' }}>No items found.</div>}
                         </div>
                     ) : (
-                        items.map(item => (
-                            <div key={item.id} style={{
-                                background: 'var(--color-surface)',
-                                borderRadius: '12px',
-                                border: '1px solid var(--color-border)',
-                                padding: '16px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
+                        filteredItems.map(item => (
+                            <div key={item.id} className="coolie-card coolie-item-card">
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <span style={{ fontWeight: '700', fontSize: '16px', color: 'var(--color-primary)' }}>
+                                    <span style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--md-sys-color-primary)' }}>
                                         {useTamilFirst ? (item.name_tamil || item.name_english) : (item.name_english || item.name_tamil)}
                                     </span>
                                     {showSubs && (
-                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)' }}>
                                             {useTamilFirst ? item.name_english : item.name_tamil}
                                         </span>
                                     )}
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button onClick={() => openModal(item)} style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '8px', color: 'var(--color-text-muted)' }}><IconEdit size={18} /></button>
-                                    <button onClick={() => handleDelete(item.id)} style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '8px', color: 'var(--color-danger)' }}><IconTrash size={18} /></button>
+                                    <button onClick={() => openModal(item)} className="coolie-icon-btn"><IconEdit size={18} /></button>
+                                    <button onClick={() => handleDelete(item.id)} className="coolie-icon-btn danger"><IconTrash size={18} /></button>
                                 </div>
                             </div>
                         ))
@@ -276,65 +291,54 @@ function CoolieItemManager({ t, language }) {
 
             {/* Modal */}
             {isModalOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'var(--color-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-                }}>
-                    <div style={{
-                        background: 'var(--color-surface)',
-                        padding: '25px',
-                        borderRadius: '12px',
-                        width: '400px',
-                        maxWidth: '90%',
-                        border: '1px solid var(--color-border)',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div className="coolie-overlay">
+                    <div className="coolie-dialog">
+                        <div className="coolie-dialog-header">
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <h3 style={{ margin: 0, color: 'var(--color-text)', fontSize: '18px' }}>{editingItem ? (t.editItem || 'பொருளை மாற்றுக') : (t.newItem || 'புதிய பொருள்')}</h3>
-                                {showSubs && <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{editingItem ? 'Edit Item' : 'New Item'}</span>}
+                                <h3 className="coolie-dialog-title" style={{ fontSize: '1.25rem', fontWeight: '600' }}>{editingItem ? (t.editItem || 'பொருளை மாற்றுக') : (t.newItem || 'புதிய பொருள்')}</h3>
+                                {showSubs && <span style={{ fontSize: '0.8rem', color: 'var(--md-sys-color-on-surface-variant)' }}>{editingItem ? 'Edit Item' : 'New Item'}</span>}
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}><IconX size={20} /></button>
+                            <button onClick={() => setIsModalOpen(false)} className="coolie-icon-btn" style={{ width: '32px', height: '32px', background: 'transparent' }}><IconX size={24} /></button>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.itemNameTamil || 'பொருள் பெயர்'}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Item Name (Tamil)</div>}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div className="coolie-input-group">
+                                <label className="coolie-label">
+                                    <div>{t.itemNameTamil || 'பொருள் பெயர்'}</div>
+                                    {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: 'normal', opacity: 0.8 }}>Item Name (Tamil)</div>}
                                 </label>
                                 <input
                                     type="text"
+                                    className="coolie-input-field"
                                     value={formData.name_tamil}
                                     onChange={e => setFormData({ ...formData, name_tamil: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid var(--color-border)', borderRadius: '3px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
                                 />
                             </div>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.itemNameEnglish || 'Item Name'}</div>
-                                    {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Item Name (English)</div>}
+                            <div className="coolie-input-group">
+                                <label className="coolie-label">
+                                    <div>{t.itemNameEnglish || 'Item Name'}</div>
+                                    {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: 'normal', opacity: 0.8 }}>Item Name (English)</div>}
                                 </label>
                                 <input
                                     type="text"
+                                    className="coolie-input-field"
                                     value={formData.name_english}
                                     onChange={e => setFormData({ ...formData, name_english: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid var(--color-border)', borderRadius: '3px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
                                 />
                             </div>
                         </div>
 
-                        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                            <button onClick={() => setIsModalOpen(false)} style={{ padding: '8px 15px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', cursor: 'pointer', color: 'var(--color-text)' }}>
+                        <div className="coolie-dialog-actions">
+                            <button onClick={() => setIsModalOpen(false)} className="coolie-text-btn">
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.2' }}>
                                     <span>{t.cancel || 'Cancel'}</span>
-                                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.7 }}>Cancel</span>}
+                                    {showSubs && <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>Cancel</span>}
                                 </div>
                             </button>
-                            <button onClick={handleSave} style={{ padding: '8px 15px', background: '#e65100', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                            <button onClick={handleSave} className="coolie-primary-btn" style={{ height: '48px', padding: '0 24px', width: 'auto' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.2' }}>
                                     <span>{t.save || 'Save'}</span>
-                                    {showSubs && <span style={{ fontSize: '10px', opacity: 0.9 }}>Save</span>}
+                                    {showSubs && <span style={{ fontSize: '0.65rem', opacity: 0.9 }}>Save</span>}
                                 </div>
                             </button>
                         </div>

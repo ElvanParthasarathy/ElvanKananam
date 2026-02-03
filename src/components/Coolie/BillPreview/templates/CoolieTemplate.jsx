@@ -7,10 +7,10 @@ import {
     gramsToKg,
     formatWeight,
     formatCurrency
-} from '../../../utils/calculations';
-import { numberToWordsTamil } from '../../../utils/tamilNumbers';
-import { renderTamil } from '../../../utils/tamilRendering';
-import { PdfIconPhone, PdfIconMail } from '../../common/PdfIcons';
+} from '../../../../utils/calculations';
+import { numberToWordsTamil } from '../../../../utils/tamilNumbers';
+import { renderTamil } from '../../../../utils/tamilRendering';
+import { PdfIconPhone, PdfIconMail } from '../../../common/PdfIcons';
 
 // Fonts are registered in BillPDF.jsx
 

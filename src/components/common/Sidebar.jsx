@@ -150,58 +150,38 @@ const Sidebar = ({ viewMode, onViewChange, onLogout, t, isOpen, onClose, languag
 
                 <div className="sidebar-footer">
                     {!isCollapsed && (
-                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                        <div className="lang-switcher-group">
                             <button
                                 onClick={() => setLanguage('ta_mixed')}
-                                style={{
-                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
-                                    background: language === 'ta_mixed' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: language === 'ta_mixed' ? '#fff' : 'var(--color-text)',
-                                    fontWeight: language === 'ta_mixed' ? 'bold' : 'normal'
-                                }}
+                                className={`lang-btn ${language === 'ta_mixed' ? 'active' : ''}`}
                                 title="Tamil + English"
                             >
                                 TA+
                             </button>
                             <button
                                 onClick={() => setLanguage('ta_only')}
-                                style={{
-                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
-                                    background: language === 'ta_only' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: language === 'ta_only' ? '#fff' : 'var(--color-text)',
-                                    fontWeight: language === 'ta_only' ? 'bold' : 'normal'
-                                }}
+                                className={`lang-btn ${language === 'ta_only' ? 'active' : ''}`}
                                 title="Tamil Only"
                             >
                                 TA
                             </button>
                             <button
                                 onClick={() => setLanguage('en_only')}
-                                style={{
-                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
-                                    background: language === 'en_only' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: language === 'en_only' ? '#fff' : 'var(--color-text)',
-                                    fontWeight: language === 'en_only' ? 'bold' : 'normal'
-                                }}
+                                className={`lang-btn ${language === 'en_only' ? 'active' : ''}`}
                                 title="English Only"
                             >
                                 EN
                             </button>
                             <button
                                 onClick={() => setLanguage('tg_mixed')}
-                                style={{
-                                    fontSize: '10px', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer',
-                                    background: language === 'tg_mixed' ? 'var(--color-primary)' : 'var(--color-surface)',
-                                    color: language === 'tg_mixed' ? '#fff' : 'var(--color-text)',
-                                    fontWeight: language === 'tg_mixed' ? 'bold' : 'normal'
-                                }}
+                                className={`lang-btn ${language === 'tg_mixed' ? 'active' : ''}`}
                                 title="Tanglish + English"
                             >
                                 TG
                             </button>
                         </div>
                     )}
-                    <div style={{ padding: '0 12px', fontSize: '11px', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                    <div className="sidebar-version">
                         ver 1.0.0
                     </div>
                 </div>

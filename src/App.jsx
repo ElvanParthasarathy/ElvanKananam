@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import BillEditor from './components/BillEditor/BillEditor';
-import BillPreview from './components/BillPreview/BillPreview';
+import BillEditor from './components/Coolie/BillEditor/BillEditor';
+import BillPreview from './components/Coolie/BillPreview/BillPreview';
 import Home from './components/Home/Home';
 import Login from './components/Login/Login';
 import SilksEditor from './components/Silks/SilksEditor';

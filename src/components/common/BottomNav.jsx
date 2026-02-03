@@ -19,7 +19,9 @@ const BottomNav = ({ viewMode, onViewChange, language, t }) => {
                 className={`bottom-nav-item ${viewMode === 'home' ? 'active' : ''}`}
                 onClick={() => onViewChange('home')}
             >
-                <IconHome size={22} />
+                <div className="nav-icon-container">
+                    <IconHome size={24} />
+                </div>
                 <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
                     <span>{t.home}</span>
                     {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Home</span>}
@@ -31,7 +33,9 @@ const BottomNav = ({ viewMode, onViewChange, language, t }) => {
                 className={`bottom-nav-item ${isActive('coolie') ? 'active' : ''}`}
                 onClick={() => onViewChange('coolie-dashboard')}
             >
-                <IconBox size={22} />
+                <div className="nav-icon-container">
+                    <IconBox size={24} />
+                </div>
                 <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
                     <span>{t.coolieBill}</span>
                     {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Coolie</span>}
@@ -43,7 +47,9 @@ const BottomNav = ({ viewMode, onViewChange, language, t }) => {
                 className={`bottom-nav-item ${isActive('silks') ? 'active' : ''}`}
                 onClick={() => onViewChange('silks-dashboard')}
             >
-                <IconFiles size={20} />
+                <div className="nav-icon-container">
+                    <IconFiles size={24} />
+                </div>
                 <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
                     <span>{t.silksBill}</span>
                     {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Maligai</span>}
@@ -55,7 +61,9 @@ const BottomNav = ({ viewMode, onViewChange, language, t }) => {
                 className={`bottom-nav-item ${viewMode === 'settings' ? 'active' : ''}`}
                 onClick={() => onViewChange('settings')}
             >
-                <IconSettings size={22} />
+                <div className="nav-icon-container">
+                    <IconSettings size={24} />
+                </div>
                 <div className="bottom-nav-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
                     <span>{t.settings}</span>
                     {showSubs && <span style={{ fontSize: '9px', opacity: 0.8 }}>Settings</span>}

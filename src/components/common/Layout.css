@@ -61,8 +61,8 @@
    ========================================================================== */
 .sidebar {
     width: var(--sidebar-width);
-    background-color: var(--color-surface);
-    border-right: 1px solid var(--color-border);
+    background-color: var(--md-sys-color-surface-container-low);
+    border-right: 1px solid var(--md-sys-color-outline-variant);
     height: 100vh;
     position: fixed;
     top: 0;
@@ -73,7 +73,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     transform: translateX(-105%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized), width var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized);
     box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
 }
 
@@ -106,7 +106,8 @@
 
 .sidebar-header {
     padding: 20px 24px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: none;
+    /* M3 usually minimizes borders */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -118,9 +119,10 @@
 }
 
 .sidebar-toggle-btn {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    /* standard icon button style */
+    color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -165,7 +167,8 @@
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--color-text-muted);
+    color: var(--md-sys-color-primary);
+    /* Use primary for section titles or variant */
     margin: 16px 12px 8px;
     font-weight: 600;
     white-space: nowrap;
@@ -176,40 +179,53 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border-radius: 8px;
-    color: var(--color-text);
+    /* Standard height 56px roughly maintained */
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    /* Pill shape */
+    color: var(--md-sys-color-on-surface-variant);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized), color var(--md-sys-motion-duration-short2) linear;
     text-decoration: none;
     border: none;
-    background: none;
+    background: transparent;
     width: 100%;
     text-align: left;
     font-family: var(--font-primary);
     font-size: 0.95rem;
     white-space: nowrap;
+    margin-bottom: 4px;
+    /* Slight spacing between items */
 }
 
 .nav-item.collapsed {
     padding: 12px;
     justify-content: center;
     gap: 0;
+    border-radius: 50%;
+    /* Circle when collapsed? Or keeping pill */
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 4px;
 }
 
 .nav-item:hover {
-    background-color: var(--color-bg);
-    color: var(--color-primary);
+    background-color: var(--md-sys-color-surface-container);
+    /* Hover state */
+    color: var(--md-sys-color-on-surface);
 }
 
 .nav-item.active {
-    background-color: var(--color-primary);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(230, 81, 0, 0.2);
+    background-color: var(--md-sys-color-secondary-container);
+    /* Active Indicator */
+    color: var(--md-sys-color-on-secondary-container);
+    box-shadow: none;
+    /* M3 usually flat active state on drawer */
+    font-weight: 700;
 }
 
 .nav-item.active svg {
-    stroke: #fff;
+    stroke: var(--md-sys-color-on-secondary-container);
 }
 
 .nav-item-icon {
@@ -218,7 +234,50 @@
 
 .sidebar-footer {
     padding: 16px;
-    border-top: 1px solid var(--color-border);
+    /* border-top: 1px solid var(--color-border); remove border for cleaner look or use outline-variant */
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lang-switcher-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.lang-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    /* Slightly rounder */
+    border: 1px solid var(--md-sys-color-outline);
+    cursor: pointer;
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-weight: 500;
+    transition: all var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized);
+}
+
+.lang-btn:hover {
+    background: var(--md-sys-color-surface-container-high);
+}
+
+.lang-btn.active {
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border-color: var(--md-sys-color-primary);
+    font-weight: 700;
+}
+
+.sidebar-version {
+    padding: 0 12px;
+    font-size: 11px;
+    color: var(--md-sys-color-on-surface-variant);
+    text-align: center;
+    opacity: 0.8;
 }
 
 /* ==========================================================================
@@ -229,18 +288,22 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: var(--color-surface-elevated) !important;
+    background-color: var(--md-sys-color-surface-container) !important;
     /* Force solid background */
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--md-sys-color-outline-variant);
     display: flex;
     justify-content: space-around;
-    padding: 8px 16px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    padding: 12px 16px;
+    /* Increased padding slightly */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
     z-index: 1010;
     /* Ensure it stays on top */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
+    /* M3 relies on surface color, maybe subtle shadow if needed */
     backdrop-filter: none;
     /* Disable any glass effects */
+    height: 80px;
+    /* Standard M3 Bottom Nav height */
 }
 
 .bottom-nav-item {
@@ -249,21 +312,51 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    color: var(--color-text-muted);
+    color: var(--md-sys-color-on-surface-variant);
     background: none;
     border: none;
-    padding: 8px;
-    min-width: 60px;
+    padding: 0;
+    min-width: 64px;
+    /* Touchable target */
     cursor: pointer;
+    flex: 1;
+}
+
+/* Active Pill Indicator Wrapper */
+.nav-icon-container {
+    padding: 4px 20px;
+    border-radius: 16px;
+    /* Pill shape */
+    transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bottom-nav-item.active .nav-icon-container {
+    background-color: var(--md-sys-color-secondary-container);
 }
 
 .bottom-nav-item.active {
-    color: var(--color-primary);
+    color: var(--md-sys-color-on-surface);
+    /* Label color active */
+}
+
+.bottom-nav-item.active svg {
+    stroke: var(--md-sys-color-on-secondary-container);
 }
 
 .bottom-nav-label {
     font-size: 0.75rem;
+    /* Label Medium 12px */
     font-weight: 500;
+    line-height: 1.33;
+    letter-spacing: 0.5px;
+    transition: color var(--md-sys-motion-duration-short2) linear;
+}
+
+.bottom-nav-item.active .bottom-nav-label {
+    font-weight: 700;
 }
 
 .desktop-only {

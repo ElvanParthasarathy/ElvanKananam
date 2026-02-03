@@ -221,53 +221,44 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                 {showSubs && <span style={{ fontSize: '14px', opacity: 0.8 }}>Loading Profiles...</span>}
             </div>
         </div>
+
     );
 
     return (
-        <div style={{ padding: isMobile ? '15px' : '30px' }}>
-            <div style={{
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                justifyContent: 'space-between',
-                alignItems: isMobile ? 'flex-start' : 'center',
-                marginBottom: '20px',
-                gap: '15px'
-            }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ fontSize: isMobile ? '1.2rem' : '22px', fontWeight: '600', margin: 0, color: 'var(--color-text)' }}>{t.businessProfile}</h2>
-                    {showSubs && <span style={{ fontSize: '13px', color: '#6b7280' }}>Coolie Business Settings</span>}
+        <div style={{ padding: isMobile ? '16px' : '30px' }}>
+            {/* Header */}
+            <div className="coolie-header-wrapper">
+                <div className="coolie-title-group">
+                    <h2 className="coolie-title">{t.businessProfile}</h2>
+                    {showSubs && <span className="coolie-subtitle">Coolie Business Settings</span>}
                 </div>
 
-                <div style={{
-                    display: 'flex',
-                    gap: isMobile ? '10px' : '15px',
-                    width: isMobile ? '100%' : 'auto',
-                    flexDirection: isMobile ? 'column' : 'row'
-                }}>
-                    {/* Custom Dual-Language Dropdown */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
+                <div className="coolie-actions-group" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+                    {/* Profile Dropdown */}
+                    <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '240px' }}>
                         <button
                             onClick={() => setShowDropdown(!showDropdown)}
                             style={{
                                 width: '100%',
-                                padding: '8px 15px',
-                                border: '1px solid var(--color-border)',
-                                borderRadius: '8px',
-                                background: 'var(--color-surface)',
-                                color: 'var(--color-text)',
-                                height: '44px',
+                                padding: '0 16px',
+                                border: 'none',
+                                borderRadius: '28px',
+                                background: 'var(--md-sys-color-surface-container-high)',
+                                color: 'var(--md-sys-color-on-surface)',
+                                height: '48px',
                                 textAlign: 'left',
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
                             }}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
                                 {selectedId === 'new' ? (
                                     <>
-                                        <span style={{ fontWeight: '600', fontSize: '13px' }}>{t.addNew}</span>
-                                        {showSubs && <span style={{ fontSize: '10px', opacity: 0.8 }}>Add New Profile</span>}
+                                        <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>{t.addNew}</span>
+                                        {showSubs && <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>Add New Profile</span>}
                                     </>
                                 ) : (
                                     (() => {
@@ -276,9 +267,9 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                         const subTitle = p?.organization_name;
                                         return (
                                             <>
-                                                <span style={{ fontWeight: '600', fontSize: '13px' }}>{title}</span>
-                                                {showSubs && subTitle && subTitle !== title && <span style={{ fontSize: '10px', opacity: 0.8 }}>{subTitle}</span>}
-                                                {showSubs && !subTitle && <span style={{ fontSize: '10px', opacity: 0.8 }}>Select Profile</span>}
+                                                <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>{title}</span>
+                                                {showSubs && subTitle && subTitle !== title && <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>{subTitle}</span>}
+                                                {showSubs && !subTitle && <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>Select Profile</span>}
                                             </>
                                         );
                                     })()
@@ -290,17 +281,16 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         {showDropdown && (
                             <div style={{
                                 position: 'absolute',
-                                top: '100%',
+                                top: 'calc(100% + 4px)',
                                 left: 0,
                                 right: 0,
                                 zIndex: 1000,
-                                background: 'var(--color-surface)',
-                                border: '1px solid var(--color-border)',
-                                borderRadius: '8px',
-                                marginTop: '4px',
-                                boxShadow: 'var(--shadow-lg)',
-                                maxHeight: '250px',
-                                overflowY: 'auto'
+                                background: 'var(--md-sys-color-surface-container-high)',
+                                borderRadius: '16px',
+                                boxShadow: 'var(--shadow-md)',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                padding: '8px 0'
                             }}>
                                 {profiles.map(p => {
                                     const title = p.marketing_title || p.organization_name;
@@ -313,19 +303,23 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                                 setShowDropdown(false);
                                             }}
                                             style={{
-                                                padding: '10px 15px',
+                                                padding: '12px 20px',
                                                 cursor: 'pointer',
-                                                borderBottom: '1px solid var(--color-border)',
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 lineHeight: '1.2',
-                                                background: selectedId === p.id ? 'var(--color-input-bg)' : 'transparent'
+                                                background: selectedId === p.id ? 'var(--md-sys-color-secondary-container)' : 'transparent',
+                                                color: selectedId === p.id ? 'var(--md-sys-color-on-secondary-container)' : 'var(--md-sys-color-on-surface)'
                                             }}
-                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-input-bg)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.background = selectedId === p.id ? 'var(--color-input-bg)' : 'transparent'}
+                                            onMouseEnter={(e) => {
+                                                if (selectedId !== p.id) e.currentTarget.style.background = 'var(--md-sys-color-surface-container-highest)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (selectedId !== p.id) e.currentTarget.style.background = 'transparent';
+                                            }}
                                         >
-                                            <span style={{ fontWeight: '600', fontSize: '13px', color: 'var(--color-text)' }}>{title}</span>
-                                            {showSubs && subTitle && subTitle !== title && <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{subTitle}</span>}
+                                            <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>{title}</span>
+                                            {showSubs && subTitle && subTitle !== title && <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>{subTitle}</span>}
                                         </div>
                                     );
                                 })}
@@ -335,19 +329,24 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                         setShowDropdown(false);
                                     }}
                                     style={{
-                                        padding: '10px 15px',
+                                        padding: '12px 20px',
                                         cursor: 'pointer',
                                         display: 'flex',
                                         flexDirection: 'column',
                                         lineHeight: '1.2',
-                                        background: selectedId === 'new' ? 'var(--color-input-bg)' : 'transparent',
-                                        color: 'var(--color-primary)'
+                                        background: selectedId === 'new' ? 'var(--md-sys-color-secondary-container)' : 'transparent',
+                                        color: selectedId === 'new' ? 'var(--md-sys-color-on-secondary-container)' : 'var(--md-sys-color-primary)',
+                                        borderTop: '1px solid var(--md-sys-color-outline-variant)'
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-input-bg)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = selectedId === 'new' ? 'var(--color-input-bg)' : 'transparent'}
+                                    onMouseEnter={(e) => {
+                                        if (selectedId !== 'new') e.currentTarget.style.background = 'var(--md-sys-color-surface-container-highest)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (selectedId !== 'new') e.currentTarget.style.background = 'transparent';
+                                    }}
                                 >
-                                    <span style={{ fontWeight: '700', fontSize: '13px' }}>+ {t.addNew}</span>
-                                    {showSubs && <span style={{ fontSize: '11px', opacity: 0.8 }}>Add New Profile</span>}
+                                    <span style={{ fontWeight: '700', fontSize: '0.875rem' }}>+ {t.addNew}</span>
+                                    {showSubs && <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Add New Profile</span>}
                                 </div>
                             </div>
                         )}
@@ -355,56 +354,26 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
 
                     <button
                         onClick={handleSave}
-                        style={{
-                            background: 'var(--color-primary)',
-                            color: 'white',
-                            border: 'none',
-                            padding: '8px 24px',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            fontWeight: '600',
-                            height: '44px',
-                            justifyContent: 'center'
-                        }}
+                        className="coolie-primary-btn"
+                        style={{ width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}
                     >
                         <IconSave size={20} />
                         <div style={{ textAlign: 'left', lineHeight: '1.2' }}>
-                            <div style={{ fontSize: '13px' }}>{t.save}</div>
-                            {showSubs && <div style={{ fontSize: '10px', fontWeight: '400', opacity: 0.9 }}>Save Profile</div>}
+                            <div style={{ fontSize: '0.875rem', fontWeight: '700' }}>{t.save}</div>
+                            {showSubs && <div style={{ fontSize: '0.7rem', fontWeight: '400', opacity: 0.9 }}>Save Profile</div>}
                         </div>
                     </button>
                 </div>
             </div>
 
-            {/* Main Form */}
-            <div style={{
-                background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                padding: isMobile ? '20px 15px' : '30px',
-                boxShadow: 'var(--shadow-sm)'
-            }}>
-                <h2 style={{ fontSize: '24px', margin: '0 0 20px 0', color: 'var(--color-text)', display: 'flex', flexDirection: 'column' }}>
-                    {selectedId === 'new' ? (
-                        <>
-                            <span>{t.newCoolieProfile}</span>
-                            {showSubs && <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'var(--color-text-muted)', marginTop: '4px' }}>New Coolie Profile</span>}
-                        </>
-                    ) : (
-                        <>
-                            <span>{t.editCoolieProfile}</span>
-                            {showSubs && <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'var(--color-text-muted)', marginTop: '4px' }}>Edit Coolie Profile</span>}
-                        </>
-                    )}
-                </h2>
-
+            {/* 1. Identity Card */}
+            <div className="coolie-card" style={{ marginTop: '24px' }}>
+                <h3 className="coolie-card-title" style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--md-sys-color-on-surface)' }}>
+                    {t.appearance || 'Identity & Appearance'}
+                </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '15px' : '20px' }}>
-
-                    {/* Logo Upload Section */}
-                    <div style={{ gridColumn: 'span 2', marginBottom: '20px' }}>
+                    {/* Logo */}
+                    <div style={{ gridColumn: 'span 2', marginBottom: '10px' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.organizationLogo}</div>
                             {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Organization Logo</div>}
@@ -432,7 +401,8 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         </div>
                     </div>
 
-                    <div style={{ gridColumn: 'span 2', marginBottom: '20px' }}>
+                    {/* Theme */}
+                    <div style={{ gridColumn: 'span 2' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.billTheme || 'பில் தீம்'}</div>
                             {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>{t.billThemeDesc || 'Select theme for preview and print'}</div>}
@@ -450,7 +420,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                         borderRadius: '8px',
                                         background: 'var(--color-surface)',
                                         color: 'var(--color-text)',
-                                        height: '54px', // Taller for subtitles
+                                        height: '54px',
                                         textAlign: 'left',
                                         display: 'flex',
                                         justifyContent: 'space-between',
@@ -526,7 +496,15 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                             }}></div>
                         </div>
                     </div>
+                </div>
+            </div>
 
+            {/* 2. Basic Info Card */}
+            <div className="coolie-card" style={{ marginTop: '20px' }}>
+                <h3 className="coolie-card-title" style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--md-sys-color-on-surface)' }}>
+                    {t.basicInfo || 'Basic Information'}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '15px' : '20px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.companyNameTamil}</div>
@@ -538,9 +516,8 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 name="marketing_title"
                                 value={formData.marketing_title}
                                 onChange={handleChange}
-                                className="input-field"
                                 placeholder={!showSubs ? t.enterOrgName : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !formData.marketing_title && (
                                 <div className="dual-placeholder-overlay">
@@ -562,9 +539,8 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 name="organization_name"
                                 value={formData.organization_name}
                                 onChange={handleChange}
-                                className="input-field"
                                 placeholder={!showSubs ? t.enterOrgName : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !formData.organization_name && (
                                 <div className="dual-placeholder-overlay">
@@ -574,14 +550,15 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <h3 style={{ fontSize: '16px', margin: '15px 0 10px 0', borderBottom: '1px solid var(--color-border)', paddingBottom: '5px', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{t.addressDetails}</span>
-                            {showSubs && <span style={{ fontSize: '11px', fontWeight: 'normal' }}>Address Details</span>}
-                        </h3>
-                    </div>
-
+            {/* 3. Address Card */}
+            <div className="coolie-card" style={{ marginTop: '20px' }}>
+                <h3 className="coolie-card-title" style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--md-sys-color-on-surface)' }}>
+                    {t.addressDetails}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '15px' : '20px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.address}</div>
@@ -594,7 +571,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 onChange={handleChange}
                                 rows={2}
                                 placeholder={!showSubs ? t.enterAddress : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)', resize: 'vertical' }}
+                                className="coolie-textarea"
                             />
                             {showSubs && !formData.address_line2 && (
                                 <div className="dual-placeholder-overlay textarea-placeholder">
@@ -616,7 +593,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 onChange={handleChange}
                                 rows={2}
                                 placeholder={!showSubs ? t.enterAddress : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)', resize: 'vertical' }}
+                                className="coolie-textarea"
                             />
                             {showSubs && !formData.address_line1 && (
                                 <div className="dual-placeholder-overlay textarea-placeholder">
@@ -640,7 +617,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                     value={bankData.cityTamil}
                                     onChange={handleBankChange}
                                     placeholder={!showSubs ? t.cityShort : ""}
-                                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                    className="coolie-input-field"
                                 />
                                 {showSubs && !bankData.cityTamil && (
                                     <div className="dual-placeholder-overlay">
@@ -662,7 +639,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                     value={formData.city}
                                     onChange={handleChange}
                                     placeholder={!showSubs ? t.cityEnglish : ""}
-                                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                    className="coolie-input-field"
                                 />
                                 {showSubs && !formData.city && (
                                     <div className="dual-placeholder-overlay">
@@ -684,7 +661,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                     value={formData.pincode}
                                     onChange={handleChange}
                                     placeholder={!showSubs ? t.pincode : ""}
-                                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                    className="coolie-input-field"
                                 />
                                 {showSubs && !formData.pincode && (
                                     <div className="dual-placeholder-overlay">
@@ -696,8 +673,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         </div>
                     </div>
 
-                    {/* District Row - Responsive */}
-                    <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px', marginTop: '10px' }}>
+                    <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
                         <div>
                             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                                 <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>மாவட்டம் (Tamil)</div>
@@ -709,7 +685,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                     name="district_tamil"
                                     value={formData.district_tamil}
                                     onChange={handleChange}
-                                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                    className="coolie-input-field"
                                 />
                             </div>
                         </div>
@@ -724,20 +700,20 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                     name="district"
                                     value={formData.district}
                                     onChange={handleChange}
-                                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                    className="coolie-input-field"
                                 />
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <h3 style={{ fontSize: '16px', margin: '15px 0 10px 0', borderBottom: '1px solid var(--color-border)', paddingBottom: '5px', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{t.bankAndContact}</span>
-                            {showSubs && <span style={{ fontSize: '11px', fontWeight: 'normal' }}>Bank & Contact</span>}
-                        </h3>
-                    </div>
-
-                    {/* Bank Details Structured */}
+            {/* 4. Bank Card */}
+            <div className="coolie-card" style={{ marginTop: '20px' }}>
+                <h3 className="coolie-card-title" style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--md-sys-color-on-surface)' }}>
+                    {t.bankAndContact}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '15px' : '20px' }}>
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.bankNameTamil}</div>
@@ -750,7 +726,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.bankNameTamil}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.bankNameTamil : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.bankNameTamil && (
                                 <div className="dual-placeholder-overlay">
@@ -772,7 +748,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.bankName}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.bankNameEnglish : ""}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.bankName && (
                                 <div className="dual-placeholder-overlay">
@@ -794,7 +770,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.accountNo}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.accountNo : ""}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.accountNo && (
                                 <div className="dual-placeholder-overlay">
@@ -816,7 +792,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.ifsc}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.ifscCode : ''}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.ifsc && (
                                 <div className="dual-placeholder-overlay">
@@ -838,7 +814,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.placeTamil}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.bankBranchTamil : ""}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.placeTamil && (
                                 <div className="dual-placeholder-overlay">
@@ -860,7 +836,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={bankData.place}
                                 onChange={handleBankChange}
                                 placeholder={!showSubs ? t.bankBranchEnglish : ""}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !bankData.place && (
                                 <div className="dual-placeholder-overlay">
@@ -870,8 +846,15 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Multiple Phone Numbers */}
+            {/* 5. Contact Card */}
+            <div className="coolie-card" style={{ marginTop: '20px' }}>
+                <h3 className="coolie-card-title" style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--md-sys-color-on-surface)' }}>
+                    {t.contact || 'Contact Information'}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '15px' : '20px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.phoneNumbers}</div>
@@ -885,7 +868,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                         value={phone}
                                         onChange={(e) => handlePhoneChange(idx, e.target.value)}
                                         placeholder={!showSubs ? t.phoneNumbers : ""}
-                                        style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                        className="coolie-input-field"
                                     />
                                     {showSubs && !phone && (
                                         <div className="dual-placeholder-overlay">
@@ -916,7 +899,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         </button>
                     </div>
 
-                    <div>
+                    <div style={{ gridColumn: 'span 2' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
                             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text)' }}>{t.email}</div>
                             {showSubs && <div style={{ fontSize: '11px', fontWeight: 'normal' }}>Email</div>}
@@ -928,7 +911,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder={!showSubs ? t.email : ""}
-                                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-input-bg)', color: 'var(--color-text)' }}
+                                className="coolie-input-field"
                             />
                             {showSubs && !formData.email && (
                                 <div className="dual-placeholder-overlay">
@@ -939,18 +922,11 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         </div>
                     </div>
 
-                    {/* Hidden fields for valid HTML form logic if needed, or just omitted visually */}
-                    <div style={{ display: 'none' }}>
-                        <input name="gstin" value="" readOnly />
-                    </div>
-
-                    <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                    {/* Footer Actions */}
+                    <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--md-sys-color-outline-variant)', paddingTop: '20px' }}>
                         <button
                             onClick={handleSave}
-                            style={{
-                                background: 'var(--color-primary)', color: 'white', border: 'none', padding: '10px 25px', borderRadius: '8px', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                            }}
+                            className="coolie-primary-btn"
                         >
                             <IconSave size={20} />
                             <div style={{ textAlign: 'left', lineHeight: '1.2' }}>
@@ -960,7 +936,7 @@ function CoolieBusinessManager({ t, language, onSaveSuccess }) {
                         </button>
                     </div>
                 </div>
-            </div >
+            </div>
         </div >
     );
 }
