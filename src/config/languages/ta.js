@@ -7,7 +7,7 @@ export const tamil = {
     welcomeBack: 'நல்வரவு!',
     login: 'உள்நுழைக',
     test: 'சோதனை',
-    reset: 'மீட்டமைக்க',
+    reset: 'மீட்டமைக்கkk',
     loading: 'ஏற்றுகிறது...',
     error: 'பிழை',
     noBills: 'பில்கள் இல்லை',
@@ -16,7 +16,7 @@ export const tamil = {
     searchPlaceholder: 'தேடுக...',
     selectCustomer: 'தேர்ந்தெடுக்கவும்', // Merchant
     silksDashboard: 'மளிகை பில்',
-    slksBills: 'மளிகை பில்',
+    slksBills: 'மளிகைhhhh பில்',
     invoices: 'இன்வாய்ஸ்கள்',
     newBillDesc: 'புதிய பில் உருவாக்கவும்',
     error_customer: 'செல்லுபடியாகும் வணிகரைத் தேர்ந்தெடுக்கவும்.',
